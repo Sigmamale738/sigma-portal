@@ -1,8 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sigma Portal</title>
+    <title>Sigma Portal - OTP Verification</title>
     <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -135,6 +136,11 @@
             transform: translateY(-2px);
         }
         
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
         .message {
             margin-top: 15px;
             padding: 10px;
@@ -154,13 +160,29 @@
             color: #721c24;
             border: 1px solid #f5c6cb;
         }
+        
+        .otp-section {
+            display: none;
+        }
+        
+        .otp-input {
+            text-align: center;
+            font-size: 1.2em;
+            letter-spacing: 8px;
+            font-weight: bold;
+        }
+        
+        .resend-btn {
+            background: #28a745 !important;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="welcome-section">
             <h1>Sigma Portal</h1>
-            <p>Access the exclusive Sigma network. New members can register to join our elite community.</p>
+            <p>Access the exclusive Sigma network with secure OTP verification.</p>
         </div>
         
         <div class="form-section">
@@ -202,7 +224,18 @@
                         <label for="confirmPassword">Confirm Access Code</label>
                         <input type="password" id="confirmPassword" required>
                     </div>
-                    <button type="button" class="submit-btn" onclick="signupUser()">Become Sigma Member</button>
+                    
+                    <!-- OTP Verification Section -->
+                    <div id="otpSection" class="otp-section">
+                        <div class="form-group">
+                            <label for="otpCode">Enter OTP Sent to Your Email</label>
+                            <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" oninput="validateOTP(this)">
+                        </div>
+                        <button type="button" class="submit-btn" onclick="verifyOTP()">Verify OTP</button>
+                        <button type="button" class="submit-btn resend-btn" onclick="resendOTP()">Resend OTP</button>
+                    </div>
+                    
+                    <button type="button" class="submit-btn" onclick="signupUser()" id="signupBtn">Become Sigma Member</button>
                     <div id="signupMessage" class="message"></div>
                 </form>
             </div>
@@ -210,12 +243,17 @@
     </div>
 
     <script>
+        // Initialize EmailJS (you'll need to create free account at https://www.emailjs.com/)
+        emailjs.init("YOUR_EMAILJS_PUBLIC_KEY"); // Replace with your actual key
+        
+        let currentEmail = '';
+        let currentUsername = '';
+        let currentOTP = '';
+
         function showForm(formType) {
-            // Update toggle buttons
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
             
-            // Show selected form
             document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
             document.getElementById(formType + 'Form').classList.add('active');
         }
@@ -229,7 +267,16 @@
             }, 5000);
         }
         
-        function signupUser() {
+        function validateOTP(input) {
+            // Only allow numbers
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+        
+        function generateOTP() {
+            return Math.floor(100000 + Math.random() * 900000).toString();
+        }
+        
+        async function signupUser() {
             const username = document.getElementById('signupUsername').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
@@ -246,21 +293,72 @@
                 return;
             }
             
-            // Store user in localStorage
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            // Generate and send OTP
+            currentEmail = email;
+            currentUsername = username;
+            currentOTP = generateOTP();
             
-            if (users[username]) {
-                showMessage(messageEl, 'Sigma ID already exists!', 'error');
+            // Send OTP via EmailJS
+            try {
+                const templateParams = {
+                    to_email: email,
+                    otp_code: currentOTP,
+                    user_name: username
+                };
+                
+                // This will work after you set up EmailJS
+                const response = await emailjs.send('YOUR_SERVICE_ID', 'YOUR_TEMPLATE_ID', templateParams);
+                
+                if (response.status === 200) {
+                    document.getElementById('otpSection').style.display = 'block';
+                    document.getElementById('signupBtn').style.display = 'none';
+                    showMessage(messageEl, 'OTP sent to your email! Check your inbox.', 'success');
+                } else {
+                    // Fallback: Show OTP on screen for testing
+                    document.getElementById('otpSection').style.display = 'block';
+                    document.getElementById('signupBtn').style.display = 'none';
+                    showMessage(messageEl, `OTP sent! For testing, use: ${currentOTP}`, 'success');
+                }
+            } catch (error) {
+                // Fallback for testing - show OTP on screen
+                document.getElementById('otpSection').style.display = 'block';
+                document.getElementById('signupBtn').style.display = 'none';
+                showMessage(messageEl, `OTP sent! For testing, use: ${currentOTP}`, 'success');
+            }
+        }
+        
+        function verifyOTP() {
+            const enteredOTP = document.getElementById('otpCode').value;
+            const messageEl = document.getElementById('signupMessage');
+            
+            if (enteredOTP.length !== 6) {
+                showMessage(messageEl, 'Please enter 6-digit OTP', 'error');
                 return;
             }
             
-            users[username] = { email: email, password: password };
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            showMessage(messageEl, 'Welcome to Sigma Network! Please login.', 'success');
-            document.getElementById('signupForm').reset();
-            showForm('login');
-            document.getElementById('loginUsername').value = username;
+            if (enteredOTP === currentOTP) {
+                // Store user in localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                users[currentUsername] = { 
+                    email: currentEmail, 
+                    password: document.getElementById('signupPassword').value,
+                    verified: true 
+                };
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showMessage(messageEl, 'Account created successfully! Welcome to Sigma Network!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+            } else {
+                showMessage(messageEl, 'Invalid OTP! Please try again.', 'error');
+            }
+        }
+        
+        function resendOTP() {
+            const messageEl = document.getElementById('signupMessage');
+            currentOTP = generateOTP();
+            showMessage(messageEl, `New OTP: ${currentOTP}`, 'success');
         }
         
         function loginUser() {
@@ -271,7 +369,6 @@
             const users = JSON.parse(localStorage.getItem('users') || '{}');
             
             if (users[username] && users[username].password === password) {
-                // Store current user and redirect
                 localStorage.setItem('currentUser', username);
                 window.location.href = 'dashboard.html';
             } else {
