@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sigma Portal - Dashboard</title>
+    <meta charset="UTF-8">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: #f8f9fa;
+        }
+        
+        .navbar {
+            background: white;
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .nav-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .nav-user {
+            color: #666;
+        }
+        
+        .logout-btn {
+            background: #dc3545;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+        
+        .welcome-card {
+            background: white;
+            padding: 3rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .welcome-card h1 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .welcome-card p {
+            color: #666;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        
+        .stat-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 1.1em;
+        }
+        
+        .sigma-features {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+        
+        .sigma-features h3 {
+            color: #333;
+            margin-bottom: 1rem;
+        }
+        
+        .sigma-features ul {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .sigma-features li {
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .sigma-features li:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-brand">Σ Sigma Portal</div>
+        <div class="nav-user">
+            Welcome, <span id="username">Sigma Member</span>!
+            <a href="index.html" class="logout-btn">Exit Network</a>
+        </div>
+    </nav>
+    
+    <div class="container">
+        <div class="welcome-card">
+            <h1>🎯 Welcome to Sigma Network</h1>
+            <p>You have successfully accessed the exclusive Sigma portal.</p>
+            <p><strong>Sigma Status: ACTIVE | Clearance Level: GRANTED</strong></p>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="userCount">1</div>
+                <div class="stat-label">Sigma Members</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">100%</div>
+                <div class="stat-label">Network Uptime</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">🔒</div>
+                <div class="stat-label">Security Level</div>
+            </div>
+        </div>
+        
+        <div class="sigma-features">
+            <h3>Σ Sigma Network Features</h3>
+            <ul>
+                <li>✅ Elite Member Access</li>
+                <li>✅ Secure Communication</li>
+                <li>✅ Priority Network Resources</li>
+                <li>✅ Exclusive Sigma Tools</li>
+                <li>✅ 24/7 Network Monitoring</li>
+                <li>✅ Encrypted Data Channels</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is logged in
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
+            window.location.href = 'index.html';
+        } else {
+            document.getElementById('username').textContent = currentUser;
+        }
+        
+        // Show user count
+        const users = JSON.parse(localStorage.getItem('users') || '{}');
+        document.getElementById('userCount').textContent = Object.keys(users).length;
+    </script>
+</body>
+</html>
