@@ -1,3 +1,16 @@
+#!/bin/bash
+
+echo "📧 EmailJS Credentials Setup"
+echo "============================"
+
+read -p "Enter EmailJS Public Key: " PUBLIC_KEY
+read -p "Enter EmailJS Service ID: " SERVICE_ID  
+read -p "Enter EmailJS Template ID: " TEMPLATE_ID
+
+cd ~/website
+
+# Create updated index.html with real credentials
+cat > index.html.tmp << 'HTML_EOF'
 <!DOCTYPE html>
 <html>
 <head>
@@ -226,3 +239,17 @@
     </script>
 </body>
 </html>
+HTML_EOF
+
+# Replace the file
+mv index.html.tmp index.html
+
+echo "✅ EmailJS credentials updated in index.html"
+echo "🚀 Pushing to GitHub..."
+
+git add .
+git commit -m "Added real EmailJS OTP integration"
+git push
+
+echo "🎉 Done! Your OTP system is now live with real emails!"
+echo "🌐 Visit: https://Sigmamale738.github.io/sigma-portal"
