@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sigma Portal - Professional OTP System</title>
+    <meta charset="UTF-8">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { display: flex; width: 100%; max-width: 900px; background: white; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        .welcome-section { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
+        .form-section { flex: 1; padding: 50px; }
+        .welcome-section h1 { font-size: 2.5em; margin-bottom: 20px; }
+        .welcome-section p { font-size: 1.1em; opacity: 0.9; line-height: 1.6; }
+        .form-container { width: 100%; }
+        .form-toggle { display: flex; margin-bottom: 30px; border-bottom: 2px solid #eee; }
+        .toggle-btn { flex: 1; padding: 15px; text-align: center; background: none; border: none; font-size: 1.1em; font-weight: 600; color: #666; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; }
+        .form { display: none; }
+        .form.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input { width: 100%; padding: 15px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+        .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: transform 0.2s ease; }
+        .submit-btn:hover { transform: translateY(-2px); }
+        .submit-btn:disabled { background: #ccc; cursor: not-allowed; }
+        .message { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .otp-section { display: none; }
+        .otp-input { text-align: center; font-size: 1.2em; letter-spacing: 8px; font-weight: bold; }
+        .resend-btn { background: #28a745 !important; margin-top: 10px; }
+        .loading { opacity: 0.6; pointer-events: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="welcome-section">
+            <h1>Sigma Portal</h1>
+            <p>Professional OTP verification system with real email delivery.</p>
+        </div>
+        
+        <div class="form-section">
+            <div class="form-container">
+                <div class="form-toggle">
+                    <button class="toggle-btn active" onclick="showForm('login')">Login</button>
+                    <button class="toggle-btn" onclick="showForm('signup')">Join Sigma</button>
+                </div>
+                
+                <!-- Signup Form -->
+                <form id="signupForm" class="form">
+                    <div class="form-group">
+                        <label for="signupUsername">Choose Sigma ID</label>
+                        <input type="text" id="signupUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupEmail">Sigma Email</label>
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signupPassword">Create Access Code</label>
+                        <input type="password" id="signupPassword" required minlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label for="confirmPassword">Confirm Access Code</label>
+                        <input type="password" id="confirmPassword" required>
+                    </div>
+                    
+                    <!-- OTP Verification Section -->
+                    <div id="otpSection" class="otp-section">
+                        <div class="form-group">
+                            <label for="otpCode">Enter OTP Sent to Your Email</label>
+                            <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" oninput="validateOTP(this)">
+                        </div>
+                        <button type="button" class="submit-btn" onclick="verifyOTP()" id="verifyBtn">Verify OTP</button>
+                        <button type="button" class="submit-btn resend-btn" onclick="resendOTP()" id="resendBtn">Resend OTP</button>
+                    </div>
+                    
+                    <button type="button" class="submit-btn" onclick="signupUser()" id="signupBtn">Become Sigma Member</button>
+                    <div id="signupMessage" class="message"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentEmail = '';
+        let currentUsername = '';
+
+        function showForm(formType) {
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
+            document.getElementById(formType + 'Form').classList.add('active');
+        }
+        
+        function showMessage(element, message, type) {
+            element.textContent = message;
+            element.className = 'message ' + type;
+            element.style.display = 'block';
+            setTimeout(() => {
+                element.style.display = 'none';
+            }, 5000);
+        }
+        
+        function validateOTP(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+        
+        function setLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+        
+        async function signupUser() {
+            const username = document.getElementById('signupUsername').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageEl = document.getElementById('signupMessage');
+            const signupBtn = document.getElementById('signupBtn');
+            
+            if (password !== confirmPassword) {
+                showMessage(messageEl, 'Access codes do not match!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage(messageEl, 'Access code must be at least 6 characters!', 'error');
+                return;
+            }
+            
+            currentEmail = email;
+            currentUsername = username;
+            
+            setLoading(signupBtn, true);
+            
+            try {
+                const response = await fetch('/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: email, username: username })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    document.getElementById('otpSection').style.display = 'block';
+                    document.getElementById('signupBtn').style.display = 'none';
+                    showMessage(messageEl, '✅ OTP sent to your email! Check your inbox.', 'success');
+                } else {
+                    showMessage(messageEl, '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, '❌ Network error. Please try again.', 'error');
+            } finally {
+                setLoading(signupBtn, false);
+            }
+        }
+        
+        async function verifyOTP() {
+            const enteredOTP = document.getElementById('otpCode').value;
+            const messageEl = document.getElementById('signupMessage');
+            const verifyBtn = document.getElementById('verifyBtn');
+            
+            if (enteredOTP.length !== 6) {
+                showMessage(messageEl, 'Please enter 6-digit OTP', 'error');
+                return;
+            }
+            
+            setLoading(verifyBtn, true);
+            
+            try {
+                const response = await fetch('/verify-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: currentEmail, otp: enteredOTP })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store user in localStorage
+                    const users = JSON.parse(localStorage.getItem('users') || '{}');
+                    users[currentUsername] = { 
+                        email: currentEmail, 
+                        password: document.getElementById('signupPassword').value,
+                        verified: true 
+                    };
+                    localStorage.setItem('users', JSON.stringify(users));
+                    
+                    showMessage(messageEl, '✅ Account verified! Welcome to Sigma Network!', 'success');
+                    setTimeout(() => {
+                        window.location.href = '/dashboard';
+                    }, 2000);
+                } else {
+                    showMessage(messageEl, '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, '❌ Network error. Please try again.', 'error');
+            } finally {
+                setLoading(verifyBtn, false);
+            }
+        }
+        
+        async function resendOTP() {
+            const messageEl = document.getElementById('signupMessage');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            setLoading(resendBtn, true);
+            
+            try {
+                const response = await fetch('/send-otp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email: currentEmail, username: currentUsername })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    showMessage(messageEl, '✅ New OTP sent to your email!', 'success');
+                } else {
+                    showMessage(messageEl, '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage(messageEl, '❌ Network error. Please try again.', 'error');
+            } finally {
+                setLoading(resendBtn, false);
+            }
+        }
+    </script>
+</body>
+</html>
