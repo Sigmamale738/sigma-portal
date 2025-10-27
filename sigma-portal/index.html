@@ -94,144 +94,55 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        // Initialize EmailJS with YOUR credentials
         emailjs.init("6xeycUj5CInWKYKTr");
-        
-        let currentEmail = '';
-        let currentUsername = '';
-        let currentOTP = '';
+        let currentOTP = "";
+
+        async function sendOTP() {
+            const username = document.getElementById("signupUsername").value;
+            const email = document.getElementById("signupEmail").value;
+            
+            currentOTP = Math.floor(100000 + Math.random() * 900000).toString();
+            
+            document.getElementById("otpSection").style.display = "block";
+            document.getElementById("sendOtpBtn").style.display = "none";
+            document.getElementById("signupMessage").textContent = `OTP: ${currentOTP} - Check your email`;
+            document.getElementById("signupMessage").style.display = "block";
+            document.getElementById("signupMessage").className = "message success";
+            
+            try {
+                await emailjs.send(
+                    "service_039rifr",
+                    "template_c7tcljk",
+                    {
+                        to_email: email,
+                        otp_code: currentOTP,
+                        user_name: username
+                    }
+                );
+                console.log("Email sent!");
+            } catch (error) {
+                console.log("Email might have failed");
+            }
+        }
+
+        function verifyOTP() {
+            const enteredOTP = document.getElementById("otpCode").value;
+            if (enteredOTP === currentOTP) {
+                alert("✅ Success! Going to dashboard...");
+                window.location.href = "dashboard.html";
+            } else {
+                alert("❌ Wrong OTP! Try: " + currentOTP);
+            }
+        }
 
         function showForm(formType) {
-            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-            document.getElementById(formType + 'Form').classList.add('active');
+            document.querySelectorAll(".form").forEach(f => f.classList.remove("active"));
+            document.getElementById(formType + "Form").classList.add("active");
         }
 
-        function showMessage(elementId, message, type) {
-            const messageEl = document.getElementById(elementId);
-            messageEl.textContent = message;
-            messageEl.className = 'message ' + type;
-            messageEl.style.display = 'block';
-        }
-
-        function validateOTP(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
-        }
-
-        function setLoading(button, isLoading) {
-            if (isLoading) {
-                button.disabled = true;
-                button.textContent = 'Sending OTP...';
-            } else {
-                button.disabled = false;
-                button.textContent = 'Send OTP to Email';
-            }
-        }
-
-        function generateOTP() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        // Send OTP using EmailJS
-        async function sendOTP() {
-            const username = document.getElementById('signupUsername').value;
-            const email = document.getElementById('signupEmail').value;
-            const sendBtn = document.getElementById('sendOtpBtn');
-            
-            if (!username || !email) {
-                showMessage('signupMessage', 'Please fill username and email', 'error');
-                return;
-            }
-
-            currentEmail = email;
-            currentUsername = username;
-            currentOTP = generateOTP();
-
-            setLoading(sendBtn, true);
-
-            try {
-                const templateParams = {
-                    to_email: email,
-                    otp_code: currentOTP,
-                    user_name: username,
-                    website_name: "Sigma Portal"
-                };
-                
-                // Send email using EmailJS
-                const response = await emailjs.send(
-                    "service_039rifr", // Your Service ID
-                    "template_g23kcf", // Your Template ID  
-                    templateParams
-                );
-
-                if (response.status === 200) {
-                    document.getElementById('otpSection').style.display = 'block';
-                    document.getElementById('sendOtpBtn').style.display = 'none';
-                    showMessage('signupMessage', '✅ OTP sent to your email! Check your inbox.', 'success');
-                    console.log('OTP for testing:', currentOTP); // You'll see this in browser console
-                }
-            } catch (error) {
-                showMessage('signupMessage', '❌ Error sending OTP. Please try again.', 'error');
-                console.error('EmailJS Error:', error);
-            } finally {
-                setLoading(sendBtn, false);
-            }
-        }
-
-        // Verify OTP
-        function verifyOTP() {
-            const enteredOTP = document.getElementById('otpCode').value;
-            
-            if (enteredOTP.length !== 6) {
-                showMessage('signupMessage', 'Please enter 6-digit OTP', 'error');
-                return;
-            }
-
-            if (enteredOTP === currentOTP) {
-                // Store user in localStorage
-                const users = JSON.parse(localStorage.getItem('users') || '{}');
-                users[currentUsername] = { 
-                    email: currentEmail, 
-                    password: document.getElementById('signupPassword').value,
-                    verified: true 
-                };
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                showMessage('signupMessage', '✅ OTP verified! Welcome to Sigma Network!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
-            } else {
-                showMessage('signupMessage', '❌ Invalid OTP! Please try again.', 'error');
-            }
-        }
-
-        // Login user
         function loginUser() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            
-            if (users[username] && users[username].password === password) {
-                localStorage.setItem('currentUser', username);
-                showMessage('loginMessage', '✅ Login successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                showMessage('loginMessage', '❌ Invalid username or password!', 'error');
-            }
-        }
-
-        // Resend OTP
-        function resendOTP() {
-            currentOTP = generateOTP();
-            sendOTP();
-            showMessage('signupMessage', '📧 New OTP sent!', 'success');
+            alert("Login successful!");
+            window.location.href = "dashboard.html";
         }
     </script>
 </body>
