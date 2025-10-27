@@ -1,217 +1,92 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sigma Portal - Elite Access</title>
+    <title>Sigma Portal - Cloud Database</title>
     <meta charset="UTF-8">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .container {
-            display: flex;
-            width: 100%;
-            max-width: 900px;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
-        
-        .welcome-section {
-            flex: 1;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 50px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-        
-        .form-section {
-            flex: 1;
-            padding: 50px;
-        }
-        
-        .welcome-section h1 {
-            font-size: 2.5em;
-            margin-bottom: 20px;
-        }
-        
-        .welcome-section p {
-            font-size: 1.1em;
-            opacity: 0.9;
-            line-height: 1.6;
-        }
-        
-        .domain-badge {
-            background: rgba(255,255,255,0.2);
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-top: 10px;
-        }
-        
-        .form-container {
-            width: 100%;
-        }
-        
-        .form-toggle {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eee;
-        }
-        
-        .toggle-btn {
-            flex: 1;
-            padding: 15px;
-            text-align: center;
-            background: none;
-            border: none;
-            font-size: 1.1em;
-            font-weight: 600;
-            color: #666;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .toggle-btn.active {
-            color: #667eea;
-            border-bottom: 3px solid #667eea;
-            margin-bottom: -2px;
-        }
-        
-        .form {
-            display: none;
-        }
-        
-        .form.active {
-            display: block;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .form-group input {
-            width: 100%;
-            padding: 15px;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            font-size: 1em;
-            transition: border-color 0.3s ease;
-        }
-        
-        .form-group input:focus {
-            outline: none;
-            border-color: #667eea;
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-2px);
-        }
-        
-        .message {
-            margin-top: 15px;
-            padding: 10px;
-            border-radius: 5px;
-            text-align: center;
-            display: none;
-        }
-        
-        .success {
-            background: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-        }
-        
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-        }
+        /* YOUR EXISTING CSS - KEEP EVERYTHING THE SAME */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { display: flex; width: 100%; max-width: 900px; background: white; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
+        .welcome-section { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
+        .form-section { flex: 1; padding: 50px; }
+        .welcome-section h1 { font-size: 2.5em; margin-bottom: 20px; }
+        .welcome-section p { font-size: 1.1em; opacity: 0.9; line-height: 1.6; }
+        .form-container { width: 100%; }
+        .form-toggle { display: flex; margin-bottom: 30px; border-bottom: 2px solid #eee; }
+        .toggle-btn { flex: 1; padding: 15px; text-align: center; background: none; border: none; font-size: 1.1em; font-weight: 600; color: #666; cursor: pointer; transition: all 0.3s ease; }
+        .toggle-btn.active { color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; }
+        .form { display: none; }
+        .form.active { display: block; }
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
+        .form-group input { width: 100%; padding: 15px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease; }
+        .form-group input:focus { outline: none; border-color: #667eea; }
+        .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: transform 0.2s ease; }
+        .submit-btn:hover { transform: translateY(-2px); }
+        .message { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .otp-section { display: none; }
+        .otp-input { text-align: center; font-size: 1.2em; letter-spacing: 8px; font-weight: bold; }
+        .resend-btn { background: #28a745 !important; margin-top: 10px; }
+        .loading { opacity: 0.6; pointer-events: none; }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="welcome-section">
             <h1>Sigma Portal</h1>
-            <p>Access the exclusive Sigma network with secure authentication.</p>
-            <div class="domain-badge">sigmamale.site</div>
+            <p>Cloud database - Login from any device</p>
         </div>
         
         <div class="form-section">
             <div class="form-container">
                 <div class="form-toggle">
-                    <button class="toggle-btn active" onclick="showForm('login')">Login</button>
-                    <button class="toggle-btn" onclick="showForm('signup')">Join Sigma</button>
+                    <button class="toggle-btn" onclick="showForm('login')">Login</button>
+                    <button class="toggle-btn active" onclick="showForm('signup')">Join Sigma</button>
                 </div>
                 
                 <!-- Login Form -->
-                <form id="loginForm" class="form active">
+                <form id="loginForm" class="form">
                     <div class="form-group">
                         <label for="loginUsername">Sigma ID</label>
                         <input type="text" id="loginUsername" required>
                     </div>
                     <div class="form-group">
-                        <label for="loginPassword">Access Code</label>
+                        <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <button type="button" class="submit-btn" onclick="loginUser()">Enter Sigma Network</button>
+                    <button type="button" class="submit-btn" onclick="loginUser()">Login to Sigma Network</button>
                     <div id="loginMessage" class="message"></div>
                 </form>
                 
-                <!-- Signup Form -->
-                <form id="signupForm" class="form">
+                <!-- Signup Form with OTP -->
+                <form id="signupForm" class="form active">
                     <div class="form-group">
                         <label for="signupUsername">Choose Sigma ID</label>
                         <input type="text" id="signupUsername" required>
                     </div>
                     <div class="form-group">
-                        <label for="signupEmail">Sigma Email</label>
+                        <label for="signupEmail">Your Email</label>
                         <input type="email" id="signupEmail" required>
                     </div>
                     <div class="form-group">
-                        <label for="signupPassword">Create Access Code</label>
+                        <label for="signupPassword">Create Password</label>
                         <input type="password" id="signupPassword" required minlength="6">
                     </div>
-                    <div class="form-group">
-                        <label for="confirmPassword">Confirm Access Code</label>
-                        <input type="password" id="confirmPassword" required>
+                    
+                    <!-- OTP Section -->
+                    <div id="otpSection" class="otp-section">
+                        <div class="form-group">
+                            <label for="otpCode">Enter OTP</label>
+                            <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" oninput="validateOTP(this)">
+                        </div>
+                        <button type="button" class="submit-btn" onclick="verifyOTP()">Verify OTP & Register</button>
+                        <button type="button" class="submit-btn resend-btn" onclick="resendOTP()">Resend OTP</button>
                     </div>
-                    <button type="button" class="submit-btn" onclick="signupUser()">Become Sigma Member</button>
+                    
+                    <button type="button" class="submit-btn" onclick="sendOTP()" id="sendOtpBtn">Send OTP to Email</button>
                     <div id="signupMessage" class="message"></div>
                 </form>
             </div>
@@ -219,6 +94,13 @@
     </div>
 
     <script>
+        // Your Worker API URL
+        const API_URL = 'https://sigmamale.site/api/user';
+        
+        let currentEmail = '';
+        let currentUsername = '';
+        let currentOTP = '';
+
         function showForm(formType) {
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -226,63 +108,167 @@
             document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
             document.getElementById(formType + 'Form').classList.add('active');
         }
-        
-        function showMessage(element, message, type) {
-            element.textContent = message;
-            element.className = 'message ' + type;
-            element.style.display = 'block';
-            setTimeout(() => {
-                element.style.display = 'none';
-            }, 5000);
+
+        function showMessage(elementId, message, type) {
+            const messageEl = document.getElementById(elementId);
+            messageEl.textContent = message;
+            messageEl.className = 'message ' + type;
+            messageEl.style.display = 'block';
         }
-        
-        function signupUser() {
+
+        function validateOTP(input) {
+            input.value = input.value.replace(/[^0-9]/g, '');
+        }
+
+        function setLoading(button, isLoading) {
+            if (isLoading) {
+                button.classList.add('loading');
+                button.disabled = true;
+            } else {
+                button.classList.remove('loading');
+                button.disabled = false;
+            }
+        }
+
+        // Send OTP to email
+        async function sendOTP() {
             const username = document.getElementById('signupUsername').value;
             const email = document.getElementById('signupEmail').value;
             const password = document.getElementById('signupPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            const messageEl = document.getElementById('signupMessage');
+            const sendBtn = document.getElementById('sendOtpBtn');
             
-            if (password !== confirmPassword) {
-                showMessage(messageEl, 'Access codes do not match!', 'error');
+            if (!username || !email || !password) {
+                showMessage('signupMessage', 'Please fill all fields', 'error');
                 return;
             }
-            
+
             if (password.length < 6) {
-                showMessage(messageEl, 'Access code must be at least 6 characters!', 'error');
+                showMessage('signupMessage', 'Password must be at least 6 characters', 'error');
                 return;
             }
-            
-            // Store user in localStorage
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            
-            if (users[username]) {
-                showMessage(messageEl, 'Sigma ID already exists!', 'error');
-                return;
+
+            currentEmail = email;
+            currentUsername = username;
+
+            setLoading(sendBtn, true);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'send-otp',
+                        email: email,
+                        username: username
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    currentOTP = result.otp;
+                    document.getElementById('otpSection').style.display = 'block';
+                    document.getElementById('sendOtpBtn').style.display = 'none';
+                    showMessage('signupMessage', '✅ OTP sent! Check your email.', 'success');
+                    console.log('Debug OTP:', result.otp); // Remove in production
+                } else {
+                    showMessage('signupMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('signupMessage', '❌ Network error', 'error');
+            } finally {
+                setLoading(sendBtn, false);
             }
-            
-            users[username] = { email: email, password: password };
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            showMessage(messageEl, 'Welcome to Sigma Network! Please login.', 'success');
-            document.getElementById('signupForm').reset();
-            showForm('login');
-            document.getElementById('loginUsername').value = username;
         }
-        
-        function loginUser() {
+
+        // Verify OTP and register user
+        async function verifyOTP() {
+            const enteredOTP = document.getElementById('otpCode').value;
+            const password = document.getElementById('signupPassword').value;
+            
+            if (enteredOTP.length !== 6) {
+                showMessage('signupMessage', 'Please enter 6-digit OTP', 'error');
+                return;
+            }
+
+            if (enteredOTP !== currentOTP) {
+                showMessage('signupMessage', '❌ Invalid OTP!', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'register',
+                        username: currentUsername,
+                        email: currentEmail,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('signupMessage', '✅ Account created! Welcome to Sigma Network!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 2000);
+                } else {
+                    showMessage('signupMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('signupMessage', '❌ Registration failed', 'error');
+            }
+        }
+
+        // Login user
+        async function loginUser() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            
-            if (users[username] && users[username].password === password) {
-                localStorage.setItem('currentUser', username);
-                window.location.href = 'dashboard.html';
-            } else {
-                showMessage(messageEl, 'Invalid Sigma ID or Access Code!', 'error');
+            const loginBtn = document.querySelector('#loginForm .submit-btn');
+
+            setLoading(loginBtn, true);
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        action: 'login',
+                        username: username,
+                        password: password
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    showMessage('loginMessage', '✅ Login successful!', 'success');
+                    setTimeout(() => {
+                        window.location.href = 'dashboard.html';
+                    }, 1000);
+                } else {
+                    showMessage('loginMessage', '❌ ' + result.message, 'error');
+                }
+            } catch (error) {
+                showMessage('loginMessage', '❌ Login failed', 'error');
+            } finally {
+                setLoading(loginBtn, false);
             }
+        }
+
+        // Resend OTP
+        async function resendOTP() {
+            await sendOTP();
+            showMessage('signupMessage', '📧 New OTP sent!', 'success');
         }
     </script>
 </body>
