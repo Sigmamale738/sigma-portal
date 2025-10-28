@@ -1,230 +1,337 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sigma Portal - Dashboard</title>
+    <title>Sigma Portal - Public eBook Sharing</title>
     <meta charset="UTF-8">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
-        body { background: #f5f5f5; }
-        
-        .header { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8f9fa; }
+        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
         .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
-        
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
-        
-        .tabs { display: flex; background: white; border-radius: 10px; overflow: hidden; margin-bottom: 2rem; }
-        .tab { flex: 1; padding: 1rem; text-align: center; cursor: pointer; border: none; background: white; }
-        .tab.active { background: #667eea; color: white; }
-        
-        .content { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        
-        .upload-box { border: 2px dashed #667eea; padding: 2rem; text-align: center; border-radius: 10px; margin: 1rem 0; }
-        
-        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
-        button { background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
-        .primary-btn { background: #667eea; width: 100%; }
-        
-        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
-        .book-card { background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea; }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 2rem; }
+        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
+        .tab-btn.active { background: #667eea; color: white; }
+        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
+        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; }
+        .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 120px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; }
+        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
+        .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
+        .loading { text-align: center; padding: 2rem; color: #666; }
     </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
+            authDomain: "sigma-ebooks.firebaseapp.com",
+            projectId: "sigma-ebooks",
+            storageBucket: "sigma-ebooks.firebasestorage.app",
+            messagingSenderId: "916594333041",
+            appId: "1:916594333041:web:8085ad7e4082530248d2d0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firestore = db;
+        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where };
+    </script>
 </head>
 <body>
-    <div class="header">
-        <div class="logo">Σ Sigma Portal</div>
+    <nav class="navbar">
+        <div class="nav-brand">Σ Sigma Portal - PUBLIC DATABASE</div>
         <button class="logout-btn" onclick="logout()">Logout</button>
-    </div>
-
+    </nav>
+    
     <div class="container">
-        <h1>Welcome to Sigma eBook Sharing</h1>
+        <h1>📚 Public eBook Sharing</h1>
+        <p><strong>REAL PUBLIC DATABASE:</strong> Books are visible to ALL users worldwide</p>
         
-        <div class="tabs">
-            <button class="tab active" onclick="showTab('upload')">📤 Upload</button>
-            <button class="tab" onclick="showTab('library')">📚 Library</button>
-            <button class="tab" onclick="showTab('mybooks')">📂 My Books</button>
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="showTab('upload')">📤 Upload eBook</button>
+            <button class="tab-btn" onclick="showTab('library')">📚 Public Library</button>
+            <button class="tab-btn" onclick="showTab('mybooks')">📂 My Uploads</button>
         </div>
-
+        
         <!-- Upload Tab -->
-        <div id="upload" class="content">
-            <h2>Upload eBook</h2>
-            <p><strong>How it works:</strong> Upload to Google Drive → Get shareable link → Add here</p>
+        <div id="upload" class="tab-content active">
+            <h2>Upload to Public Library</h2>
             
-            <div class="upload-box">
-                <h3>🚀 Quick Upload Guide</h3>
-                <ol style="text-align: left; margin: 1rem 0;">
-                    <li>Go to <a href="https://drive.google.com" target="_blank">Google Drive</a></li>
-                    <li>Upload your eBook file</li>
-                    <li>Right-click → "Get shareable link"</li>
-                    <li>Set to "Anyone with link can view"</li>
-                    <li>Paste the link below</li>
+            <div class="guide-box">
+                <h3>🚀 How to Upload:</h3>
+                <ol>
+                    <li>Upload eBook to <strong>Google Drive</strong></li>
+                    <li>Get <strong>shareable link</strong> (anyone can view)</li>
+                    <li>Add book details below</li>
+                    <li>Book becomes <strong>PUBLIC</strong> to all users worldwide</li>
                 </ol>
                 <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
             </div>
-
-            <form onsubmit="addBook(event)">
-                <input type="text" id="bookTitle" placeholder="Book Title" required>
-                <input type="text" id="bookAuthor" placeholder="Author Name" required>
-                <textarea id="bookDesc" placeholder="Book Description" rows="3"></textarea>
+            
+            <form onsubmit="addBookToPublicLibrary(event)">
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" id="bookTitle" placeholder="Enter book title" required>
+                </div>
                 
-                <select id="bookCategory">
-                    <option>Programming</option>
-                    <option>Science</option>
-                    <option>Education</option>
-                    <option>Fiction</option>
-                </select>
+                <div class="form-group">
+                    <label>Author Name *</label>
+                    <input type="text" id="bookAuthor" placeholder="Author name" required>
+                </div>
                 
-                <input type="url" id="bookLink" placeholder="Google Drive Link" required>
+                <div class="form-group">
+                    <label>Book Description</label>
+                    <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
+                </div>
                 
-                <button type="submit" class="primary-btn">➕ Add to Library</button>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="bookCategory">
+                        <option>Programming & Tech</option>
+                        <option>Science & Education</option>
+                        <option>Fiction & Literature</option>
+                        <option>Business & Finance</option>
+                        <option>Self Development</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Google Drive Link *</label>
+                    <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
+                    <small style="color: #666;">Make sure the link is set to "Anyone with link can view"</small>
+                </div>
+                
+                <button type="submit" class="upload-btn">🌐 Add to PUBLIC Library</button>
             </form>
         </div>
-
-        <!-- Library Tab -->
-        <div id="library" class="content" style="display: none;">
-            <h2>eBook Library</h2>
-            <p>Download books shared by the community</p>
+        
+        <!-- Public Library Tab -->
+        <div id="library" class="tab-content">
+            <h2>📚 Public eBook Library</h2>
+            <p>Books shared by ALL Sigma users worldwide</p>
             
-            <div class="books-grid" id="libraryGrid">
-                <div class="book-card">
-                    <strong>JavaScript Guide</strong><br>
-                    By John Developer<br>
-                    <small>Programming • 15 downloads</small><br>
-                    <button onclick="downloadBook('https://drive.google.com')">📥 Download</button>
-                </div>
+            <div class="books-grid" id="publicLibraryGrid">
+                <div class="loading">Loading public books from Firebase database...</div>
             </div>
         </div>
-
+        
         <!-- My Books Tab -->
-        <div id="mybooks" class="content" style="display: none;">
-            <h2>My Uploads</h2>
-            <p>Books you've shared</p>
+        <div id="mybooks" class="tab-content">
+            <h2>My Uploaded eBooks</h2>
+            <p>Books you've shared with the global community</p>
+            
             <div class="books-grid" id="myBooksGrid">
-                <!-- User's books will appear here -->
+                <div class="loading">Loading your books from Firebase database...</div>
             </div>
         </div>
     </div>
 
     <script>
         // Check login
-        if (!localStorage.getItem('currentUser')) {
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
             window.location.href = 'index.html';
         }
 
-        // Tab system
-        function showTab(tabName) {
-            // Hide all content
-            document.querySelectorAll('.content').forEach(tab => {
-                tab.style.display = 'none';
-            });
-            
-            // Remove active from all tabs
-            document.querySelectorAll('.tab').forEach(tab => {
-                tab.classList.remove('active');
-            });
-            
-            // Show selected tab
-            document.getElementById(tabName).style.display = 'block';
+        // Wait for Firebase to load
+        let firebaseReady = false;
+        const checkFirebase = setInterval(() => {
+            if (window.firestore && window.firestoreFunctions) {
+                firebaseReady = true;
+                clearInterval(checkFirebase);
+                loadPublicBooks();
+                loadMyBooks();
+            }
+        }, 100);
+
+        // Tab navigation
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
             
-            // Load data if needed
-            if (tabName === 'library') loadLibrary();
-            if (tabName === 'mybooks') loadMyBooks();
+            if (tabId === 'library') loadPublicBooks();
+            if (tabId === 'mybooks') loadMyBooks();
         }
 
-        // Add book function
-        function addBook(event) {
+        // Add book to PUBLIC Firestore database
+        async function addBookToPublicLibrary(event) {
             event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
             
             const title = document.getElementById('bookTitle').value;
             const author = document.getElementById('bookAuthor').value;
-            const link = document.getElementById('bookLink').value;
+            const description = document.getElementById('bookDescription').value;
+            const category = document.getElementById('bookCategory').value;
+            const driveLink = document.getElementById('driveLink').value;
             
-            if (!title || !author || !link) {
-                alert('Please fill all fields');
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
                 return;
             }
 
-            // Get existing books
-            let books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
-            
-            // Add new book
-            books.push({
-                id: Date.now(),
-                title: title,
-                author: author,
-                link: link,
-                category: document.getElementById('bookCategory').value,
-                description: document.getElementById('bookDesc').value,
-                uploadedBy: localStorage.getItem('currentUser'),
-                downloads: 0,
-                date: new Date().toLocaleDateString()
-            });
-            
-            // Save back
-            localStorage.setItem('sigmaBooks', JSON.stringify(books));
-            
-            alert('✅ Book added to library!');
-            event.target.reset();
-            loadLibrary();
-            loadMyBooks();
-        }
+            try {
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                // Add to Firestore (PUBLIC DATABASE)
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    driveLink: driveLink,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
+                });
 
-        // Load library books
-        function loadLibrary() {
-            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
-            const grid = document.getElementById('libraryGrid');
-            
-            if (books.length === 0) {
-                grid.innerHTML = '<p>No books yet. Be the first to upload!</p>';
-                return;
+                alert(`✅ "${title}" added to PUBLIC library! All users worldwide can see it now.`);
+                event.target.reset();
+                
+                // Refresh displays
+                loadPublicBooks();
+                loadMyBooks();
+                
+            } catch (error) {
+                alert('Error adding book: ' + error.message);
+                console.error('Firebase error:', error);
             }
-            
-            grid.innerHTML = books.map(book => `
-                <div class="book-card">
-                    <strong>${book.title}</strong><br>
-                    By ${book.author}<br>
-                    <small>${book.category} • ${book.downloads} downloads</small><br>
-                    <button onclick="downloadBook('${book.link}', ${book.id})">📥 Download</button>
-                </div>
-            `).join('');
         }
 
-        // Load user's books
-        function loadMyBooks() {
-            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
-            const user = localStorage.getItem('currentUser');
-            const userBooks = books.filter(book => book.uploadedBy === user);
-            const grid = document.getElementById('myBooksGrid');
+        // Load ALL books from PUBLIC database
+        async function loadPublicBooks() {
+            if (!firebaseReady) return;
             
-            if (userBooks.length === 0) {
-                grid.innerHTML = '<p>You haven\'t uploaded any books yet.</p>';
-                return;
+            try {
+                const { collection, getDocs, query, orderBy } = window.firestoreFunctions;
+                
+                const q = query(collection(window.firestore, 'books'), orderBy('uploadDate', 'desc'));
+                const snapshot = await getDocs(q);
+                
+                const grid = document.getElementById('publicLibraryGrid');
+                
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">No books in public library yet. Be the first to upload!</div>';
+                    return;
+                }
+                
+                grid.innerHTML = snapshot.docs.map(doc => {
+                    const book = doc.data();
+                    const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    
+                    return `
+                        <div class="book-card">
+                            <div class="book-cover">📚</div>
+                            <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                                ${book.category} • ${book.downloads || 0} downloads
+                            </div>
+                            <div style="color: #999; font-size: 0.8em;">
+                                Uploaded by ${book.uploadedBy}<br>
+                                ${uploadDate}
+                            </div>
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
+                                📥 Download eBook
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading books:', error);
+                document.getElementById('publicLibraryGrid').innerHTML = 
+                    '<div class="loading">Error loading public library. Please refresh the page.</div>';
             }
-            
-            grid.innerHTML = userBooks.map(book => `
-                <div class="book-card">
-                    <strong>${book.title}</strong><br>
-                    By ${book.author}<br>
-                    <small>${book.downloads} downloads • ${book.date}</small><br>
-                    <button onclick="downloadBook('${book.link}', ${book.id})">📥 Download</button>
-                </div>
-            `).join('');
         }
 
-        // Download book
-        function downloadBook(link, bookId) {
+        // Load user's books from PUBLIC database
+        async function loadMyBooks() {
+            if (!firebaseReady) return;
+            
+            try {
+                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
+                
+                const q = query(
+                    collection(window.firestore, 'books'), 
+                    where('uploadedBy', '==', currentUser),
+                    orderBy('uploadDate', 'desc')
+                );
+                const snapshot = await getDocs(q);
+                
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books to the public library yet.</div>';
+                    return;
+                }
+                
+                grid.innerHTML = snapshot.docs.map(doc => {
+                    const book = doc.data();
+                    const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    
+                    return `
+                        <div class="book-card">
+                            <div class="book-cover">📚</div>
+                            <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                                ${book.downloads || 0} downloads • ${uploadDate}
+                            </div>
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
+                                📥 Download (${book.downloads || 0})
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading my books:', error);
+            }
+        }
+
+        // Download book and update counter
+        async function downloadBook(driveLink, bookId) {
             // Open Google Drive link
-            window.open(link, '_blank');
+            window.open(driveLink, '_blank');
             
-            // Update download count
-            if (bookId) {
-                let books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
-                const book = books.find(b => b.id === bookId);
-                if (book) {
-                    book.downloads = (book.downloads || 0) + 1;
-                    localStorage.setItem('sigmaBooks', JSON.stringify(books));
-                    loadLibrary();
+            // Update download count in PUBLIC database
+            if (bookId && firebaseReady) {
+                try {
+                    const { updateDoc, doc, increment } = window.firestoreFunctions;
+                    const bookRef = doc(window.firestore, 'books', bookId);
+                    await updateDoc(bookRef, {
+                        downloads: increment(1)
+                    });
+                    
+                    // Refresh displays
+                    loadPublicBooks();
                     loadMyBooks();
+                    
+                } catch (error) {
+                    console.error('Error updating download count:', error);
                 }
             }
         }
@@ -234,10 +341,6 @@
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
-
-        // Load initial data
-        loadLibrary();
-        loadMyBooks();
     </script>
 </body>
 </html>
