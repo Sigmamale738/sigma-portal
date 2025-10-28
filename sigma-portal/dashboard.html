@@ -3,6 +3,7 @@
 <head>
     <title>Sigma Portal - Dashboard</title>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
         * {
             margin: 0;
@@ -15,6 +16,7 @@
             background: #f8f9fa;
         }
         
+        /* Header */
         .navbar {
             background: white;
             padding: 1rem 2rem;
@@ -22,6 +24,9 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
         
         .nav-brand {
@@ -31,6 +36,12 @@
         }
         
         .nav-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .user-info {
             color: #666;
         }
         
@@ -44,32 +55,57 @@
             text-decoration: none;
         }
         
+        /* Sidebar */
         .container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 2rem;
+            display: flex;
+            min-height: calc(100vh - 80px);
         }
         
-        .welcome-card {
+        .sidebar {
+            width: 250px;
             background: white;
-            padding: 3rem;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-            text-align: center;
-            margin-bottom: 2rem;
+            padding: 2rem 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
         }
         
-        .welcome-card h1 {
-            color: #333;
-            margin-bottom: 1rem;
+        .sidebar-item {
+            padding: 1rem 2rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            border-left: 4px solid transparent;
         }
         
-        .welcome-card p {
-            color: #666;
-            font-size: 1.1em;
-            line-height: 1.6;
+        .sidebar-item:hover, .sidebar-item.active {
+            background: #f8f9fa;
+            border-left-color: #667eea;
+            color: #667eea;
         }
         
+        .sidebar-item i {
+            margin-right: 10px;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 2rem;
+        }
+        
+        .content-section {
+            display: none;
+            animation: fadeIn 0.5s;
+        }
+        
+        .content-section.active {
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Dashboard Cards */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
@@ -97,85 +133,330 @@
             font-size: 1.1em;
         }
         
-        .sigma-features {
+        /* eBook Grid */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+        
+        .book-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+        
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .book-cover {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 80px;
+            height: 100px;
+            border-radius: 8px;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 2em;
+        }
+        
+        .book-title {
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        
+        .book-author {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 1rem;
+        }
+        
+        .download-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        /* Upload Form */
+        .upload-form {
             background: white;
             padding: 2rem;
             border-radius: 10px;
             box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #e1e1e1;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+        
+        .file-upload {
+            border: 2px dashed #667eea;
+            padding: 2rem;
+            text-align: center;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .upload-btn {
+            background: #667eea;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        /* Profile */
+        .profile-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            max-width: 500px;
+        }
+        
+        .profile-header {
+            text-align: center;
             margin-bottom: 2rem;
         }
         
-        .sigma-features h3 {
-            color: #333;
-            margin-bottom: 1rem;
-        }
-        
-        .sigma-features ul {
-            list-style: none;
-            padding: 0;
-        }
-        
-        .sigma-features li {
-            padding: 8px 0;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .sigma-features li:last-child {
-            border-bottom: none;
-        }
-        
-        .verification-badge {
-            background: #28a745;
+        .profile-avatar {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-            margin-left: 10px;
+            font-size: 2em;
         }
     </style>
 </head>
 <body>
+    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">Σ Sigma Portal</div>
         <div class="nav-user">
-            Welcome, <span id="username">Sigma Member</span>!
-            <span class="verification-badge">OTP Verified</span>
-            <a href="index.html" class="logout-btn">Exit Network</a>
+            <div class="user-info">
+                Welcome, <span id="username">User</span>!
+                <span style="background:#28a745; color:white; padding:2px 8px; border-radius:10px; font-size:0.8em; margin-left:10px;">
+                    OTP Verified
+                </span>
+            </div>
+            <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
     
+    <!-- Main Container -->
     <div class="container">
-        <div class="welcome-card">
-            <h1>🎉 Welcome to Sigma Network!</h1>
-            <p>Your account has been successfully verified with OTP authentication.</p>
-            <p><strong>Sigma Status: ACTIVE | OTP Verification: ✅ COMPLETE</strong></p>
-        </div>
-        
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-number" id="userCount">1</div>
-                <div class="stat-label">Verified Members</div>
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-item active" onclick="showSection('dashboard')">
+                📊 Dashboard
             </div>
-            <div class="stat-card">
-                <div class="stat-number">100%</div>
-                <div class="stat-label">Security Level</div>
+            <div class="sidebar-item" onclick="showSection('ebooks')">
+                📚 eBook Library
             </div>
-            <div class="stat-card">
-                <div class="stat-number">🔒</div>
-                <div class="stat-label">OTP Protected</div>
+            <div class="sidebar-item" onclick="showSection('upload')">
+                ⬆️ Upload eBook
+            </div>
+            <div class="sidebar-item" onclick="showSection('profile')">
+                👤 My Profile
+            </div>
+            <div class="sidebar-item" onclick="showSection('settings')">
+                ⚙️ Settings
             </div>
         </div>
         
-        <div class="sigma-features">
-            <h3>Σ Enhanced Security Features</h3>
-            <ul>
-                <li>✅ OTP Email Verification</li>
-                <li>✅ Encrypted Data Storage</li>
-                <li>✅ Secure Authentication</li>
-                <li>✅ Verified Member Access</li>
-                <li>✅ 24/7 Security Monitoring</li>
-                <li>✅ Multi-layer Protection</li>
-            </ul>
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <h1>Dashboard Overview</h1>
+                <p>Welcome to your Sigma Portal dashboard</p>
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalBooks">0</div>
+                        <div class="stat-label">Total eBooks</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="downloadedBooks">0</div>
+                        <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="uploadedBooks">0</div>
+                        <div class="stat-label">Uploaded</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">100%</div>
+                        <div class="stat-label">Security Level</div>
+                    </div>
+                </div>
+                
+                <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); margin-top:2rem;">
+                    <h2>Recent Activity</h2>
+                    <p>No recent activity yet. Start by uploading your first eBook!</p>
+                </div>
+            </div>
+            
+            <!-- eBook Library Section -->
+            <div id="ebooks" class="content-section">
+                <h1>eBook Library</h1>
+                <p>Browse and download available eBooks</p>
+                
+                <div class="books-grid">
+                    <div class="book-card">
+                        <div class="book-cover">📚</div>
+                        <div class="book-title">JavaScript Guide</div>
+                        <div class="book-author">By John Developer</div>
+                        <button class="download-btn" onclick="downloadBook(1)">Download</button>
+                    </div>
+                    
+                    <div class="book-card">
+                        <div class="book-cover">🐍</div>
+                        <div class="book-title">Python Basics</div>
+                        <div class="book-author">By Sarah Coder</div>
+                        <button class="download-btn" onclick="downloadBook(2)">Download</button>
+                    </div>
+                    
+                    <div class="book-card">
+                        <div class="book-cover">🔬</div>
+                        <div class="book-title">Data Science</div>
+                        <div class="book-author">By Dr. Alex</div>
+                        <button class="download-btn" onclick="downloadBook(3)">Download</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Section -->
+            <div id="upload" class="content-section">
+                <h1>Upload eBook</h1>
+                <p>Share your knowledge with the community</p>
+                
+                <form class="upload-form" onsubmit="uploadBook(event)">
+                    <div class="form-group">
+                        <label>Book Title</label>
+                        <input type="text" id="bookTitle" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Author Name</label>
+                        <input type="text" id="bookAuthor" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="bookDescription" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Category</label>
+                        <select id="bookCategory">
+                            <option>Programming</option>
+                            <option>Science</option>
+                            <option>Education</option>
+                            <option>Fiction</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Upload eBook File</label>
+                        <div class="file-upload" onclick="document.getElementById('bookFile').click()">
+                            <p>📁 Click to select eBook file</p>
+                            <p><small>PDF, EPUB, MOBI (Max: 10MB)</small></p>
+                            <input type="file" id="bookFile" accept=".pdf,.epub,.mobi" style="display:none">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="upload-btn">Upload eBook</button>
+                </form>
+            </div>
+            
+            <!-- Profile Section -->
+            <div id="profile" class="content-section">
+                <h1>My Profile</h1>
+                
+                <div class="profile-card">
+                    <div class="profile-header">
+                        <div class="profile-avatar">👤</div>
+                        <h2 id="profileUsername">User</h2>
+                        <p id="profileEmail">user@example.com</p>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" placeholder="Enter your full name">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Bio</label>
+                        <textarea id="userBio" rows="3" placeholder="Tell us about yourself"></textarea>
+                    </div>
+                    
+                    <button class="upload-btn" onclick="updateProfile()">Update Profile</button>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settings" class="content-section">
+                <h1>Settings</h1>
+                
+                <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); max-width:500px;">
+                    <div class="form-group">
+                        <label>Notification Settings</label>
+                        <div>
+                            <input type="checkbox" id="emailNotifications" checked>
+                            <label for="emailNotifications">Email notifications</label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Security</label>
+                        <button class="upload-btn" style="background:#dc3545;" onclick="changePassword()">
+                            Change Password
+                        </button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Account</label>
+                        <button class="upload-btn" style="background:#ffc107; color:#000;" onclick="exportData()">
+                            Export My Data
+                        </button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -186,11 +467,77 @@
             window.location.href = 'index.html';
         } else {
             document.getElementById('username').textContent = currentUser;
+            document.getElementById('profileUsername').textContent = currentUser;
+            
+            // Load user data
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            if (users[currentUser]) {
+                document.getElementById('profileEmail').textContent = users[currentUser].email || 'No email set';
+            }
         }
         
-        // Show user count
-        const users = JSON.parse(localStorage.getItem('users') || '{}');
-        document.getElementById('userCount').textContent = Object.keys(users).length;
+        // Navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Remove active class from all sidebar items
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Show selected section
+            document.getElementById(sectionId).classList.add('active');
+            
+            // Add active class to clicked sidebar item
+            event.target.classList.add('active');
+        }
+        
+        // eBook download
+        function downloadBook(bookId) {
+            alert(`Downloading book #${bookId}\nThis would trigger actual file download in production`);
+        }
+        
+        // Upload eBook
+        function uploadBook(event) {
+            event.preventDefault();
+            const title = document.getElementById('bookTitle').value;
+            alert(`eBook "${title}" uploaded successfully!`);
+            // Reset form
+            event.target.reset();
+        }
+        
+        // Update profile
+        function updateProfile() {
+            alert('Profile updated successfully!');
+        }
+        
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+        
+        // Settings functions
+        function changePassword() {
+            alert('Password change feature would open here');
+        }
+        
+        function exportData() {
+            alert('Data export would start here');
+        }
+        
+        // Update stats
+        function updateStats() {
+            document.getElementById('totalBooks').textContent = '3';
+            document.getElementById('downloadedBooks').textContent = '0';
+            document.getElementById('uploadedBooks').textContent = '0';
+        }
+        
+        // Initialize
+        updateStats();
     </script>
 </body>
 </html>
