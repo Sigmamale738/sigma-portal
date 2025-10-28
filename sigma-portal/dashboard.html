@@ -1,355 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Sigma Portal - Enhanced eBook Sharing</title>
-    <meta charset="UTF-8">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f8f9fa; }
-        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
-        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
-        .tab-btn.active { background: #667eea; color: white; }
-        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab-content.active { display: block; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
-        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
-        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; }
-        .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 120px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; }
-        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
-        .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
-        .loading { text-align: center; padding: 2rem; color: #666; }
-        .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
-        .search-box { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
-        .search-input { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
-        .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
-        .filter-btn { background: #f8f9fa; border: 2px solid #e1e1e1; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
-        .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
-        .rating-stars { color: #ffc107; margin: 0.5rem 0; }
-        .review-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e1e1e1; }
-        .review-input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; margin: 0.5rem 0; }
-        .user-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
-        .user-avatar { width: 50px; height: 50px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
-        .premium-badge { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
-    </style>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
-            authDomain: "sigma-ebooks.firebaseapp.com",
-            projectId: "sigma-ebooks",
-            storageBucket: "sigma-ebooks.firebasestorage.app",
-            messagingSenderId: "916594333041",
-            appId: "1:916594333041:web:8085ad7e4082530248d2d0"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-
-        window.firebaseApp = app;
-        window.firestore = db;
-        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, arrayUnion };
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sigma Portal - eBook Dashboard</title>
+<style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+    body { background: linear-gradient(145deg,#0a1f2d,#183b55); color: #fff; min-height: 100vh; overflow-x: hidden; }
+    header { text-align: center; padding: 25px; background: rgba(255,255,255,0.1); backdrop-filter: blur(8px); border-bottom: 1px solid rgba(255,255,255,0.2); }
+    header h1 { font-size: 1.9em; }
+    header span { color: #3fa9f5; }
+    .tabs { display: flex; justify-content: center; gap: 10px; padding: 10px; flex-wrap: wrap; }
+    .tab-btn { background: rgba(255,255,255,0.15); border: none; color: #fff; padding: 8px 16px; border-radius: 6px; cursor: pointer; transition: 0.3s; }
+    .tab-btn.active, .tab-btn:hover { background: #3fa9f5; }
+    .tab-content { display: none; padding: 20px; animation: fadeIn 0.4s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from {opacity:0;} to {opacity:1;} }
+    .upload-box { max-width: 400px; margin: 40px auto; background: rgba(255,255,255,0.08); padding: 25px; border-radius: 12px; text-align: center; box-shadow: 0 0 12px rgba(0,0,0,0.4); }
+    input[type="file"] { margin: 10px 0; }
+    button.upload-btn { background: #3fa9f5; border: none; padding: 8px 14px; border-radius: 6px; color: #fff; cursor: pointer; }
+    .progress-bar { height: 8px; background: rgba(255,255,255,0.3); border-radius: 4px; overflow: hidden; margin-top: 10px; }
+    .progress-bar div { height: 100%; width: 0%; background: #3fa9f5; transition: width 0.3s; }
+    footer { text-align: center; padding: 20px; font-size: 0.9em; opacity: 0.8; }
+</style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="nav-brand">Σ Sigma Portal - ENHANCED</div>
-        <div style="display: flex; align-items: center; gap: 1rem;">
-            <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">S</div>
-                <div>
-                    <div style="font-weight: bold;" id="userName">Sigma User</div>
-                    <div class="premium-badge">⭐ PREMIUM USER</div>
-                </div>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
-    </nav>
+<header>
+    <h1>📚 <span>Sigma Portal</span> Dashboard</h1>
+    <p>Community eBook Sharing Platform</p>
+</header>
 
-    <div class="container">
-        <h1>📚 Sigma eBook Sharing - Enhanced</h1>
-        <p><strong>NOW WITH:</strong> Search • Ratings • Reviews • User Profiles • File Upload</p>
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('upload')">Upload eBook</button>
+    <button class="tab-btn" onclick="showTab('library')">Public Library</button>
+    <button class="tab-btn" onclick="showTab('profile')">My Profile</button>
+</div>
 
-        <div class="tab-buttons">
-            <button class="tab-btn active" onclick="showTab('library')">📚 Public Library</button>
-            <button class="tab-btn" onclick="showTab('upload')">📤 Upload eBook</button>
-            <button class="tab-btn" onclick="showTab('mybooks')">📂 My Uploads</button>
-            <button class="tab-btn" onclick="showTab('profile')">👤 My Profile</button>
-        </div>
-
-        <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search books by title, author, or category..." onkeyup="filterBooks()">
-            <div class="filters">
-                <button class="filter-btn active" onclick="setFilter('all')">All Books</button>
-                <button class="filter-btn" onclick="setFilter('programming')">Programming</button>
-                <button class="filter-btn" onclick="setFilter('science')">Science</button>
-                <button class="filter-btn" onclick="setFilter('fiction')">Fiction</button>
-                <button class="filter-btn" onclick="setFilter('business')">Business</button>
-                <button class="filter-btn" onclick="setFilter('trending')">🔥 Trending</button>
-                <button class="filter-btn" onclick="setFilter('highest-rated')">⭐ Highest Rated</button>
-            </div>
-        </div>
-
-        <div id="library" class="tab-content active">
-            <h2>📚 Enhanced Public Library</h2>
-            <p>Discover amazing books with ratings and reviews</p>
-            <div class="books-grid" id="publicLibraryGrid">
-                <div class="loading">Loading enhanced library with ratings...</div>
-            </div>
-        </div>
-
-        <div id="upload" class="tab-content">
-            <h2>📤 Upload eBook</h2>
-
-            <div class="guide-box">
-                <h3>🚀 Simple File Upload:</h3>
-                <ol>
-                    <li><strong>Choose PDF file</strong> from your device</li>
-                    <li>Add book details below</li>
-                    <li>Click upload</li>
-                </ol>
-            </div>
-
-            <form id="uploadForm">
-                <div class="form-group">
-                    <label>Book Title *</label>
-                    <input type="text" id="bookTitle" placeholder="Enter book title" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Author Name *</label>
-                    <input type="text" id="bookAuthor" placeholder="Author name" required>
-                </div>
-
-                <div class="form-group">
-                    <label>Book Description</label>
-                    <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Category</label>
-                    <select id="bookCategory">
-                        <option>Programming & Tech</option>
-                        <option>Science & Education</option>
-                        <option>Fiction & Literature</option>
-                        <option>Business & Finance</option>
-                        <option>Self Development</option>
-                        <option>Other</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>Select eBook File (PDF) *</label>
-                    <input type="file" id="bookFile" accept=".pdf" required style="padding: 1rem; border: 2px dashed #667eea; border-radius: 8px; width: 100%;">
-                </div>
-
-                <button type="submit" class="upload-btn">📤 Upload eBook</button>
-            </form>
-        </div>
-
-        <div id="mybooks" class="tab-content">
-            <h2>My Uploaded eBooks</h2>
-            <p>Manage your books and see community feedback</p>
-            <div class="books-grid" id="myBooksGrid">
-                <div class="loading">Loading your books with ratings...</div>
-            </div>
-        </div>
-
-        <div id="profile" class="tab-content">
-            <h2>👤 My Profile</h2>
-            <div class="user-profile" style="margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">S</div>
-                <div>
-                    <h3>Sigma User</h3>
-                    <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Joined: <span id="joinDate">28/10/2025</span></p>
-                </div>
-            </div>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
-                <div class="book-card">
-                    <h4>📊 My Stats</h4>
-                    <p><strong>Books Uploaded:</strong> <span id="uploadCount">0</span></p>
-                    <p><strong>Total Downloads:</strong> <span id="totalDownloads">0</span></p>
-                    <p><strong>Average Rating:</strong> <span id="averageRating">-</span></p>
-                </div>
-                <div class="book-card">
-                    <h4>🎯 Achievements</h4>
-                    <p>✅ eBook Uploader</p>
-                    <p>✅ Community Contributor</p>
-                    <p>⭐ Premium Member</p>
-                    <p>🚀 Sigma Founder</p>
-                </div>
-            </div>
-        </div>
+<!-- Upload Tab -->
+<div id="upload" class="tab-content active">
+    <div class="upload-box">
+        <h3>Upload eBook</h3>
+        <input type="file" id="fileInput">
+        <button class="upload-btn" onclick="uploadFile()">Upload</button>
+        <div class="progress-bar"><div id="progress"></div></div>
+        <p id="statusText"></p>
     </div>
+</div>
 
-    <script>
-        const currentUser = localStorage.getItem('currentUser') || 'Sigma User';
-        document.getElementById('userName').textContent = currentUser;
-        document.getElementById('userAvatar').textContent = currentUser.charAt(0);
-        document.getElementById('joinDate').textContent = new Date().toLocaleDateString();
+<!-- Library Tab -->
+<div id="library" class="tab-content">
+    <h3 style="text-align:center;">📖 Public Library</h3>
+    <ul id="fileList" style="list-style:none;padding:10px;text-align:center;"></ul>
+</div>
 
-        if (!localStorage.getItem('currentUser')) {
-            window.location.href = 'index.html';
-        }
+<!-- Profile Tab -->
+<div id="profile" class="tab-content">
+    <h3 style="text-align:center;">👤 My Profile</h3>
+    <p style="text-align:center;">Logged in as: <strong>Sigma User</strong></p>
+    <p style="text-align:center;">Uploads will be shown soon.</p>
+</div>
 
-        let allBooks = [];
-        let currentFilter = 'all';
-        let searchQuery = '';
+<footer>
+    © 2025 Sigma Portal | Powered by Firebase
+</footer>
 
-        let firebaseReady = false;
-        const checkFirebase = setInterval(() => {
-            if (window.firestore && window.firestoreFunctions) {
-                firebaseReady = true;
-                clearInterval(checkFirebase);
-                loadEnhancedBooks();
-                loadUserStats();
-            }
-        }, 100);
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
 
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyC79GvrDeN9XkiMga9XHHHqmUbPemHKpjY",
+    authDomain: "sigmaportal-8d595.firebaseapp.com",
+    projectId: "sigmaportal-8d595",
+    storageBucket: "sigmaportal-8d595.firebasestorage.app",
+    messagingSenderId: "250400389869",
+    appId: "1:250400389869:web:a57865e79bd9523775aae4"
+  };
+  firebase.initializeApp(firebaseConfig);
+  const storage = firebase.storage();
+  const db = firebase.firestore();
 
-            if (tabId === 'library') loadEnhancedBooks();
-            if (tabId === 'mybooks') loadMyBooks();
-            if (tabId === 'profile') loadUserStats();
-        }
+  async function uploadFile() {
+    const file = document.getElementById('fileInput').files[0];
+    if (!file) return alert("Please choose a file first!");
+    const storageRef = storage.ref('ebooks/' + file.name);
+    const uploadTask = storageRef.put(file);
 
-        function filterBooks() {
-            searchQuery = document.getElementById('searchInput').value.toLowerCase();
-            loadEnhancedBooks();
-        }
+    document.getElementById('statusText').textContent = 'Uploading...';
+    uploadTask.on('state_changed',
+      (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+        document.getElementById('progress').style.width = progress + '%';
+      },
+      (error) => {
+        alert('Upload failed: ' + error.message);
+      },
+      async () => {
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+        await db.collection('ebooks').add({ name: file.name, url: url, timestamp: new Date() });
+        document.getElementById('statusText').textContent = '✅ Upload complete!';
+        loadFiles();
+      }
+    );
+  }
 
-        function setFilter(filter) {
-            currentFilter = filter;
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            loadEnhancedBooks();
-        }
+  async function loadFiles() {
+    const list = document.getElementById('fileList');
+    list.innerHTML = '';
+    const snapshot = await db.collection('ebooks').orderBy('timestamp', 'desc').get();
+    snapshot.forEach(doc => {
+      const data = doc.data();
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <div style="background:rgba(255,255,255,0.1);margin:10px;padding:10px;border-radius:8px;">
+          <strong>${data.name}</strong><br>
+          <a href="${data.url}" target="_blank" style="color:#3fa9f5;">Download</a>
+        </div>`;
+      list.appendChild(li);
+    });
+  }
 
-        async function loadEnhancedBooks() {
-            if (!firebaseReady) return;
-            try {
-                const { collection, getDocs, query, orderBy } = window.firestoreFunctions;
-                const q = query(collection(window.firestore, 'books'), orderBy('uploadDate', 'desc'));
-                const snapshot = await getDocs(q);
-                allBooks = snapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
+  function showTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    const clickedButton = [...document.querySelectorAll('.tab-btn')]
+      .find(btn => btn.getAttribute('onclick')?.includes(tabId));
+    if (clickedButton) clickedButton.classList.add('active');
+    if (tabId === 'library') loadFiles();
+  }
 
-                let filteredBooks = allBooks;
-                if (searchQuery) {
-                    filteredBooks = filteredBooks.filter(book =>
-                        book.title.toLowerCase().includes(searchQuery) ||
-                        book.author.toLowerCase().includes(searchQuery) ||
-                        (book.category && book.category.toLowerCase().includes(searchQuery)) ||
-                        (book.description && book.description.toLowerCase().includes(searchQuery))
-                    );
-                }
-
-                if (currentFilter !== 'all') {
-                    switch(currentFilter) {
-                        case 'programming':
-                            filteredBooks = filteredBooks.filter(book => book.category && book.category.includes('Programming'));
-                            break;
-                        case 'science':
-                            filteredBooks = filteredBooks.filter(book => book.category && book.category.includes('Science'));
-                            break;
-                        case 'fiction':
-                            filteredBooks = filteredBooks.filter(book => book.category && book.category.includes('Fiction'));
-                            break;
-                        case 'business':
-                            filteredBooks = filteredBooks.filter(book => book.category && book.category.includes('Business'));
-                            break;
-                        case 'trending':
-                            filteredBooks = filteredBooks.filter(book => (book.downloads || 0) > 10);
-                            break;
-                        case 'highest-rated':
-                            filteredBooks = filteredBooks.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
-                            break;
-                    }
-                }
-
-                displayEnhancedBooks(filteredBooks);
-            } catch (error) {
-                console.error('Error loading books:', error);
-                document.getElementById('publicLibraryGrid').innerHTML = '<div class="loading">Error loading enhanced library.</div>';
-            }
-        }
-
-        function displayEnhancedBooks(books) {
-            const grid = document.getElementById('publicLibraryGrid');
-            if (books.length === 0) {
-                grid.innerHTML = '<div class="loading">No books found matching your criteria.</div>';
-                return;
-            }
-
-            grid.innerHTML = books.map(book => {
-                const uploadDate = book.uploadDate ? new Date(book.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown date';
-                const isOwner = book.uploadedBy === currentUser;
-                const averageRating = book.averageRating || 0;
-                const stars = '⭐'.repeat(Math.floor(averageRating)) + '☆'.repeat(5 - Math.floor(averageRating));
-
-                return `
-                    <div class="book-card">
-                        ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
-                        <div class="book-cover">📚</div>
-                        <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
-                        <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
-                        <div class="rating-stars" title="${averageRating.toFixed(1)}/5 stars">
-                            ${stars} <small style="color: #666;">(${averageRating.toFixed(1)})</small>
-                        </div>
-                        <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                            ${book.category} • ${book.downloads || 0} downloads
-                        </div>
-                        <div style="color: #999; font-size: 0.8em;">
-                            Uploaded by ${book.uploadedBy} • ${uploadDate}
-                        </div>
-                        <button class="download-btn" onclick="downloadBook('${book.id}')">
-                            📥 Download eBook
-                        </button>
-                        <div class="review-section">
-                            <div style="display: flex; gap: 5px; margin: 0.5rem 0;">
-                                <span style="cursor: pointer; font-size: 1.2em;" onclick="rateBook('${book.id}', 1)">★</span>
-                                <span style="cursor: pointer; font-size: 1.2em;" onclick="rateBook('${book.id}', 2)">★</span>
-                                <span style="cursor: pointer; font-size: 1.2em;" onclick="rateBook('${book.id}', 3)">★</span>
-                                <span style="cursor: pointer; font-size: 1.2em;" onclick="rateBook('${book.id}', 4)">★</span>
-                                <span style="cursor: pointer; font-size: 1.2em;" onclick="rateBook('${book.id}', 5)">★</span>
-                            </div>
-                            ${book.reviews && book.reviews.length > 0 ? 
-                                `<div style="max-height: 100px; overflow-y: auto; margin: 10px 0;">
-                                    ${book.reviews.map(review => 
-                                        `<div style="padding: 5px; border-bottom: 1px solid #eee;">
-                                            <strong>${review.user}:</strong> ${review.text}
-                                            <div style="color: #999; font-size: 0.8em;">${review.date}</div>
-                                        </div>`
-                                    ).join('')}
-                                </div>` : ''
-                            }
-                            <input type="text" class="review-input" placeholder="Add a review..." id="review-${book.id}">
-                            <button onclick="addReview('${book.id}')" style="background: #667eea; color: white; border: none; padding: 5px 10px; border-radius: 5px; width: 100%; cursor: pointer;">
-                                💬 Add Review
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-        }
-
-        async function uploadBook(event) {
-            event.preventDefault();
+  document.addEventListener('DOMContentLoaded', () => {
+    loadFiles();
+  });
+</script>
+</body>
+</html>
 
