@@ -20,18 +20,20 @@
         .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
         .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
         .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; }
+        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; }
         .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 120px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; }
         .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
         .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
         .loading { text-align: center; padding: 2rem; color: #666; }
+        .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
     </style>
     
     <!-- Firebase SDK -->
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -50,7 +52,7 @@
         // Make Firebase available globally
         window.firebaseApp = app;
         window.firestore = db;
-        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, doc, query, orderBy, where };
+        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment };
     </script>
 </head>
 <body>
@@ -74,12 +76,13 @@
             <h2>Upload to Public Library</h2>
             
             <div class="guide-box">
-                <h3>🚀 How to Upload:</h3>
+                <h3>🚀 How to Upload CORRECTLY:</h3>
                 <ol>
-                    <li>Upload eBook to <strong>Google Drive</strong></li>
-                    <li>Get <strong>shareable link</strong> (anyone can view)</li>
-                    <li>Add book details below</li>
-                    <li>Book becomes <strong>PUBLIC</strong> to all users worldwide</li>
+                    <li><strong>Upload eBook to Google Drive</strong></li>
+                    <li><strong>Right-click file → Share → General access</strong></li>
+                    <li><strong>Change from "Restricted" to "Anyone with the link"</strong></li>
+                    <li><strong>Set role to "Viewer"</strong> (not "Editor")</li>
+                    <li><strong>Copy link and paste below</strong></li>
                 </ol>
                 <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
             </div>
@@ -115,7 +118,9 @@
                 <div class="form-group">
                     <label>Google Drive Link *</label>
                     <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
-                    <small style="color: #666;">Make sure the link is set to "Anyone with link can view"</small>
+                    <small style="color: #666;">
+                        ✅ Make sure link is set to <strong>"Anyone with the link can view"</strong>
+                    </small>
                 </div>
                 
                 <button type="submit" class="upload-btn">🌐 Add to PUBLIC Library</button>
@@ -240,9 +245,11 @@
                 grid.innerHTML = snapshot.docs.map(doc => {
                     const book = doc.data();
                     const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    const isOwner = book.uploadedBy === currentUser;
                     
                     return `
                         <div class="book-card">
+                            ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
                             <div class="book-cover">📚</div>
                             <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                             <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
@@ -256,6 +263,11 @@
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
                                 📥 Download eBook
                             </button>
+                            ${isOwner ? `
+                                <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
+                                    🗑️ Delete This Book
+                                </button>
+                            ` : ''}
                         </div>
                     `;
                 }).join('');
@@ -294,6 +306,7 @@
                     
                     return `
                         <div class="book-card">
+                            <div class="owner-badge">OWNER</div>
                             <div class="book-cover">📚</div>
                             <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                             <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
@@ -302,6 +315,9 @@
                             </div>
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
                                 📥 Download (${book.downloads || 0})
+                            </button>
+                            <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
+                                🗑️ Delete This Book
                             </button>
                         </div>
                     `;
@@ -320,10 +336,10 @@
             // Update download count in PUBLIC database
             if (bookId && firebaseReady) {
                 try {
-                    const { updateDoc, doc, increment } = window.firestoreFunctions;
+                    const { updateDoc, doc } = window.firestoreFunctions;
                     const bookRef = doc(window.firestore, 'books', bookId);
                     await updateDoc(bookRef, {
-                        downloads: increment(1)
+                        downloads: window.firestoreFunctions.increment(1)
                     });
                     
                     // Refresh displays
@@ -333,6 +349,33 @@
                 } catch (error) {
                     console.error('Error updating download count:', error);
                 }
+            }
+        }
+
+        // Delete book (only for owner)
+        async function deleteBook(bookId, bookTitle) {
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"? This action cannot be undone!`)) {
+                return;
+            }
+
+            if (!firebaseReady) {
+                alert('Firebase is not ready. Please try again.');
+                return;
+            }
+
+            try {
+                const { deleteDoc, doc } = window.firestoreFunctions;
+                await deleteDoc(doc(window.firestore, 'books', bookId));
+                
+                alert(`✅ "${bookTitle}" has been deleted from the public library.`);
+                
+                // Refresh displays
+                loadPublicBooks();
+                loadMyBooks();
+                
+            } catch (error) {
+                alert('Error deleting book: ' + error.message);
+                console.error('Delete error:', error);
             }
         }
 
