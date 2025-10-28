@@ -5,513 +5,284 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background: #f8f9fa; }
         
-        body {
-            background: #f8f9fa;
-        }
+        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
         
-        /* Header */
-        .navbar {
-            background: white;
-            padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+        .container { max-width: 1000px; margin: 2rem auto; padding: 0 2rem; }
         
-        .nav-brand {
-            font-size: 1.5em;
-            font-weight: bold;
-            color: #667eea;
-        }
+        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
+        .tab-btn.active { background: #667eea; color: white; }
         
-        .nav-user {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
+        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
         
-        .user-info {
-            color: #666;
-        }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
         
-        .logout-btn {
-            background: #dc3545;
-            color: white;
-            padding: 8px 16px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-        }
+        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
         
-        /* Sidebar */
-        .container {
-            display: flex;
-            min-height: calc(100vh - 80px);
-        }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; }
+        .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 120px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; }
+        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
         
-        .sidebar {
-            width: 250px;
-            background: white;
-            padding: 2rem 0;
-            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
-        }
-        
-        .sidebar-item {
-            padding: 1rem 2rem;
-            cursor: pointer;
-            transition: background 0.3s;
-            border-left: 4px solid transparent;
-        }
-        
-        .sidebar-item:hover, .sidebar-item.active {
-            background: #f8f9fa;
-            border-left-color: #667eea;
-            color: #667eea;
-        }
-        
-        .sidebar-item i {
-            margin-right: 10px;
-        }
-        
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            padding: 2rem;
-        }
-        
-        .content-section {
-            display: none;
-            animation: fadeIn 0.5s;
-        }
-        
-        .content-section.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Dashboard Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
-        
-        .stat-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .stat-number {
-            font-size: 2.5em;
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 0.5rem;
-        }
-        
-        .stat-label {
-            color: #666;
-            font-size: 1.1em;
-        }
-        
-        /* eBook Grid */
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 1.5rem;
-            margin-top: 2rem;
-        }
-        
-        .book-card {
-            background: white;
-            border-radius: 10px;
-            padding: 1.5rem;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            text-align: center;
-            transition: transform 0.3s;
-        }
-        
-        .book-card:hover {
-            transform: translateY(-5px);
-        }
-        
-        .book-cover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            width: 80px;
-            height: 100px;
-            border-radius: 8px;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2em;
-        }
-        
-        .book-title {
-            font-weight: bold;
-            margin-bottom: 0.5rem;
-        }
-        
-        .book-author {
-            color: #666;
-            font-size: 0.9em;
-            margin-bottom: 1rem;
-        }
-        
-        .download-btn {
-            background: #28a745;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 5px;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        /* Upload Form */
-        .upload-form {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-        }
-        
-        .form-group {
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .form-group input, .form-group textarea, .form-group select {
-            width: 100%;
-            padding: 1rem;
-            border: 2px solid #e1e1e1;
-            border-radius: 8px;
-            font-size: 1em;
-        }
-        
-        .file-upload {
-            border: 2px dashed #667eea;
-            padding: 2rem;
-            text-align: center;
-            border-radius: 8px;
-            cursor: pointer;
-        }
-        
-        .upload-btn {
-            background: #667eea;
-            color: white;
-            padding: 1rem 2rem;
-            border: none;
-            border-radius: 8px;
-            font-size: 1.1em;
-            cursor: pointer;
-            width: 100%;
-        }
-        
-        /* Profile */
-        .profile-card {
-            background: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-            max-width: 500px;
-        }
-        
-        .profile-header {
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-        
-        .profile-avatar {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 50%;
-            margin: 0 auto 1rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2em;
-        }
+        .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
     </style>
 </head>
 <body>
-    <!-- Navigation -->
     <nav class="navbar">
         <div class="nav-brand">Σ Sigma Portal</div>
-        <div class="nav-user">
-            <div class="user-info">
-                Welcome, <span id="username">User</span>!
-                <span style="background:#28a745; color:white; padding:2px 8px; border-radius:10px; font-size:0.8em; margin-left:10px;">
-                    OTP Verified
-                </span>
-            </div>
-            <button class="logout-btn" onclick="logout()">Logout</button>
-        </div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </nav>
     
-    <!-- Main Container -->
     <div class="container">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-item active" onclick="showSection('dashboard')">
-                📊 Dashboard
+        <h1>Welcome to Sigma eBook Sharing</h1>
+        <p>Share and download eBooks with the community</p>
+        
+        <div class="tab-buttons">
+            <button class="tab-btn active" onclick="showTab('upload')">📤 Upload eBook</button>
+            <button class="tab-btn" onclick="showTab('library')">📚 eBook Library</button>
+            <button class="tab-btn" onclick="showTab('mybooks')">📂 My Uploads</button>
+        </div>
+        
+        <!-- Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <h2>Upload eBook Using Google Drive</h2>
+            
+            <div class="guide-box">
+                <h3>📖 How to Upload:</h3>
+                <ol>
+                    <li><strong>Upload your eBook</strong> to Google Drive</li>
+                    <li><strong>Right-click</strong> the file → <strong>"Get shareable link"</strong></li>
+                    <li>Set permission to <strong>"Anyone with link can view"</strong></li>
+                    <li><strong>Copy the link</strong> and paste below</li>
+                    <li>Fill book details and click <strong>"Add to Library"</strong></li>
+                </ol>
+                <button onclick="window.open('https://drive.google.com', '_blank')" 
+                        style="background: #4285f4; color: white; padding: 10px 20px; border: none; border-radius: 5px; margin-top: 1rem; cursor: pointer;">
+                    📁 Open Google Drive
+                </button>
             </div>
-            <div class="sidebar-item" onclick="showSection('ebooks')">
-                📚 eBook Library
-            </div>
-            <div class="sidebar-item" onclick="showSection('upload')">
-                ⬆️ Upload eBook
-            </div>
-            <div class="sidebar-item" onclick="showSection('profile')">
-                👤 My Profile
-            </div>
-            <div class="sidebar-item" onclick="showSection('settings')">
-                ⚙️ Settings
+            
+            <form onsubmit="addBook(event)">
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" id="bookTitle" placeholder="Enter book title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Author Name *</label>
+                    <input type="text" id="bookAuthor" placeholder="Author name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Book Description</label>
+                    <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="bookCategory">
+                        <option>Programming & Tech</option>
+                        <option>Science & Education</option>
+                        <option>Fiction & Literature</option>
+                        <option>Business & Finance</option>
+                        <option>Self Development</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Google Drive Link *</label>
+                    <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
+                    <small style="color: #666;">Paste the shareable Google Drive link here</small>
+                </div>
+                
+                <button type="submit" class="upload-btn">➕ Add to Library</button>
+            </form>
+        </div>
+        
+        <!-- Library Tab -->
+        <div id="library" class="tab-content">
+            <h2>Community eBook Library</h2>
+            <p>Download eBooks shared by our community members</p>
+            
+            <div class="books-grid" id="libraryGrid">
+                <!-- Books will be loaded here -->
             </div>
         </div>
         
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Dashboard Section -->
-            <div id="dashboard" class="content-section active">
-                <h1>Dashboard Overview</h1>
-                <p>Welcome to your Sigma Portal dashboard</p>
-                
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-number" id="totalBooks">0</div>
-                        <div class="stat-label">Total eBooks</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="downloadedBooks">0</div>
-                        <div class="stat-label">Downloads</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="uploadedBooks">0</div>
-                        <div class="stat-label">Uploaded</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number">100%</div>
-                        <div class="stat-label">Security Level</div>
-                    </div>
-                </div>
-                
-                <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); margin-top:2rem;">
-                    <h2>Recent Activity</h2>
-                    <p>No recent activity yet. Start by uploading your first eBook!</p>
-                </div>
-            </div>
+        <!-- My Books Tab -->
+        <div id="mybooks" class="tab-content">
+            <h2>My Uploaded eBooks</h2>
+            <p>Books you've shared with the community</p>
             
-            <!-- eBook Library Section -->
-            <div id="ebooks" class="content-section">
-                <h1>eBook Library</h1>
-                <p>Browse and download available eBooks</p>
-                
-                <div class="books-grid">
-                    <div class="book-card">
-                        <div class="book-cover">📚</div>
-                        <div class="book-title">JavaScript Guide</div>
-                        <div class="book-author">By John Developer</div>
-                        <button class="download-btn" onclick="downloadBook(1)">Download</button>
-                    </div>
-                    
-                    <div class="book-card">
-                        <div class="book-cover">🐍</div>
-                        <div class="book-title">Python Basics</div>
-                        <div class="book-author">By Sarah Coder</div>
-                        <button class="download-btn" onclick="downloadBook(2)">Download</button>
-                    </div>
-                    
-                    <div class="book-card">
-                        <div class="book-cover">🔬</div>
-                        <div class="book-title">Data Science</div>
-                        <div class="book-author">By Dr. Alex</div>
-                        <button class="download-btn" onclick="downloadBook(3)">Download</button>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Upload Section -->
-            <div id="upload" class="content-section">
-                <h1>Upload eBook</h1>
-                <p>Share your knowledge with the community</p>
-                
-                <form class="upload-form" onsubmit="uploadBook(event)">
-                    <div class="form-group">
-                        <label>Book Title</label>
-                        <input type="text" id="bookTitle" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Author Name</label>
-                        <input type="text" id="bookAuthor" required>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Description</label>
-                        <textarea id="bookDescription" rows="3"></textarea>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Category</label>
-                        <select id="bookCategory">
-                            <option>Programming</option>
-                            <option>Science</option>
-                            <option>Education</option>
-                            <option>Fiction</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Upload eBook File</label>
-                        <div class="file-upload" onclick="document.getElementById('bookFile').click()">
-                            <p>📁 Click to select eBook file</p>
-                            <p><small>PDF, EPUB, MOBI (Max: 10MB)</small></p>
-                            <input type="file" id="bookFile" accept=".pdf,.epub,.mobi" style="display:none">
-                        </div>
-                    </div>
-                    
-                    <button type="submit" class="upload-btn">Upload eBook</button>
-                </form>
-            </div>
-            
-            <!-- Profile Section -->
-            <div id="profile" class="content-section">
-                <h1>My Profile</h1>
-                
-                <div class="profile-card">
-                    <div class="profile-header">
-                        <div class="profile-avatar">👤</div>
-                        <h2 id="profileUsername">User</h2>
-                        <p id="profileEmail">user@example.com</p>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Full Name</label>
-                        <input type="text" id="fullName" placeholder="Enter your full name">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Bio</label>
-                        <textarea id="userBio" rows="3" placeholder="Tell us about yourself"></textarea>
-                    </div>
-                    
-                    <button class="upload-btn" onclick="updateProfile()">Update Profile</button>
-                </div>
-            </div>
-            
-            <!-- Settings Section -->
-            <div id="settings" class="content-section">
-                <h1>Settings</h1>
-                
-                <div style="background:white; padding:2rem; border-radius:10px; box-shadow:0 3px 10px rgba(0,0,0,0.1); max-width:500px;">
-                    <div class="form-group">
-                        <label>Notification Settings</label>
-                        <div>
-                            <input type="checkbox" id="emailNotifications" checked>
-                            <label for="emailNotifications">Email notifications</label>
-                        </div>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Security</label>
-                        <button class="upload-btn" style="background:#dc3545;" onclick="changePassword()">
-                            Change Password
-                        </button>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>Account</label>
-                        <button class="upload-btn" style="background:#ffc107; color:#000;" onclick="exportData()">
-                            Export My Data
-                        </button>
-                    </div>
-                </div>
+            <div class="books-grid" id="myBooksGrid">
+                <!-- User's books will be loaded here -->
             </div>
         </div>
     </div>
 
     <script>
-        // Check if user is logged in
+        // Check if user is logged in (using your existing localStorage system)
         const currentUser = localStorage.getItem('currentUser');
         if (!currentUser) {
             window.location.href = 'index.html';
-        } else {
-            document.getElementById('username').textContent = currentUser;
-            document.getElementById('profileUsername').textContent = currentUser;
-            
-            // Load user data
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            if (users[currentUser]) {
-                document.getElementById('profileEmail').textContent = users[currentUser].email || 'No email set';
-            }
         }
         
-        // Navigation
-        function showSection(sectionId) {
-            // Hide all sections
-            document.querySelectorAll('.content-section').forEach(section => {
-                section.classList.remove('active');
+        // Load books when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllBooks();
+            loadUserBooks();
+        });
+        
+        // Tab navigation
+        function showTab(tabId) {
+            // Hide all tabs
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
             });
             
-            // Remove active class from all sidebar items
-            document.querySelectorAll('.sidebar-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            
-            // Show selected section
-            document.getElementById(sectionId).classList.add('active');
-            
-            // Add active class to clicked sidebar item
+            // Show selected tab
+            document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
+            
+            // Refresh data when switching tabs
+            if (tabId === 'library') loadAllBooks();
+            if (tabId === 'mybooks') loadUserBooks();
         }
         
-        // eBook download
-        function downloadBook(bookId) {
-            alert(`Downloading book #${bookId}\nThis would trigger actual file download in production`);
-        }
-        
-        // Upload eBook
-        function uploadBook(event) {
+        // Add book to library
+        function addBook(event) {
             event.preventDefault();
+            
             const title = document.getElementById('bookTitle').value;
-            alert(`eBook "${title}" uploaded successfully!`);
+            const author = document.getElementById('bookAuthor').value;
+            const description = document.getElementById('bookDescription').value;
+            const category = document.getElementById('bookCategory').value;
+            const driveLink = document.getElementById('driveLink').value;
+            
+            // Validate Google Drive link
+            if (!driveLink.includes('drive.google.com')) {
+                alert('Please provide a valid Google Drive link');
+                return;
+            }
+            
+            // Get existing books from localStorage
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            
+            // Create new book object
+            const newBook = {
+                id: Date.now(),
+                title: title,
+                author: author,
+                description: description,
+                category: category,
+                driveLink: driveLink,
+                uploadedBy: currentUser,
+                uploadDate: new Date().toLocaleDateString(),
+                downloads: 0
+            };
+            
+            // Add to books array
+            books.push(newBook);
+            
+            // Save back to localStorage
+            localStorage.setItem('sigmaBooks', JSON.stringify(books));
+            
+            alert(`✅ "${title}" has been added to the library!`);
+            
             // Reset form
             event.target.reset();
+            
+            // Refresh displays
+            loadAllBooks();
+            loadUserBooks();
+            
+            // Switch to library tab
+            showTab('library');
         }
         
-        // Update profile
-        function updateProfile() {
-            alert('Profile updated successfully!');
+        // Load all books for library
+        function loadAllBooks() {
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            const libraryGrid = document.getElementById('libraryGrid');
+            
+            if (books.length === 0) {
+                libraryGrid.innerHTML = '<p>No books in library yet. Be the first to upload!</p>';
+                return;
+            }
+            
+            libraryGrid.innerHTML = books.map(book => `
+                <div class="book-card">
+                    <div class="book-cover">📚</div>
+                    <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                    <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                    <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                        ${book.category} • ${book.downloads} downloads
+                    </div>
+                    <div style="color: #999; font-size: 0.8em;">
+                        Uploaded by ${book.uploadedBy}
+                    </div>
+                    <button class="download-btn" onclick="downloadBook(${book.id})">
+                        📥 Download eBook
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Load user's books
+        function loadUserBooks() {
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            const userBooks = books.filter(book => book.uploadedBy === currentUser);
+            const myBooksGrid = document.getElementById('myBooksGrid');
+            
+            if (userBooks.length === 0) {
+                myBooksGrid.innerHTML = '<p>You haven\'t uploaded any books yet.</p>';
+                return;
+            }
+            
+            myBooksGrid.innerHTML = userBooks.map(book => `
+                <div class="book-card">
+                    <div class="book-cover">📚</div>
+                    <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                    <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                    <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                        ${book.downloads} downloads • ${book.uploadDate}
+                    </div>
+                    <button class="download-btn" onclick="downloadBook(${book.id})">
+                        📥 Download (${book.downloads})
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Download book
+        function downloadBook(bookId) {
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            const book = books.find(b => b.id === bookId);
+            
+            if (book) {
+                // Increment download count
+                book.downloads = (book.downloads || 0) + 1;
+                localStorage.setItem('sigmaBooks', JSON.stringify(books));
+                
+                // Open Google Drive link in new tab
+                window.open(book.driveLink, '_blank');
+                
+                // Refresh displays
+                loadAllBooks();
+                loadUserBooks();
+            }
         }
         
         // Logout
@@ -519,25 +290,6 @@
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
-        
-        // Settings functions
-        function changePassword() {
-            alert('Password change feature would open here');
-        }
-        
-        function exportData() {
-            alert('Data export would start here');
-        }
-        
-        // Update stats
-        function updateStats() {
-            document.getElementById('totalBooks').textContent = '3';
-            document.getElementById('downloadedBooks').textContent = '0';
-            document.getElementById('uploadedBooks').textContent = '0';
-        }
-        
-        // Initialize
-        updateStats();
     </script>
 </body>
 </html>
