@@ -1,42 +1,243 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Dashboard - WORKING</title>
+    <title>Sigma Portal - Dashboard</title>
+    <meta charset="UTF-8">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background: #f0f2f5; font-family: Arial; }
-        .header { background: white; padding: 20px; text-align: center; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .content { max-width: 800px; margin: 40px auto; padding: 20px; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin: 20px 0; }
-        button { background: #28a745; color: white; padding: 15px; border: none; border-radius: 8px; cursor: pointer; width: 100%; margin: 10px 0; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+        body { background: #f5f5f5; }
+        
+        .header { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+        
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+        
+        .tabs { display: flex; background: white; border-radius: 10px; overflow: hidden; margin-bottom: 2rem; }
+        .tab { flex: 1; padding: 1rem; text-align: center; cursor: pointer; border: none; background: white; }
+        .tab.active { background: #667eea; color: white; }
+        
+        .content { background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        
+        .upload-box { border: 2px dashed #667eea; padding: 2rem; text-align: center; border-radius: 10px; margin: 1rem 0; }
+        
+        input, textarea, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 5px; }
+        button { background: #28a745; color: white; padding: 12px 20px; border: none; border-radius: 5px; cursor: pointer; margin: 5px; }
+        .primary-btn { background: #667eea; width: 100%; }
+        
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; margin-top: 1rem; }
+        .book-card { background: #f8f9fa; padding: 1rem; border-radius: 8px; border-left: 4px solid #667eea; }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>✅ Sigma Dashboard - WORKING!</h1>
-        <p>File upload system ready</p>
+        <div class="logo">Σ Sigma Portal</div>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
-    
-    <div class="content">
-        <div class="card">
-            <h2>📤 Upload eBook</h2>
-            <p>Use Google Drive to share files:</p>
-            <ol>
-                <li>Upload to Google Drive</li>
-                <li>Get shareable link</li>
-                <li>Add link here</li>
-            </ol>
-            <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
-        </div>
+
+    <div class="container">
+        <h1>Welcome to Sigma eBook Sharing</h1>
         
-        <div class="card">
-            <h2>📚 Sample eBooks</h2>
-            <button onclick="alert('Downloading JavaScript Guide')">📥 JavaScript Guide</button>
-            <button onclick="alert('Downloading Python Basics')">📥 Python Basics</button>
-            <button onclick="alert('Downloading Web Development')">📥 Web Development</button>
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('upload')">📤 Upload</button>
+            <button class="tab" onclick="showTab('library')">📚 Library</button>
+            <button class="tab" onclick="showTab('mybooks')">📂 My Books</button>
         </div>
-        
-        <button onclick="location.href='index.html'" style="background: #dc3545;">Logout</button>
+
+        <!-- Upload Tab -->
+        <div id="upload" class="content">
+            <h2>Upload eBook</h2>
+            <p><strong>How it works:</strong> Upload to Google Drive → Get shareable link → Add here</p>
+            
+            <div class="upload-box">
+                <h3>🚀 Quick Upload Guide</h3>
+                <ol style="text-align: left; margin: 1rem 0;">
+                    <li>Go to <a href="https://drive.google.com" target="_blank">Google Drive</a></li>
+                    <li>Upload your eBook file</li>
+                    <li>Right-click → "Get shareable link"</li>
+                    <li>Set to "Anyone with link can view"</li>
+                    <li>Paste the link below</li>
+                </ol>
+                <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
+            </div>
+
+            <form onsubmit="addBook(event)">
+                <input type="text" id="bookTitle" placeholder="Book Title" required>
+                <input type="text" id="bookAuthor" placeholder="Author Name" required>
+                <textarea id="bookDesc" placeholder="Book Description" rows="3"></textarea>
+                
+                <select id="bookCategory">
+                    <option>Programming</option>
+                    <option>Science</option>
+                    <option>Education</option>
+                    <option>Fiction</option>
+                </select>
+                
+                <input type="url" id="bookLink" placeholder="Google Drive Link" required>
+                
+                <button type="submit" class="primary-btn">➕ Add to Library</button>
+            </form>
+        </div>
+
+        <!-- Library Tab -->
+        <div id="library" class="content" style="display: none;">
+            <h2>eBook Library</h2>
+            <p>Download books shared by the community</p>
+            
+            <div class="books-grid" id="libraryGrid">
+                <div class="book-card">
+                    <strong>JavaScript Guide</strong><br>
+                    By John Developer<br>
+                    <small>Programming • 15 downloads</small><br>
+                    <button onclick="downloadBook('https://drive.google.com')">📥 Download</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Books Tab -->
+        <div id="mybooks" class="content" style="display: none;">
+            <h2>My Uploads</h2>
+            <p>Books you've shared</p>
+            <div class="books-grid" id="myBooksGrid">
+                <!-- User's books will appear here -->
+            </div>
+        </div>
     </div>
+
+    <script>
+        // Check login
+        if (!localStorage.getItem('currentUser')) {
+            window.location.href = 'index.html';
+        }
+
+        // Tab system
+        function showTab(tabName) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(tab => {
+                tab.style.display = 'none';
+            });
+            
+            // Remove active from all tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(tabName).style.display = 'block';
+            event.target.classList.add('active');
+            
+            // Load data if needed
+            if (tabName === 'library') loadLibrary();
+            if (tabName === 'mybooks') loadMyBooks();
+        }
+
+        // Add book function
+        function addBook(event) {
+            event.preventDefault();
+            
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const link = document.getElementById('bookLink').value;
+            
+            if (!title || !author || !link) {
+                alert('Please fill all fields');
+                return;
+            }
+
+            // Get existing books
+            let books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            
+            // Add new book
+            books.push({
+                id: Date.now(),
+                title: title,
+                author: author,
+                link: link,
+                category: document.getElementById('bookCategory').value,
+                description: document.getElementById('bookDesc').value,
+                uploadedBy: localStorage.getItem('currentUser'),
+                downloads: 0,
+                date: new Date().toLocaleDateString()
+            });
+            
+            // Save back
+            localStorage.setItem('sigmaBooks', JSON.stringify(books));
+            
+            alert('✅ Book added to library!');
+            event.target.reset();
+            loadLibrary();
+            loadMyBooks();
+        }
+
+        // Load library books
+        function loadLibrary() {
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            const grid = document.getElementById('libraryGrid');
+            
+            if (books.length === 0) {
+                grid.innerHTML = '<p>No books yet. Be the first to upload!</p>';
+                return;
+            }
+            
+            grid.innerHTML = books.map(book => `
+                <div class="book-card">
+                    <strong>${book.title}</strong><br>
+                    By ${book.author}<br>
+                    <small>${book.category} • ${book.downloads} downloads</small><br>
+                    <button onclick="downloadBook('${book.link}', ${book.id})">📥 Download</button>
+                </div>
+            `).join('');
+        }
+
+        // Load user's books
+        function loadMyBooks() {
+            const books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+            const user = localStorage.getItem('currentUser');
+            const userBooks = books.filter(book => book.uploadedBy === user);
+            const grid = document.getElementById('myBooksGrid');
+            
+            if (userBooks.length === 0) {
+                grid.innerHTML = '<p>You haven\'t uploaded any books yet.</p>';
+                return;
+            }
+            
+            grid.innerHTML = userBooks.map(book => `
+                <div class="book-card">
+                    <strong>${book.title}</strong><br>
+                    By ${book.author}<br>
+                    <small>${book.downloads} downloads • ${book.date}</small><br>
+                    <button onclick="downloadBook('${book.link}', ${book.id})">📥 Download</button>
+                </div>
+            `).join('');
+        }
+
+        // Download book
+        function downloadBook(link, bookId) {
+            // Open Google Drive link
+            window.open(link, '_blank');
+            
+            // Update download count
+            if (bookId) {
+                let books = JSON.parse(localStorage.getItem('sigmaBooks') || '[]');
+                const book = books.find(b => b.id === bookId);
+                if (book) {
+                    book.downloads = (book.downloads || 0) + 1;
+                    localStorage.setItem('sigmaBooks', JSON.stringify(books));
+                    loadLibrary();
+                    loadMyBooks();
+                }
+            }
+        }
+
+        // Logout
+        function logout() {
+            localStorage.removeItem('currentUser');
+            window.location.href = 'index.html';
+        }
+
+        // Load initial data
+        loadLibrary();
+        loadMyBooks();
+    </script>
 </body>
 </html>
