@@ -1,9 +1,13 @@
+#!/bin/bash
+
+cat > dashboard-enhanced.html << 'HTML_EOF'
 <!DOCTYPE html>
 <html>
 <head>
     <title>Sigma Portal - Enhanced eBook Sharing</title>
     <meta charset="UTF-8">
     <style>
+        /* ALL YOUR EXISTING CSS REMAINS SAME */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f8f9fa; }
         .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
@@ -27,6 +31,8 @@
         .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
         .loading { text-align: center; padding: 2rem; color: #666; }
         .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
+
+        /* NEW FEATURES CSS */
         .search-box { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
         .search-input { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
         .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
@@ -38,11 +44,24 @@
         .user-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
         .user-avatar { width: 50px; height: 50px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .premium-badge { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
+        
+        /* File Upload Styles */
+        .file-upload-container { border: 2px dashed #667eea; border-radius: 8px; padding: 2rem; text-align: center; margin-bottom: 1.5rem; }
+        .file-upload-label { cursor: pointer; color: #667eea; font-weight: bold; }
+        .file-name { margin-top: 0.5rem; color: #666; }
+        .star-rating { display: flex; gap: 5px; margin: 0.5rem 0; }
+        .star { cursor: pointer; font-size: 1.2em; color: #ddd; }
+        .star.active { color: #ffc107; }
+        .reviews-list { max-height: 150px; overflow-y: auto; margin-top: 0.5rem; }
+        .review-item { padding: 0.5rem; border-bottom: 1px solid #f0f0f0; }
+        .review-author { font-weight: bold; color: #667eea; }
     </style>
 
+    <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, arrayUnion } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
@@ -55,10 +74,13 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
 
         window.firebaseApp = app;
         window.firestore = db;
-        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment };
+        window.firebaseStorage = storage;
+        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, arrayUnion };
+        window.storageFunctions = { ref, uploadBytes, getDownloadURL };
     </script>
 </head>
 <body>
@@ -66,9 +88,9 @@
         <div class="nav-brand">Σ Sigma Portal - ENHANCED</div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">S</div>
+                <div class="user-avatar" id="userAvatar">U</div>
                 <div>
-                    <div style="font-weight: bold;" id="userName">Sigma User</div>
+                    <div style="font-weight: bold;" id="userName">User</div>
                     <div class="premium-badge">⭐ PREMIUM USER</div>
                 </div>
             </div>
@@ -78,7 +100,7 @@
 
     <div class="container">
         <h1>📚 Sigma eBook Sharing - Enhanced</h1>
-        <p><strong>NOW WITH:</strong> Search • Ratings • Reviews • User Profiles • File Upload</p>
+        <p><strong>NOW WITH:</strong> Search • Real Ratings • Real Reviews • File Upload</p>
 
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('library')">📚 Public Library</button>
@@ -87,6 +109,7 @@
             <button class="tab-btn" onclick="showTab('profile')">👤 My Profile</button>
         </div>
 
+        <!-- Search & Filters -->
         <div class="search-box">
             <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search books by title, author, or category..." onkeyup="filterBooks()">
             <div class="filters">
@@ -99,43 +122,47 @@
                 <button class="filter-btn" onclick="setFilter('highest-rated')">⭐ Highest Rated</button>
             </div>
         </div>
-
+        
+        <!-- Public Library Tab -->
         <div id="library" class="tab-content active">
             <h2>📚 Enhanced Public Library</h2>
-            <p>Discover amazing books with ratings and reviews</p>
+            <p>Discover amazing books with real ratings and reviews</p>
+            
             <div class="books-grid" id="publicLibraryGrid">
-                <div class="loading">Loading enhanced library with ratings...</div>
+                <div class="loading">Loading enhanced library...</div>
             </div>
         </div>
-
+        
+        <!-- Upload Tab -->
         <div id="upload" class="tab-content">
-            <h2>📤 Upload eBook</h2>
-
+            <h2>Upload eBook File</h2>
+            
             <div class="guide-box">
-                <h3>🚀 Simple File Upload:</h3>
+                <h3>🚀 New Upload System:</h3>
                 <ol>
-                    <li><strong>Choose PDF file</strong> from your device</li>
-                    <li>Add book details below</li>
-                    <li>Click upload</li>
+                    <li><strong>Select PDF file</strong> directly from your device</li>
+                    <li>Add book details and description</li>
+                    <li>File gets uploaded to secure storage</li>
+                    <li>Get <strong>real ratings & reviews</strong> from community</li>
                 </ol>
             </div>
-
-            <form onsubmit="uploadBook(event)">
+            
+            <form onsubmit="uploadBookFile(event)">
                 <div class="form-group">
                     <label>Book Title *</label>
                     <input type="text" id="bookTitle" placeholder="Enter book title" required>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Author Name *</label>
                     <input type="text" id="bookAuthor" placeholder="Author name" required>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Book Description</label>
                     <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
                 </div>
-
+                
                 <div class="form-group">
                     <label>Category</label>
                     <select id="bookCategory">
@@ -147,34 +174,45 @@
                         <option>Other</option>
                     </select>
                 </div>
-
+                
                 <div class="form-group">
-                    <label>Select eBook File (PDF) *</label>
-                    <input type="file" id="bookFile" accept=".pdf" required style="padding: 1rem; border: 2px dashed #667eea; border-radius: 8px; width: 100%;">
+                    <label>Upload eBook File (PDF) *</label>
+                    <div class="file-upload-container">
+                        <label class="file-upload-label">
+                            📁 Click to select PDF file
+                            <input type="file" id="bookFile" accept=".pdf" style="display: none;" onchange="showFileName()" required>
+                        </label>
+                        <div class="file-name" id="fileName">No file selected</div>
+                    </div>
                 </div>
-
-                <button type="submit" class="upload-btn">📤 Upload eBook</button>
+                
+                <button type="submit" class="upload-btn" id="uploadButton">📤 Upload eBook File</button>
             </form>
         </div>
-
+        
+        <!-- My Books Tab -->
         <div id="mybooks" class="tab-content">
             <h2>My Uploaded eBooks</h2>
             <p>Manage your books and see community feedback</p>
+            
             <div class="books-grid" id="myBooksGrid">
-                <div class="loading">Loading your books with ratings...</div>
+                <div class="loading">Loading your books...</div>
             </div>
         </div>
 
+        <!-- Profile Tab -->
         <div id="profile" class="tab-content">
             <h2>👤 My Profile</h2>
+            
             <div class="user-profile" style="margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">S</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
                 <div>
-                    <h3>Sigma User</h3>
+                    <h3 id="profileName">User</h3>
                     <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Joined: <span id="joinDate">28/10/2025</span></p>
+                    <p>Joined: <span id="joinDate">Loading...</span></p>
                 </div>
             </div>
+
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                 <div class="book-card">
                     <h4>📊 My Stats</h4>
@@ -182,6 +220,7 @@
                     <p><strong>Total Downloads:</strong> <span id="totalDownloads">0</span></p>
                     <p><strong>Average Rating:</strong> <span id="averageRating">-</span></p>
                 </div>
+                
                 <div class="book-card">
                     <h4>🎯 Achievements</h4>
                     <p>✅ eBook Uploader</p>
@@ -194,19 +233,26 @@
     </div>
 
     <script>
-        const currentUser = localStorage.getItem('currentUser') || 'Sigma User';
+        // Check login and initialize user data
+        const currentUser = localStorage.getItem('currentUser') || 'User';
+
+        // Update user display elements
         document.getElementById('userName').textContent = currentUser;
-        document.getElementById('userAvatar').textContent = currentUser.charAt(0);
+        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+        document.getElementById('profileName').textContent = currentUser;
+        document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
         document.getElementById('joinDate').textContent = new Date().toLocaleDateString();
 
         if (!localStorage.getItem('currentUser')) {
             window.location.href = 'index.html';
         }
 
+        // Global variables
         let allBooks = [];
         let currentFilter = 'all';
         let searchQuery = '';
 
+        // Wait for Firebase to load
         let firebaseReady = false;
         const checkFirebase = setInterval(() => {
             if (window.firestore && window.firestoreFunctions) {
@@ -217,6 +263,7 @@
             }
         }, 100);
 
+        // Enhanced tab navigation
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -228,11 +275,91 @@
             if (tabId === 'profile') loadUserStats();
         }
 
+        // File upload functions
+        function showFileName() {
+            const fileInput = document.getElementById('bookFile');
+            const fileName = document.getElementById('fileName');
+            if (fileInput.files.length > 0) {
+                fileName.textContent = 'Selected: ' + fileInput.files[0].name;
+            } else {
+                fileName.textContent = 'No file selected';
+            }
+        }
+
+        // Upload book file to Firebase Storage
+        async function uploadBookFile(event) {
+            event.preventDefault();
+            if (!firebaseReady) return;
+            
+            const fileInput = document.getElementById('bookFile');
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const description = document.getElementById('bookDescription').value;
+            const category = document.getElementById('bookCategory').value;
+            
+            if (!fileInput.files[0]) {
+                alert('Please select a PDF file');
+                return;
+            }
+
+            const uploadButton = document.getElementById('uploadButton');
+            uploadButton.textContent = '📤 Uploading...';
+            uploadButton.disabled = true;
+
+            try {
+                const { ref, uploadBytes, getDownloadURL } = window.storageFunctions;
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                // Upload file to Firebase Storage
+                const file = fileInput.files[0];
+                const storageRef = ref(window.firebaseStorage, 'books/' + Date.now() + '_' + file.name);
+                const snapshot = await uploadBytes(storageRef, file);
+                const downloadURL = await getDownloadURL(snapshot.ref);
+                
+                // Add book to Firestore
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    fileURL: downloadURL,
+                    fileName: file.name,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date(),
+                    downloads: 0,
+                    totalRating: 0,
+                    ratingCount: 0,
+                    averageRating: 0,
+                    reviews: []
+                });
+                
+                // Reset form
+                document.getElementById('bookTitle').value = '';
+                document.getElementById('bookAuthor').value = '';
+                document.getElementById('bookDescription').value = '';
+                document.getElementById('bookFile').value = '';
+                document.getElementById('fileName').textContent = 'No file selected';
+                
+                alert('Book uploaded successfully!');
+                loadEnhancedBooks();
+                showTab('library');
+                
+            } catch (error) {
+                console.error('Error uploading book:', error);
+                alert('Error uploading book. Please try again.');
+            } finally {
+                uploadButton.textContent = '📤 Upload eBook File';
+                uploadButton.disabled = false;
+            }
+        }
+
+        // Search functionality
         function filterBooks() {
             searchQuery = document.getElementById('searchInput').value.toLowerCase();
             loadEnhancedBooks();
         }
 
+        // Filter functionality
         function setFilter(filter) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -240,20 +367,26 @@
             loadEnhancedBooks();
         }
 
+        // Enhanced book loading with search/filter
         async function loadEnhancedBooks() {
             if (!firebaseReady) return;
+            
             try {
                 const { collection, getDocs, query, orderBy } = window.firestoreFunctions;
+                
                 const q = query(collection(window.firestore, 'books'), orderBy('uploadDate', 'desc'));
                 const snapshot = await getDocs(q);
+                
                 allBooks = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
 
+                // Apply search and filters
                 let filteredBooks = allBooks;
+                
                 if (searchQuery) {
-                    filteredBooks = filteredBooks.filter(book =>
+                    filteredBooks = filteredBooks.filter(book => 
                         book.title.toLowerCase().includes(searchQuery) ||
                         book.author.toLowerCase().includes(searchQuery) ||
                         (book.category && book.category.toLowerCase().includes(searchQuery)) ||
@@ -279,20 +412,24 @@
                             filteredBooks = filteredBooks.filter(book => (book.downloads || 0) > 10);
                             break;
                         case 'highest-rated':
-                            filteredBooks = filteredBooks.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                            filteredBooks = filteredBooks.sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0));
                             break;
                     }
                 }
 
                 displayEnhancedBooks(filteredBooks);
+                
             } catch (error) {
                 console.error('Error loading books:', error);
-                document.getElementById('publicLibraryGrid').innerHTML = '<div class="loading">Error loading enhanced library.</div>';
+                document.getElementById('publicLibraryGrid').innerHTML = 
+                    '<div class="loading">Error loading enhanced library.</div>';
             }
         }
 
+        // Display books with REAL ratings and reviews
         function displayEnhancedBooks(books) {
             const grid = document.getElementById('publicLibraryGrid');
+            
             if (books.length === 0) {
                 grid.innerHTML = '<div class="loading">No books found matching your criteria.</div>';
                 return;
@@ -301,28 +438,54 @@
             grid.innerHTML = books.map(book => {
                 const uploadDate = book.uploadDate ? new Date(book.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown date';
                 const isOwner = book.uploadedBy === currentUser;
-                const rating = 4.0 + (book.id.charCodeAt(0) % 10) / 10;
-                const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
-
+                const averageRating = book.averageRating || 0;
+                const stars = '⭐'.repeat(Math.floor(averageRating)) + '☆'.repeat(5 - Math.floor(averageRating));
+                
                 return `
                     <div class="book-card">
                         ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
                         <div class="book-cover">📚</div>
                         <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                         <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
-                        <div class="rating-stars" title="${rating.toFixed(1)}/5 stars">
-                            ${stars} <small style="color: #666;">(${rating.toFixed(1)})</small>
+                        
+                        <div class="rating-stars" title="${averageRating.toFixed(1)}/5 stars">
+                            ${stars} <small style="color: #666;">(${averageRating.toFixed(1)})</small>
                         </div>
+                        
                         <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                            ${book.category} • ${book.downloads || 0} downloads
+                            ${book.category || 'Uncategorized'} • ${book.downloads || 0} downloads
                         </div>
                         <div style="color: #999; font-size: 0.8em;">
                             Uploaded by ${book.uploadedBy} • ${uploadDate}
                         </div>
-                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                        
+                        <button class="download-btn" onclick="downloadBook('${book.fileURL}', '${book.id}')">
                             📥 Download eBook
                         </button>
+                        
+                        <!-- Rating Section -->
                         <div class="review-section">
+                            <div class="star-rating" id="rating-${book.id}">
+                                <span class="star" onclick="rateBook('${book.id}', 1)">★</span>
+                                <span class="star" onclick="rateBook('${book.id}', 2)">★</span>
+                                <span class="star" onclick="rateBook('${book.id}', 3)">★</span>
+                                <span class="star" onclick="rateBook('${book.id}', 4)">★</span>
+                                <span class="star" onclick="rateBook('${book.id}', 5)">★</span>
+                            </div>
+                            
+                            <!-- Reviews List -->
+                            <div class="reviews-list">
+                                ${book.reviews && book.reviews.length > 0 ? 
+                                    book.reviews.map(review => 
+                                        `<div class="review-item">
+                                            <span class="review-author">${review.user}:</span> ${review.text}
+                                        </div>`
+                                    ).join('') : 
+                                    '<div style="color: #999; text-align: center;">No reviews yet</div>'
+                                }
+                            </div>
+                            
+                            <!-- Add Review -->
                             <input type="text" class="review-input" placeholder="Add a review..." id="review-${book.id}">
                             <button onclick="addReview('${book.id}')" style="background: #667eea; color: white; border: none; padding: 5px 10px; border-radius: 5px; width: 100%; cursor: pointer;">
                                 💬 Add Review
@@ -333,269 +496,53 @@
             }).join('');
         }
 
-        function uploadBook(event) {
-            event.preventDefault();
-            
-            const title = document.getElementById('bookTitle').value;
-            const author = document.getElementById('bookAuthor').value;
-            const description = document.getElementById('bookDescription').value;
-            const category = document.getElementById('bookCategory').value;
-            const fileInput = document.getElementById('bookFile');
-            
-            if (!fileInput.files[0]) {
-                alert('Please select a PDF file');
-                return;
-            }
-            
-            const file = fileInput.files[0];
-            
-            alert('✅ Uploaded: ' + title + ' by ' + author + '\nFile: ' + file.name + '\nSize: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
-            
-            // Clear form
-            document.getElementById('bookTitle').value = '';
-            document.getElementById('bookAuthor').value = '';
-            document.getElementById('bookDescription').value = '';
-            fileInput.value = '';
-        }
-
-        function downloadBook(driveLink, bookId) {
-            if (firebaseReady && bookId) {
-                const { doc, updateDoc, increment } = window.firestoreFunctions;
-                updateDoc(doc(window.firestore, 'books', bookId), {
-                    downloads: increment(1)
-                }).catch(error => console.error('Error updating download count:', error));
-            }
-            window.open(driveLink, '_blank');
-        }
-
-        function addReview(bookId) {
-            const reviewInput = document.getElementById(`review-${bookId}`);
-            const reviewText = reviewInput.value.trim();
-            if (reviewText) {
-                alert('Review added: ' + reviewText);
-                reviewInput.value = '';
-            } else {
-                alert('Please enter a review first.');
-            }
-        }
-
-        async function loadMyBooks() {
-            if (!firebaseReady) return;
-            try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
-                const grid = document.getElementById('myBooksGrid');
-                if (myBooks.length === 0) {
-                    grid.innerHTML = '<div class="loading">You haven\\'t uploaded any books yet.</div>';
-                    return;
-                }
-                grid.innerHTML = myBooks.map(book => {
-                    const uploadDate = book.uploadDate ? new Date(book.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown date';
-                    const rating = 4.0 + (book.id.charCodeAt(0) % 10) / 10;
-                    const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
-                    return `
-                        <div class="book-card">
-                            <div class="owner-badge">YOUR BOOK</div>
-                            <div class="book-cover">📚</div>
-                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
-                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
-                            <div class="rating-stars">${stars} <small style="color: #666;">(${rating.toFixed(1)})</small></div>
-                            <div style="color: #888; font-size: 0.9em;">${book.downloads || 0} downloads • ${uploadDate}</div>
-                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">📥 Download</button>
-                            <button class="delete-btn" onclick="deleteBook('${book.id}')">🗑️ Delete Book</button>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Error loading my books:', error);
-                document.getElementById('myBooksGrid').innerHTML = '<div class="loading">Error loading your books.</div>';
-            }
-        }
-
-        async function deleteBook(bookId) {
-            if (!firebaseReady) return;
-            if (confirm('Are you sure you want to delete this book?')) {
-                try {
-                    const { doc, deleteDoc } = window.firestoreFunctions;
-                    await deleteDoc(doc(window.firestore, 'books', bookId));
-                    alert('Book deleted successfully!');
-                    loadMyBooks();
-                    loadEnhancedBooks();
-                } catch (error) {
-                    console.error('Error deleting book:', error);
-                    alert('Error deleting book. Please try again.');
-                }
-            }
-        }
-
-        async function loadUserStats() {
-            if (!firebaseReady) return;
-            try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
-                const totalDownloads = myBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
-                document.getElementById('uploadCount').textContent = myBooks.length;
-                document.getElementById('totalDownloads').textContent = totalDownloads;
-                document.getElementById('averageRating').textContent = myBooks.length > 0 ? '4.5/5' : '-';
-            } catch (error) {
-                console.error('Error loading user stats:', error);
-            }
-        }
-
-        function logout() {
-            localStorage.removeItem('currentUser');
-            window.location.href = 'index.html';
-        }
-    </script>
-</body>
-</html>
-
-        async function loadMyBooks() {
-            if (!firebaseReady) return;
-            try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
-                const grid = document.getElementById('myBooksGrid');
-                if (myBooks.length === 0) {
-                    grid.innerHTML = '<div class="loading">You haven\\'t uploaded any books yet.</div>';
-                    return;
-                }
-                grid.innerHTML = myBooks.map(book => {
-                    const uploadDate = book.uploadDate ? new Date(book.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown date';
-                    const averageRating = book.averageRating || 0;
-                    const stars = '⭐'.repeat(Math.floor(averageRating)) + '☆'.repeat(5 - Math.floor(averageRating));
-                    return `
-                        <div class="book-card">
-                            <div class="owner-badge">YOUR BOOK</div>
-                            <div class="book-cover">📚</div>
-                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
-                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
-                            <div class="rating-stars">${stars} <small style="color: #666;">(${averageRating.toFixed(1)})</small></div>
-                            <div style="color: #888; font-size: 0.9em;">${book.downloads || 0} downloads • ${uploadDate}</div>
-                            <button class="download-btn" onclick="downloadBook('${book.id}')">📥 Download</button>
-                            <button class="delete-btn" onclick="deleteBook('${book.id}')">🗑️ Delete Book</button>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('Error loading my books:', error);
-                document.getElementById('myBooksGrid').innerHTML = '<div class="loading">Error loading your books.</div>';
-            }
-        }
-
-        async function loadUserStats() {
-            if (!firebaseReady) return;
-            try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
-                const totalDownloads = myBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
-                const totalRating = myBooks.reduce((sum, book) => sum + (book.averageRating || 0), 0);
-                const averageRating = myBooks.length > 0 ? (totalRating / myBooks.length).toFixed(1) : '-';
-                document.getElementById('uploadCount').textContent = myBooks.length;
-                document.getElementById('totalDownloads').textContent = totalDownloads;
-                document.getElementById('averageRating').textContent = averageRating;
-            } catch (error) {
-                console.error('Error loading user stats:', error);
-            }
-        }
-
-        // Fixed upload function that saves to Firebase
-        async function uploadBook(event) {
-            event.preventDefault();
-
-            if (!firebaseReady) {
-                alert('Firebase not ready yet. Please wait...');
-                return;
-            }
-
-            const title = document.getElementById('bookTitle').value;
-            const author = document.getElementById('bookAuthor').value;
-            const description = document.getElementById('bookDescription').value;
-            const category = document.getElementById('bookCategory').value;
-            const fileInput = document.getElementById('bookFile');
-
-            if (!fileInput.files[0]) {
-                alert('Please select a PDF file');
-                return;
-            }
-
-            try {
-                const { collection, addDoc } = window.firestoreFunctions;
-
-                await addDoc(collection(window.firestore, 'books'), {
-                    title: title,
-                    author: author,
-                    description: description,
-                    category: category,
-                    fileName: fileInput.files[0].name,
-                    fileSize: (fileInput.files[0].size / 1024 / 1024).toFixed(2) + ' MB',
-                    uploadedBy: currentUser,
-                    uploadDate: new Date(),
-                    downloads: 0,
-                    totalRating: 0,
-                    ratingCount: 0,
-                    averageRating: 0,
-                    reviews: []
-                });
-
-                // Clear form
-                document.getElementById('bookTitle').value = '';
-                document.getElementById('bookAuthor').value = '';
-                document.getElementById('bookDescription').value = '';
-                document.getElementById('bookFile').value = '';
-
-                alert('✅ Book uploaded successfully to Firebase!');
-                loadEnhancedBooks();
-
-            } catch (error) {
-                console.error('Error uploading book:', error);
-                alert('Error uploading book. Please try again.');
-            }
-        }
-
-        // Fixed rating system
+        // Rate a book
         async function rateBook(bookId, rating) {
             if (!firebaseReady) return;
-
+            
             try {
-                const { doc, updateDoc, getDoc, increment } = window.firestoreFunctions;
+                const { doc, updateDoc, getDoc } = window.firestoreFunctions;
                 const bookRef = doc(window.firestore, 'books', bookId);
                 const bookDoc = await getDoc(bookRef);
                 const bookData = bookDoc.data();
-
+                
                 const currentTotal = bookData.totalRating || 0;
                 const currentCount = bookData.ratingCount || 0;
                 const newTotal = currentTotal + rating;
                 const newCount = currentCount + 1;
                 const newAverage = newTotal / newCount;
-
+                
                 await updateDoc(bookRef, {
                     totalRating: newTotal,
                     ratingCount: newCount,
                     averageRating: newAverage
                 });
-
+                
                 alert(`Thanks for your ${rating} star rating!`);
                 loadEnhancedBooks();
-
+                
             } catch (error) {
                 console.error('Error rating book:', error);
                 alert('Error submitting rating. Please try again.');
             }
         }
 
-        // Fixed review system
+        // Add review
         async function addReview(bookId) {
             if (!firebaseReady) return;
-
+            
             const reviewInput = document.getElementById(`review-${bookId}`);
             const reviewText = reviewInput.value.trim();
-
+            
             if (!reviewText) {
                 alert('Please enter a review first.');
                 return;
             }
-
+            
             try {
                 const { doc, updateDoc, arrayUnion } = window.firestoreFunctions;
                 const bookRef = doc(window.firestore, 'books', bookId);
-
+                
                 await updateDoc(bookRef, {
                     reviews: arrayUnion({
                         user: currentUser,
@@ -603,32 +550,85 @@
                         date: new Date()
                     })
                 });
-
+                
                 alert('Review added successfully!');
                 reviewInput.value = '';
                 loadEnhancedBooks();
-
+                
             } catch (error) {
                 console.error('Error adding review:', error);
                 alert('Error adding review. Please try again.');
             }
         }
 
-        // Fixed download function
-        function downloadBook(bookId) {
+        // Download book function
+        function downloadBook(fileURL, bookId) {
+            // Increment download count
             if (firebaseReady && bookId) {
                 const { doc, updateDoc, increment } = window.firestoreFunctions;
                 updateDoc(doc(window.firestore, 'books', bookId), {
                     downloads: increment(1)
                 }).catch(error => console.error('Error updating download count:', error));
             }
-            alert('Download started! File would download in real app.');
+            
+            // Open download link
+            window.open(fileURL, '_blank');
         }
 
-        // Fixed delete function
+        // Load user's books
+        async function loadMyBooks() {
+            if (!firebaseReady) return;
+            
+            try {
+                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (myBooks.length === 0) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    return;
+                }
+                
+                grid.innerHTML = myBooks.map(book => {
+                    const uploadDate = book.uploadDate ? new Date(book.uploadDate.seconds * 1000).toLocaleDateString() : 'Unknown date';
+                    const averageRating = book.averageRating || 0;
+                    const stars = '⭐'.repeat(Math.floor(averageRating)) + '☆'.repeat(5 - Math.floor(averageRating));
+                    
+                    return `
+                        <div class="book-card">
+                            <div class="owner-badge">YOUR BOOK</div>
+                            <div class="book-cover">📚</div>
+                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            
+                            <div class="rating-stars">
+                                ${stars} <small style="color: #666;">(${averageRating.toFixed(1)})</small>
+                            </div>
+                            
+                            <div style="color: #888; font-size: 0.9em;">
+                                ${book.downloads || 0} downloads • ${uploadDate}
+                            </div>
+                            
+                            <button class="download-btn" onclick="downloadBook('${book.fileURL}', '${book.id}')">
+                                📥 Download
+                            </button>
+                            <button class="delete-btn" onclick="deleteBook('${book.id}')">
+                                🗑️ Delete Book
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading my books:', error);
+                document.getElementById('myBooksGrid').innerHTML = 
+                    '<div class="loading">Error loading your books.</div>';
+            }
+        }
+
+        // Delete book function
         async function deleteBook(bookId) {
             if (!firebaseReady) return;
-
+            
             if (confirm('Are you sure you want to delete this book?')) {
                 try {
                     const { doc, deleteDoc } = window.firestoreFunctions;
@@ -643,7 +643,26 @@
             }
         }
 
-        // Fixed logout function
+        // Load user statistics
+        async function loadUserStats() {
+            if (!firebaseReady) return;
+            
+            try {
+                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
+                const totalDownloads = myBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
+                const totalRating = myBooks.reduce((sum, book) => sum + (book.averageRating || 0), 0);
+                const averageRating = myBooks.length > 0 ? (totalRating / myBooks.length).toFixed(1) : '-';
+                
+                document.getElementById('uploadCount').textContent = myBooks.length;
+                document.getElementById('totalDownloads').textContent = totalDownloads;
+                document.getElementById('averageRating').textContent = averageRating;
+                
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        // Logout function
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
@@ -651,3 +670,9 @@
     </script>
 </body>
 </html>
+HTML_EOF
+
+echo "✅ Fixed dashboard-enhanced.html created successfully!"
+echo "✅ Fixed: Real ratings system (no more random changes)"
+echo "✅ Fixed: Real review storage (reviews saved to Firebase)"
+echo "✅ Added: File upload system (no more Google Drive links)"
