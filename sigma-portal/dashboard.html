@@ -74,9 +74,9 @@
         <div class="nav-brand">Σ Sigma Portal - ENHANCED</div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div class="user-profile">
-                <div class="user-avatar" id="userAvatar">U</div>
+                <div class="user-avatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
                 <div>
-                    <div style="font-weight: bold;" id="userName">User</div>
+                    <div style="font-weight: bold;">${currentUser}</div>
                     <div class="premium-badge">⭐ PREMIUM USER</div>
                 </div>
             </div>
@@ -119,20 +119,22 @@
             </div>
         </div>
         
-        <!-- UPLOAD SECTION FIXED: File upload instead of Google Drive -->
+        <!-- Upload Tab -->
         <div id="upload" class="tab-content">
-            <h2>Upload eBook</h2>
+            <h2>Upload to Public Library</h2>
             
             <div class="guide-box">
-                <h3>🚀 Simple File Upload:</h3>
+                <h3>🚀 How to Upload:</h3>
                 <ol>
-                    <li><strong>Choose PDF file</strong> from your device</li>
+                    <li>Upload eBook to <strong>Google Drive</strong></li>
+                    <li>Get <strong>shareable link</strong> (anyone can view)</li>
                     <li>Add book details below</li>
-                    <li>Click upload</li>
+                    <li>Get <strong>ratings & reviews</strong> from community</li>
                 </ol>
+                <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
             </div>
             
-            <form onsubmit="uploadBook(event)">
+            <form onsubmit="addBookToPublicLibrary(event)">
                 <div class="form-group">
                     <label>Book Title *</label>
                     <input type="text" id="bookTitle" placeholder="Enter book title" required>
@@ -161,11 +163,11 @@
                 </div>
                 
                 <div class="form-group">
-                    <label>Select eBook File (PDF) *</label>
-                    <input type="file" id="bookFile" accept=".pdf" required style="padding: 1rem; border: 2px dashed #667eea; border-radius: 8px; width: 100%;">
+                    <label>Google Drive Link *</label>
+                    <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
                 </div>
                 
-                <button type="submit" class="upload-btn">📤 Upload eBook</button>
+                <button type="submit" class="upload-btn">🌐 Add to Enhanced Library</button>
             </form>
         </div>
         
@@ -184,11 +186,11 @@
             <h2>👤 My Profile</h2>
             
             <div class="user-profile" style="margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
                 <div>
-                    <h3 id="profileName">User</h3>
+                    <h3>${currentUser}</h3>
                     <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Joined: <span id="joinDate">Loading...</span></p>
+                    <p>Joined: ${new Date().toLocaleDateString()}</p>
                 </div>
             </div>
 
@@ -212,19 +214,13 @@
     </div>
 
     <script>
-        // Check login and initialize user data
-        const currentUser = localStorage.getItem('currentUser') || 'User';
-        document.getElementById('userName').textContent = currentUser;
-        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
-        document.getElementById('profileName').textContent = currentUser;
-        document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
-        document.getElementById('joinDate').textContent = new Date().toLocaleDateString();
-
-        if (!localStorage.getItem('currentUser')) {
+        // Check login
+        const currentUser = localStorage.getItem('currentUser');
+        if (!currentUser) {
             window.location.href = 'index.html';
         }
 
-        // Global variables for enhanced features
+        // NEW: Global variables for enhanced features
         let allBooks = [];
         let currentFilter = 'all';
         let searchQuery = '';
@@ -240,7 +236,7 @@
             }
         }, 100);
 
-        // Enhanced tab navigation
+        // NEW: Enhanced tab navigation
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
@@ -252,13 +248,13 @@
             if (tabId === 'profile') loadUserStats();
         }
 
-        // Search functionality
+        // NEW: Search functionality
         function filterBooks() {
             searchQuery = document.getElementById('searchInput').value.toLowerCase();
             loadEnhancedBooks();
         }
 
-        // Filter functionality
+        // NEW: Filter functionality
         function setFilter(filter) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -266,7 +262,7 @@
             loadEnhancedBooks();
         }
 
-        // Enhanced book loading with search/filter
+        // NEW: Enhanced book loading with search/filter
         async function loadEnhancedBooks() {
             if (!firebaseReady) return;
             
@@ -328,7 +324,7 @@
             }
         }
 
-        // Display books with enhanced features
+        // NEW: Display books with enhanced features
         function displayEnhancedBooks(books) {
             const grid = document.getElementById('publicLibraryGrid');
             
@@ -374,55 +370,116 @@
                                 💬 Add Review
                             </button>
                         </div>
+                        
+                        ${isOwner ? `
+                            <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')">
+                                🗑️ Delete This Book
+                            </button>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
         }
 
-        // SIMPLE UPLOAD FUNCTION - File selection from device
-        function uploadBook(event) {
+        // NEW: Add review function
+        async function addReview(bookId) {
+            const reviewInput = document.getElementById(`review-${bookId}`);
+            const reviewText = reviewInput.value.trim();
+            
+            if (!reviewText) {
+                alert('Please enter a review');
+                return;
+            }
+
+            try {
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                await addDoc(collection(window.firestore, 'reviews'), {
+                    bookId: bookId,
+                    userId: currentUser,
+                    review: reviewText,
+                    rating: 5, // For demo - in real app, get from star rating
+                    date: new Date().toISOString()
+                });
+
+                alert('✅ Review added successfully!');
+                reviewInput.value = '';
+                
+            } catch (error) {
+                alert('Error adding review: ' + error.message);
+            }
+        }
+
+        // NEW: Load user statistics
+        async function loadUserStats() {
+            if (!firebaseReady) return;
+            
+            try {
+                const { collection, getDocs, query, where } = window.firestoreFunctions;
+                
+                // Get user's books
+                const booksQuery = query(
+                    collection(window.firestore, 'books'), 
+                    where('uploadedBy', '==', currentUser)
+                );
+                const booksSnapshot = await getDocs(booksQuery);
+                
+                const userBooks = booksSnapshot.docs.map(doc => doc.data());
+                const uploadCount = userBooks.length;
+                const totalDownloads = userBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
+                
+                document.getElementById('uploadCount').textContent = uploadCount;
+                document.getElementById('totalDownloads').textContent = totalDownloads;
+                document.getElementById('averageRating').textContent = uploadCount > 0 ? '4.5/5' : '-';
+                
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        // KEEP ALL YOUR EXISTING FUNCTIONS - they remain exactly the same
+        async function addBookToPublicLibrary(event) {
             event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
             
             const title = document.getElementById('bookTitle').value;
             const author = document.getElementById('bookAuthor').value;
             const description = document.getElementById('bookDescription').value;
             const category = document.getElementById('bookCategory').value;
-            const fileInput = document.getElementById('bookFile');
+            const driveLink = document.getElementById('driveLink').value;
             
-            if (!fileInput.files[0]) {
-                alert('Please select a PDF file');
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
                 return;
             }
-            
-            const file = fileInput.files[0];
-            
-            alert('✅ Uploaded: ' + title + ' by ' + author + '\nFile: ' + file.name + '\nSize: ' + (file.size / 1024 / 1024).toFixed(2) + ' MB');
-            
-            // Clear form
-            document.getElementById('bookTitle').value = '';
-            document.getElementById('bookAuthor').value = '';
-            document.getElementById('bookDescription').value = '';
-            fileInput.value = '';
-        }
 
-        function downloadBook(driveLink, bookId) {
-            if (firebaseReady && bookId) {
-                const { doc, updateDoc, increment } = window.firestoreFunctions;
-                updateDoc(doc(window.firestore, 'books', bookId), {
-                    downloads: increment(1)
-                }).catch(error => console.error('Error updating download count:', error));
-            }
-            window.open(driveLink, '_blank');
-        }
+            try {
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    driveLink: driveLink,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
+                });
 
-        function addReview(bookId) {
-            const reviewInput = document.getElementById(`review-${bookId}`);
-            const reviewText = reviewInput.value.trim();
-            if (reviewText) {
-                alert('Review added: ' + reviewText);
-                reviewInput.value = '';
-            } else {
-                alert('Please enter a review first.');
+                alert(`✅ "${title}" added to enhanced library!`);
+                event.target.reset();
+                
+                loadEnhancedBooks();
+                loadMyBooks();
+                loadUserStats();
+                
+            } catch (error) {
+                alert('Error adding book: ' + error.message);
             }
         }
 
@@ -430,39 +487,47 @@
             if (!firebaseReady) return;
             
             try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
+                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
+                
+                const q = query(
+                    collection(window.firestore, 'books'), 
+                    where('uploadedBy', '==', currentUser),
+                    orderBy('uploadDate', 'desc')
+                );
+                const snapshot = await getDocs(q);
+                
                 const grid = document.getElementById('myBooksGrid');
                 
-                if (myBooks.length === 0) {
-                    grid.innerHTML = '<div class="loading">You haven\\'t uploaded any books yet.</div>';
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
                     return;
                 }
                 
-                grid.innerHTML = myBooks.map(book => {
+                grid.innerHTML = snapshot.docs.map(doc => {
+                    const book = doc.data();
                     const uploadDate = new Date(book.uploadDate).toLocaleDateString();
                     const rating = Math.random() * 2 + 3;
                     const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
                     
                     return `
                         <div class="book-card">
-                            <div class="owner-badge">YOUR BOOK</div>
+                            <div class="owner-badge">OWNER</div>
                             <div class="book-cover">📚</div>
-                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
-                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                             
                             <div class="rating-stars">
                                 ${stars} <small style="color: #666;">(${rating.toFixed(1)})</small>
                             </div>
                             
-                            <div style="color: #888; font-size: 0.9em;">
+                            <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
                                 ${book.downloads || 0} downloads • ${uploadDate}
                             </div>
-                            
-                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
-                                📥 Download
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
+                                📥 Download (${book.downloads || 0})
                             </button>
-                            <button class="delete-btn" onclick="deleteBook('${book.id}')">
-                                🗑️ Delete Book
+                            <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
+                                🗑️ Delete This Book
                             </button>
                         </div>
                     `;
@@ -470,40 +535,50 @@
                 
             } catch (error) {
                 console.error('Error loading my books:', error);
-                document.getElementById('myBooksGrid').innerHTML = 
-                    '<div class="loading">Error loading your books.</div>';
             }
         }
 
-        async function deleteBook(bookId) {
-            if (!firebaseReady) return;
+        async function downloadBook(driveLink, bookId) {
+            window.open(driveLink, '_blank');
             
-            if (confirm('Are you sure you want to delete this book?')) {
+            if (bookId && firebaseReady) {
                 try {
-                    const { doc, deleteDoc } = window.firestoreFunctions;
-                    await deleteDoc(doc(window.firestore, 'books', bookId));
-                    alert('Book deleted successfully!');
-                    loadMyBooks();
+                    const { updateDoc, doc } = window.firestoreFunctions;
+                    const bookRef = doc(window.firestore, 'books', bookId);
+                    await updateDoc(bookRef, {
+                        downloads: window.firestoreFunctions.increment(1)
+                    });
+                    
                     loadEnhancedBooks();
+                    loadMyBooks();
+                    loadUserStats();
+                    
                 } catch (error) {
-                    console.error('Error deleting book:', error);
-                    alert('Error deleting book. Please try again.');
+                    console.error('Error updating download count:', error);
                 }
             }
         }
 
-        async function loadUserStats() {
-            if (!firebaseReady) return;
-            
+        async function deleteBook(bookId, bookTitle) {
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
+
+            if (!firebaseReady) {
+                alert('Firebase is not ready. Please try again.');
+                return;
+            }
+
             try {
-                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
-                const totalDownloads = myBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
-                document.getElementById('uploadCount').textContent = myBooks.length;
-                document.getElementById('totalDownloads').textContent = totalDownloads;
-                document.getElementById('averageRating').textContent = myBooks.length > 0 ? '4.5/5' : '-';
+                const { deleteDoc, doc } = window.firestoreFunctions;
+                await deleteDoc(doc(window.firestore, 'books', bookId));
+                
+                alert(`✅ "${bookTitle}" has been deleted.`);
+                
+                loadEnhancedBooks();
+                loadMyBooks();
+                loadUserStats();
                 
             } catch (error) {
-                console.error('Error loading user stats:', error);
+                alert('Error deleting book: ' + error.message);
             }
         }
 
