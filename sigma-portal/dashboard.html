@@ -341,7 +341,7 @@
                 const rating = Math.random() * 2 + 3; // 3-5 stars for demo
                 const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
                 
-                return `
+                return 
                     <div class="book-card">
                         ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
                         <div class="book-cover">📚</div>
@@ -371,7 +371,7 @@
                             </button>
                         </div>
                         
-                        ${isOwner ? `
+                        ${isOwner ? 
                             <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')">
                                 🗑️ Delete This Book
                             </button>
