@@ -509,7 +509,7 @@
                     const rating = Math.random() * 2 + 3;
                     const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
                     
-                    return `
+                    return 
                         <div class="book-card">
                             <div class="owner-badge">OWNER</div>
                             <div class="book-cover">📚</div>
@@ -530,7 +530,7 @@
                                 🗑️ Delete This Book
                             </button>
                         </div>
-                    `;
+                    ;
                 }).join('');
                 
             } catch (error) {
