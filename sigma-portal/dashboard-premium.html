@@ -1,0 +1,2302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sigma Portal - Premium eBook Sharing</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --primary: #667eea;
+            --primary-dark: #5a6fd8;
+            --secondary: #764ba2;
+            --success: #28a745;
+            --danger: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --white: #ffffff;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --border-radius: 10px;
+            --box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+
+        /* Dark Mode Variables */
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text-color: #f0f0f0;
+            --text-muted: #a0a0a0;
+            --border-color: #444;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: var(--light);
+            color: var(--dark);
+            transition: var(--transition);
+            min-height: 100vh;
+        }
+
+        .dark-mode body {
+            background: var(--bg-color);
+            color: var(--text-color);
+        }
+
+        /* Navbar */
+        .navbar {
+            background: var(--white);
+            padding: 1rem 2rem;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            transition: var(--transition);
+        }
+
+        .dark-mode .navbar {
+            background: var(--card-bg);
+        }
+
+        .nav-brand {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .theme-toggle, .notification-bell {
+            background: none;
+            border: none;
+            font-size: 1.3em;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+            padding: 0.5rem;
+            border-radius: 50%;
+        }
+
+        .theme-toggle:hover, .notification-bell:hover {
+            background: var(--gray-light);
+            color: var(--primary);
+        }
+
+        .dark-mode .theme-toggle:hover, 
+        .dark-mode .notification-bell:hover {
+            background: #444;
+        }
+
+        .notification-bell {
+            position: relative;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--danger);
+            color: var(--white);
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-weight: bold;
+            font-size: 1.2em;
+            box-shadow: var(--box-shadow);
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-weight: bold;
+        }
+
+        .premium-badge {
+            background: linear-gradient(135deg, #ffd700, #ffed4e);
+            color: #000;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            display: inline-block;
+            margin-top: 0.2rem;
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: var(--white);
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tabs */
+        .tab-buttons {
+            display: flex;
+            margin-bottom: 2rem;
+            background: var(--white);
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+        }
+
+        .dark-mode .tab-buttons {
+            background: var(--card-bg);
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 1rem;
+            text-align: center;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: var(--primary);
+            transition: var(--transition);
+            transform: translateX(-50%);
+        }
+
+        .tab-btn:hover {
+            background: rgba(102, 126, 234, 0.1);
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .tab-btn.active::after {
+            width: 100%;
+        }
+
+        .tab-content {
+            display: none;
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            animation: slideIn 0.3s ease;
+            transition: var(--transition);
+        }
+
+        .dark-mode .tab-content {
+            background: var(--card-bg);
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Search & Filters */
+        .search-box {
+            background: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            margin-bottom: 2rem;
+            transition: var(--transition);
+        }
+
+        .dark-mode .search-box {
+            background: var(--card-bg);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            background: var(--light);
+            border: 2px solid var(--gray-light);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 500;
+        }
+
+        .filter-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .filter-btn.active {
+            background: var(--primary);
+            color: var(--white);
+            border-color: var(--primary);
+        }
+
+        .advanced-filters {
+            background: var(--light);
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            transition: var(--transition);
+        }
+
+        .dark-mode .advanced-filters {
+            background: #333;
+        }
+
+        .filter-row {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            flex: 1;
+            min-width: 150px;
+        }
+
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .dark-mode .filter-group label {
+            color: var(--text-color);
+        }
+
+        .filter-group select {
+            width: 100%;
+            padding: 0.7rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .filter-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+
+        /* AI Recommendation */
+        .ai-recommendation {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            box-shadow: var(--box-shadow);
+            animation: slideInFromLeft 0.5s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        @keyframes slideInFromLeft {
+            from { opacity: 0; transform: translateX(-20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .ai-recommendation::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path d="M0,0 L100,0 L100,100 Z" fill="rgba(255,255,255,0.1)"/></svg>');
+            background-size: cover;
+        }
+
+        .ai-recommendation h3 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .ai-recommendation p {
+            margin-bottom: 1rem;
+        }
+
+        .ai-recommendation button {
+            background: var(--white);
+            color: var(--primary);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .ai-recommendation button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Books Grid */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        .book-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            border: 1px solid var(--gray-light);
+            position: relative;
+            transition: var(--transition);
+            animation: fadeInUp 0.5s ease;
+            overflow: hidden;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dark-mode .book-card {
+            background: var(--card-bg);
+            border-color: var(--border-color);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+        }
+
+        .bookmark-btn {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(255,255,255,0.9);
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            cursor: pointer;
+            font-size: 1.2em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            z-index: 2;
+        }
+
+        .dark-mode .bookmark-btn {
+            background: rgba(45, 45, 45, 0.9);
+            color: var(--text-color);
+        }
+
+        .bookmark-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .bookmark-btn.bookmarked {
+            color: var(--warning);
+        }
+
+        .owner-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: var(--primary);
+            color: var(--white);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        .book-cover {
+            width: 100%;
+            height: 160px;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            position: relative;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--white);
+            font-size: 3em;
+        }
+
+        .book-cover-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .book-card:hover .book-cover-img {
+            transform: scale(1.05);
+        }
+
+        .book-title {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+        }
+
+        .book-author {
+            color: var(--gray);
+            margin-bottom: 0.5rem;
+            font-size: 0.9em;
+        }
+
+        .dark-mode .book-author {
+            color: var(--text-muted);
+        }
+
+        .rating-stars {
+            color: var(--warning);
+            margin: 0.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .book-meta {
+            color: var(--gray);
+            font-size: 0.9em;
+            margin: 0.5rem 0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .dark-mode .book-meta {
+            color: var(--text-muted);
+        }
+
+        .reading-progress {
+            font-size: 0.8em;
+            color: var(--primary);
+            margin: 0.5rem 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--gray-light);
+            border-radius: 3px;
+            margin: 0.3rem 0;
+            overflow: hidden;
+        }
+
+        .dark-mode .progress-bar {
+            background: #444;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .social-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .social-btn {
+            flex: 1;
+            background: var(--light);
+            border: 1px solid var(--gray-light);
+            padding: 8px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .dark-mode .social-btn {
+            background: #333;
+            border-color: var(--border-color);
+        }
+
+        .social-btn:hover {
+            background: var(--primary);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .download-btn {
+            background: var(--success);
+            color: var(--white);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: 600;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .download-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        .delete-btn {
+            background: var(--danger);
+            color: var(--white);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            width: 100%;
+            font-size: 0.9em;
+            transition: var(--transition);
+        }
+
+        .delete-btn:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .dark-mode .form-group label {
+            color: var(--text-color);
+        }
+
+        .form-group input, .form-group textarea, .form-group select {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid var(--gray-light);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: var(--transition);
+        }
+
+        .dark-mode .form-group input, 
+        .dark-mode .form-group textarea, 
+        .dark-mode .form-group select {
+            background: #333;
+            border-color: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+        }
+
+        .cover-upload {
+            margin: 1rem 0;
+        }
+
+        .cover-preview {
+            width: 100px;
+            height: 140px;
+            object-fit: cover;
+            border-radius: 5px;
+            border: 2px dashed var(--gray-light);
+            display: none;
+            margin-top: 0.5rem;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Guide Box */
+        .guide-box {
+            background: #e7f3ff;
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            border-left: 4px solid var(--primary);
+            transition: var(--transition);
+        }
+
+        .dark-mode .guide-box {
+            background: #2a4365;
+        }
+
+        .guide-box h3 {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .guide-box ul {
+            padding-left: 1.5rem;
+        }
+
+        .guide-box li {
+            margin-bottom: 0.5rem;
+        }
+
+        /* Stats & Profile */
+        .reading-stats {
+            background: var(--light);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            margin: 1rem 0;
+            transition: var(--transition);
+        }
+
+        .dark-mode .reading-stats {
+            background: #333;
+        }
+
+        .reading-stats h4 {
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 1.5rem;
+            box-shadow: var(--box-shadow);
+            transition: var(--transition);
+            text-align: center;
+        }
+
+        .dark-mode .stat-card {
+            background: var(--card-bg);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 2.5em;
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.9em;
+        }
+
+        .dark-mode .stat-label {
+            color: var(--text-muted);
+        }
+
+        .badge-collection {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin: 1rem 0;
+        }
+
+        .badge {
+            background: var(--primary);
+            color: var(--white);
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+            font-size: 1.1em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .dark-mode .loading {
+            color: var(--text-muted);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(102, 126, 234, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            padding: 2rem;
+            border-radius: var(--border-radius);
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            animation: modalSlideIn 0.3s ease;
+        }
+
+        .dark-mode .modal-content {
+            background: var(--card-bg);
+        }
+
+        @keyframes modalSlideIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .modal-title {
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5em;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .close-modal:hover {
+            color: var(--danger);
+            transform: rotate(90deg);
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .modal-btn.primary {
+            background: var(--primary);
+            color: var(--white);
+        }
+
+        .modal-btn.primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .modal-btn.secondary {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .dark-mode .modal-btn.secondary {
+            background: #444;
+            color: var(--text-color);
+        }
+
+        .modal-btn.secondary:hover {
+            background: var(--gray);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1100;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background: var(--white);
+            color: var(--dark);
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            max-width: 350px;
+            animation: toastSlideIn 0.3s ease;
+            transition: var(--transition);
+        }
+
+        .dark-mode .toast {
+            background: var(--card-bg);
+            color: var(--text-color);
+        }
+
+        @keyframes toastSlideIn {
+            from { opacity: 0; transform: translateX(100%); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger);
+        }
+
+        .toast.info {
+            border-left: 4px solid var(--info);
+        }
+
+        .toast.warning {
+            border-left: 4px solid var(--warning);
+        }
+
+        .toast-icon {
+            font-size: 1.5em;
+        }
+
+        .toast.success .toast-icon {
+            color: var(--success);
+        }
+
+        .toast.error .toast-icon {
+            color: var(--danger);
+        }
+
+        .toast.info .toast-icon {
+            color: var(--info);
+        }
+
+        .toast.warning .toast-icon {
+            color: var(--warning);
+        }
+
+        .toast-message {
+            flex: 1;
+        }
+
+        .toast-close {
+            background: none;
+            border: none;
+            font-size: 1.2em;
+            cursor: pointer;
+            color: var(--gray);
+            transition: var(--transition);
+        }
+
+        .toast-close:hover {
+            color: var(--danger);
+        }
+
+        /* Login Form */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            padding: 2rem;
+        }
+
+        .login-card {
+            background: var(--white);
+            border-radius: var(--border-radius);
+            padding: 2.5rem;
+            box-shadow: var(--box-shadow);
+            width: 100%;
+            max-width: 400px;
+            animation: fadeInUp 0.5s ease;
+        }
+
+        .dark-mode .login-card {
+            background: var(--card-bg);
+        }
+
+        .login-title {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: var(--primary);
+            font-size: 1.8em;
+        }
+
+        .login-btn {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: var(--white);
+            border: none;
+            padding: 1rem;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            width: 100%;
+            transition: var(--transition);
+            font-weight: 600;
+            margin-top: 1rem;
+        }
+
+        .login-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 1rem;
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .container {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .filter-row {
+                flex-direction: column;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    
+    <!-- Firebase SDK -->
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+        
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
+            authDomain: "sigma-ebooks.firebaseapp.com",
+            projectId: "sigma-ebooks",
+            storageBucket: "sigma-ebooks.firebasestorage.app",
+            messagingSenderId: "916594333041",
+            appId: "1:916594333041:web:8085ad7e4082530248d2d0"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const storage = getStorage(app);
+        
+        // Make Firebase available globally
+        window.firebaseApp = app;
+        window.firebaseAuth = auth;
+        window.firestore = db;
+        window.firebaseStorage = storage;
+        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment };
+        window.storageFunctions = { ref, uploadBytes, getDownloadURL };
+        window.authFunctions = { signInAnonymously, onAuthStateChanged, signOut };
+    </script>
+</head>
+<body>
+    <!-- Login Screen (shown initially) -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-card">
+            <h1 class="login-title">
+                <i class="fas fa-book-open"></i> Sigma Portal
+            </h1>
+            <p style="text-align: center; margin-bottom: 2rem; color: var(--gray);">
+                Premium eBook Sharing Platform
+            </p>
+            
+            <div class="form-group">
+                <label><i class="fas fa-user"></i> Display Name</label>
+                <input type="text" id="displayName" placeholder="Enter your display name" value="Premium User">
+            </div>
+            
+            <button class="login-btn" onclick="login()">
+                <i class="fas fa-sign-in-alt"></i> Enter Premium Portal
+            </button>
+            
+            <div style="margin-top: 2rem; padding: 1rem; background: var(--light); border-radius: 8px;">
+                <h4><i class="fas fa-star"></i> Premium Features:</h4>
+                <ul style="padding-left: 1.5rem; margin-top: 0.5rem;">
+                    <li>Upload eBooks with custom covers</li>
+                    <li>Track reading progress</li>
+                    <li>Bookmark favorite books</li>
+                    <li>AI recommendations</li>
+                    <li>Dark mode & advanced filters</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Dashboard (hidden initially) -->
+    <div id="dashboard" style="display: none;">
+        <!-- Navbar -->
+        <nav class="navbar">
+            <div class="nav-brand">
+                <i class="fas fa-book-open"></i>
+                <span>Σ Sigma Portal - PREMIUM</span>
+            </div>
+            
+            <div class="nav-controls">
+                <button class="theme-toggle" onclick="toggleDarkMode()">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="notification-bell" onclick="showNotifications()">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-count" id="notificationCount">3</span>
+                </button>
+                
+                <div class="user-profile">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">User</div>
+                        <div class="premium-badge">⭐ PREMIUM USER</div>
+                    </div>
+                </div>
+                
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </nav>
+        
+        <!-- Main Container -->
+        <div class="container">
+            <h1 style="margin-bottom: 0.5rem;">📚 Sigma eBook Sharing - PREMIUM</h1>
+            <p style="margin-bottom: 2rem; color: var(--gray);"><strong>PREMIUM FEATURES:</strong> Book Covers • Reading Progress • Bookmarks • AI Recommendations • Dark Mode • Social Features</p>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="showTab('library')">
+                    <i class="fas fa-book"></i> Smart Library
+                </button>
+                <button class="tab-btn" onclick="showTab('upload')">
+                    <i class="fas fa-cloud-upload-alt"></i> Upload eBook
+                </button>
+                <button class="tab-btn" onclick="showTab('mybooks')">
+                    <i class="fas fa-bookmark"></i> My Library
+                </button>
+                <button class="tab-btn" onclick="showTab('bookmarks')">
+                    <i class="fas fa-bookmark"></i> Bookmarks
+                </button>
+                <button class="tab-btn" onclick="showTab('profile')">
+                    <i class="fas fa-user"></i> My Profile
+                </button>
+            </div>
+
+            <!-- Search & Filters -->
+            <div class="search-box">
+                <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search books by title, author, or category..." onkeyup="filterBooks()">
+                
+                <div class="filters">
+                    <button class="filter-btn active" onclick="setFilter('all')">All Books</button>
+                    <button class="filter-btn" onclick="setFilter('programming')">Programming</button>
+                    <button class="filter-btn" onclick="setFilter('science')">Science</button>
+                    <button class="filter-btn" onclick="setFilter('fiction')">Fiction</button>
+                    <button class="filter-btn" onclick="setFilter('business')">Business</button>
+                    <button class="filter-btn" onclick="setFilter('trending')"><i class="fas fa-fire"></i> Trending</button>
+                    <button class="filter-btn" onclick="setFilter('highest-rated')"><i class="fas fa-star"></i> Highest Rated</button>
+                    <button class="filter-btn" onclick="setFilter('bookmarked')"><i class="fas fa-bookmark"></i> Bookmarked</button>
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="advanced-filters">
+                    <h4><i class="fas fa-sliders-h"></i> Advanced Filters</h4>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <label>Rating</label>
+                            <select id="ratingFilter" onchange="applyAdvancedFilters()">
+                                <option value="0">Any Rating</option>
+                                <option value="4">⭐ 4+ Stars</option>
+                                <option value="3">⭐ 3+ Stars</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Downloads</label>
+                            <select id="downloadsFilter" onchange="applyAdvancedFilters()">
+                                <option value="0">Any Downloads</option>
+                                <option value="10">10+ Downloads</option>
+                                <option value="50">50+ Downloads</option>
+                            </select>
+                        </div>
+                        <div class="filter-group">
+                            <label>Sort By</label>
+                            <select id="sortFilter" onchange="applyAdvancedFilters()">
+                                <option value="newest">Newest First</option>
+                                <option value="popular">Most Popular</option>
+                                <option value="rating">Highest Rated</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- AI Recommendations -->
+            <div class="ai-recommendation" id="aiRecommendation" style="display: none;">
+                <h3><i class="fas fa-robot"></i> AI Recommendation</h3>
+                <p id="aiRecommendationText">Based on your reading history, we recommend...</p>
+                <button onclick="hideAIRecommendation()">Dismiss</button>
+            </div>
+            
+            <!-- Public Library Tab -->
+            <div id="library" class="tab-content active">
+                <h2><i class="fas fa-book"></i> Smart Library with AI</h2>
+                <p>Discover books with intelligent recommendations</p>
+                
+                <div class="books-grid" id="publicLibraryGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading premium library with AI features...
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Upload Tab -->
+            <div id="upload" class="tab-content">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload to Premium Library</h2>
+                
+                <div class="guide-box">
+                    <h3><i class="fas fa-rocket"></i> Premium Upload Features:</h3>
+                    <ul>
+                        <li><i class="fas fa-camera"></i> Upload custom book covers</li>
+                        <li><i class="fas fa-tags"></i> AI-powered categorization</li>
+                        <li><i class="fas fa-chart-bar"></i> Advanced analytics tracking</li>
+                        <li><i class="fas fa-share-alt"></i> Social sharing features</li>
+                    </ul>
+                </div>
+                
+                <form onsubmit="addBookToPublicLibrary(event)">
+                    <div class="form-group">
+                        <label><i class="fas fa-image"></i> Book Cover Image</label>
+                        <input type="file" id="bookCover" class="cover-upload" accept="image/*" onchange="previewCover(event)">
+                        <img id="coverPreview" class="cover-preview">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-heading"></i> Book Title *</label>
+                        <input type="text" id="bookTitle" placeholder="Enter book title" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-user"></i> Author Name *</label>
+                        <input type="text" id="bookAuthor" placeholder="Author name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-align-left"></i> Book Description</label>
+                        <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-folder"></i> Category</label>
+                        <select id="bookCategory">
+                            <option>Programming & Tech</option>
+                            <option>Science & Education</option>
+                            <option>Fiction & Literature</option>
+                            <option>Business & Finance</option>
+                            <option>Self Development</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-link"></i> Google Drive Link *</label>
+                        <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-file"></i> Pages</label>
+                        <input type="number" id="bookPages" placeholder="Number of pages">
+                    </div>
+                    
+                    <button type="submit" class="upload-btn">
+                        <i class="fas fa-cloud-upload-alt"></i> Upload to Premium Library
+                    </button>
+                </form>
+            </div>
+            
+            <!-- My Books Tab -->
+            <div id="mybooks" class="tab-content">
+                <h2><i class="fas fa-bookmark"></i> My Premium Library</h2>
+                <p>Manage your books with advanced analytics</p>
+                
+                <div class="reading-stats">
+                    <h4><i class="fas fa-chart-bar"></i> Your Reading Statistics</h4>
+                    <p>Total Books: <strong id="totalBooks">0</strong> | Total Pages: <strong id="totalPages">0</strong></p>
+                    <p>Reading Progress: <strong id="readingProgress">0%</strong></p>
+                </div>
+                
+                <div class="books-grid" id="myBooksGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading your premium library...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Bookmarks Tab -->
+            <div id="bookmarks" class="tab-content">
+                <h2><i class="fas fa-bookmark"></i> My Bookmarks</h2>
+                <p>Your saved books for quick access</p>
+                
+                <div class="books-grid" id="bookmarksGrid">
+                    <div class="loading">
+                        <div class="spinner"></div>
+                        Loading your bookmarks...
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content">
+                <h2><i class="fas fa-user"></i> My Premium Profile</h2>
+                
+                <div class="user-profile" style="margin-bottom: 2rem;">
+                    <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
+                    <div>
+                        <h3 id="profileName">User</h3>
+                        <div class="premium-badge">⭐ PREMIUM MEMBER</div>
+                        <p>Member since: <span id="memberSince">${new Date().toLocaleDateString()}</span></p>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                        </div>
+                        <div class="stat-value" id="uploadCount">0</div>
+                        <div class="stat-label">Books Uploaded</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-download"></i>
+                        </div>
+                        <div class="stat-value" id="totalDownloads">0</div>
+                        <div class="stat-label">Total Downloads</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <div class="stat-value" id="averageRating">-</div>
+                        <div class="stat-label">Average Rating</div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <i class="fas fa-book-reader"></i>
+                        </div>
+                        <div class="stat-value" id="booksRead">0</div>
+                        <div class="stat-label">Books Read</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 2rem;">
+                    <h3><i class="fas fa-trophy"></i> Achievements</h3>
+                    <div class="badge-collection">
+                        <div class="badge"><i class="fas fa-upload"></i> Uploader</div>
+                        <div class="badge"><i class="fas fa-star"></i> Reviewer</div>
+                        <div class="badge"><i class="fas fa-bookmark"></i> Collector</div>
+                        <div class="badge"><i class="fas fa-rocket"></i> Pioneer</div>
+                    </div>
+                    
+                    <div style="margin-top: 1.5rem;">
+                        <h4><i class="fas fa-bullseye"></i> Reading Goals</h4>
+                        <p>Monthly Target: 5 books</p>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 40%;"></div>
+                        </div>
+                        <p>Progress: 2/5 books</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading Progress Modal -->
+        <div class="modal" id="readingModal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title"><i class="fas fa-book-open"></i> Reading Progress</div>
+                    <button class="close-modal" onclick="closeReadingModal()">&times;</button>
+                </div>
+                
+                <p>Track your progress for: <strong id="modalBookTitle"></strong></p>
+                
+                <div class="form-group">
+                    <label>Current Page</label>
+                    <input type="number" id="currentPage" placeholder="Enter current page">
+                </div>
+                
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="readingStatus">
+                        <option value="want-to-read">Want to Read</option>
+                        <option value="reading">Currently Reading</option>
+                        <option value="completed">Completed</option>
+                    </select>
+                </div>
+                
+                <div class="modal-actions">
+                    <button class="modal-btn primary" onclick="saveReadingProgress()">Save Progress</button>
+                    <button class="modal-btn secondary" onclick="closeReadingModal()">Cancel</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Toast Container -->
+        <div class="toast-container" id="toastContainer"></div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentUser = null;
+        let currentUserId = null;
+        let allBooks = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
+        let userBookmarks = [];
+        let readingProgress = {};
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+
+        // Apply dark mode on load
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        }
+
+        // Initialize Firebase Auth
+        function initAuth() {
+            const { onAuthStateChanged } = window.authFunctions;
+            
+            onAuthStateChanged(window.firebaseAuth, (user) => {
+                if (user) {
+                    // User is signed in
+                    currentUserId = user.uid;
+                    currentUser = localStorage.getItem('displayName') || 'Premium User';
+                    
+                    // Update UI
+                    document.getElementById('userName').textContent = currentUser;
+                    document.getElementById('profileName').textContent = currentUser;
+                    document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+                    document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
+                    
+                    // Load user data
+                    userBookmarks = JSON.parse(localStorage.getItem(`bookmarks_${currentUserId}`) || '[]');
+                    readingProgress = JSON.parse(localStorage.getItem(`readingProgress_${currentUserId}`) || '{}');
+                    
+                    // Show dashboard
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('dashboard').style.display = 'block';
+                    
+                    // Load books
+                    loadPremiumBooks();
+                    loadUserStats();
+                    showAIRecommendation();
+                    
+                    showToast('Welcome to Sigma Premium!', 'success');
+                } else {
+                    // User is signed out
+                    document.getElementById('loginScreen').style.display = 'flex';
+                    document.getElementById('dashboard').style.display = 'none';
+                }
+            });
+        }
+
+        // Login function
+        async function login() {
+            const displayName = document.getElementById('displayName').value;
+            if (!displayName) {
+                showToast('Please enter a display name', 'error');
+                return;
+            }
+            
+            try {
+                const { signInAnonymously } = window.authFunctions;
+                await signInAnonymously(window.firebaseAuth);
+                localStorage.setItem('displayName', displayName);
+                showToast('Login successful!', 'success');
+            } catch (error) {
+                console.error('Login error:', error);
+                showToast('Login failed. Please try again.', 'error');
+            }
+        }
+
+        // Logout function
+        async function logout() {
+            try {
+                const { signOut } = window.authFunctions;
+                await signOut(window.firebaseAuth);
+                localStorage.removeItem('displayName');
+                showToast('Logged out successfully', 'info');
+            } catch (error) {
+                console.error('Logout error:', error);
+            }
+        }
+
+        // Wait for Firebase to load and initialize auth
+        let firebaseReady = false;
+        const checkFirebase = setInterval(() => {
+            if (window.firebaseAuth && window.authFunctions) {
+                firebaseReady = true;
+                clearInterval(checkFirebase);
+                initAuth();
+            }
+        }, 100);
+
+        // PREMIUM: Enhanced tab navigation
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+                setTimeout(() => {
+                    tab.style.display = 'none';
+                }, 300);
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            setTimeout(() => {
+                const tab = document.getElementById(tabId);
+                tab.style.display = 'block';
+                setTimeout(() => {
+                    tab.classList.add('active');
+                }, 10);
+            }, 300);
+            
+            if (tabId === 'library') loadPremiumBooks();
+            if (tabId === 'mybooks') loadMyBooks();
+            if (tabId === 'bookmarks') loadBookmarks();
+            if (tabId === 'profile') loadUserStats();
+        }
+
+        // PREMIUM: Cover image preview
+        function previewCover(event) {
+            const input = event.target;
+            const preview = document.getElementById('coverPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // PREMIUM: Dark mode toggle
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark-mode', darkMode);
+            localStorage.setItem('darkMode', darkMode);
+            
+            const icon = document.querySelector('.theme-toggle i');
+            icon.className = darkMode ? 'fas fa-sun' : 'fas fa-moon';
+            
+            showToast(`Dark mode ${darkMode ? 'enabled' : 'disabled'}`, 'info');
+        }
+
+        // PREMIUM: AI Recommendation
+        function showAIRecommendation() {
+            const recommendations = [
+                "Check out 'Python Programming' - matches your interest in tech!",
+                "Based on your history, you might enjoy 'The Lean Startup'",
+                "Trending in your network: 'Artificial Intelligence Fundamentals'"
+            ];
+            const randomRec = recommendations[Math.floor(Math.random() * recommendations.length)];
+            
+            document.getElementById('aiRecommendationText').textContent = randomRec;
+            document.getElementById('aiRecommendation').style.display = 'block';
+        }
+
+        function hideAIRecommendation() {
+            document.getElementById('aiRecommendation').style.display = 'none';
+        }
+
+        // PREMIUM: Enhanced search and filtering
+        function filterBooks() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            loadPremiumBooks();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadPremiumBooks();
+        }
+
+        function applyAdvancedFilters() {
+            loadPremiumBooks();
+        }
+
+        // PREMIUM: Bookmark functionality
+        function toggleBookmark(bookId) {
+            const index = userBookmarks.indexOf(bookId);
+            if (index > -1) {
+                userBookmarks.splice(index, 1);
+                showToast('Book removed from bookmarks', 'info');
+            } else {
+                userBookmarks.push(bookId);
+                showToast('Book added to bookmarks', 'success');
+            }
+            localStorage.setItem(`bookmarks_${currentUserId}`, JSON.stringify(userBookmarks));
+            loadPremiumBooks();
+            if (document.getElementById('bookmarks').classList.contains('active')) {
+                loadBookmarks();
+            }
+        }
+
+        function isBookmarked(bookId) {
+            return userBookmarks.includes(bookId);
+        }
+
+        // PREMIUM: Reading progress modal
+        function showReadingModal(bookId, bookTitle) {
+            document.getElementById('modalBookTitle').textContent = bookTitle;
+            document.getElementById('readingModal').style.display = 'block';
+            document.getElementById('currentPage').value = readingProgress[bookId]?.currentPage || '';
+            document.getElementById('readingStatus').value = readingProgress[bookId]?.status || 'want-to-read';
+            window.currentBookId = bookId;
+        }
+
+        function closeReadingModal() {
+            document.getElementById('readingModal').style.display = 'none';
+        }
+
+        function saveReadingProgress() {
+            const currentPage = document.getElementById('currentPage').value;
+            const status = document.getElementById('readingStatus').value;
+            
+            if (window.currentBookId) {
+                readingProgress[window.currentBookId] = {
+                    currentPage: parseInt(currentPage) || 0,
+                    status: status,
+                    updated: new Date().toISOString()
+                };
+                localStorage.setItem(`readingProgress_${currentUserId}`, JSON.stringify(readingProgress));
+                showToast('Reading progress saved!', 'success');
+            }
+            
+            closeReadingModal();
+            loadMyBooks();
+            loadUserStats();
+        }
+
+        // PREMIUM: Load books from Firebase
+        async function loadPremiumBooks() {
+            if (!firebaseReady || !currentUserId) return;
+            
+            try {
+                const { collection, getDocs, query, orderBy } = window.firestoreFunctions;
+                
+                const q = query(collection(window.firestore, 'books'), orderBy('uploadDate', 'desc'));
+                const snapshot = await getDocs(q);
+                
+                allBooks = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                // Apply all filters
+                let filteredBooks = applyAllFilters(allBooks);
+                displayPremiumBooks(filteredBooks);
+                
+            } catch (error) {
+                console.error('Error loading books:', error);
+                document.getElementById('publicLibraryGrid').innerHTML = 
+                    '<div class="loading">Error loading premium library. Make sure you are logged in.</div>';
+            }
+        }
+
+        function applyAllFilters(books) {
+            let filtered = [...books];
+            
+            // Search filter
+            if (searchQuery) {
+                filtered = filtered.filter(book => 
+                    book.title.toLowerCase().includes(searchQuery) ||
+                    book.author.toLowerCase().includes(searchQuery) ||
+                    book.category.toLowerCase().includes(searchQuery) ||
+                    (book.description && book.description.toLowerCase().includes(searchQuery))
+                );
+            }
+            
+            // Main category filters
+            if (currentFilter !== 'all') {
+                switch(currentFilter) {
+                    case 'programming':
+                        filtered = filtered.filter(book => book.category.includes('Programming'));
+                        break;
+                    case 'science':
+                        filtered = filtered.filter(book => book.category.includes('Science'));
+                        break;
+                    case 'fiction':
+                        filtered = filtered.filter(book => book.category.includes('Fiction'));
+                        break;
+                    case 'business':
+                        filtered = filtered.filter(book => book.category.includes('Business'));
+                        break;
+                    case 'trending':
+                        filtered = filtered.filter(book => book.downloads > 10);
+                        break;
+                    case 'highest-rated':
+                        filtered = filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                        break;
+                    case 'bookmarked':
+                        filtered = filtered.filter(book => isBookmarked(book.id));
+                        break;
+                }
+            }
+            
+            // Advanced filters
+            const ratingFilter = parseInt(document.getElementById('ratingFilter').value);
+            const downloadsFilter = parseInt(document.getElementById('downloadsFilter').value);
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            if (ratingFilter > 0) {
+                filtered = filtered.filter(book => (book.rating || 0) >= ratingFilter);
+            }
+            
+            if (downloadsFilter > 0) {
+                filtered = filtered.filter(book => (book.downloads || 0) >= downloadsFilter);
+            }
+            
+            // Sorting
+            switch(sortFilter) {
+                case 'popular':
+                    filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                    break;
+                case 'rating':
+                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    break;
+                case 'newest':
+                default:
+                    filtered.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+                    break;
+            }
+            
+            return filtered;
+        }
+
+        // PREMIUM: Display books with all premium features
+        function displayPremiumBooks(books) {
+            const grid = document.getElementById('publicLibraryGrid');
+            
+            if (books.length === 0) {
+                grid.innerHTML = '<div class="loading">No books found matching your criteria.</div>';
+                return;
+            }
+            
+            grid.innerHTML = books.map(book => {
+                const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                const isOwner = book.uploadedBy === currentUserId;
+                const bookmarked = isBookmarked(book.id);
+                const progress = readingProgress[book.id];
+                
+                // Calculate rating and progress
+                const rating = book.rating || Math.random() * 2 + 3;
+                const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                const progressPercent = progress ? Math.min(100, Math.round((progress.currentPage / (book.pages || 100)) * 100)) : 0;
+                
+                return `
+                    <div class="book-card">
+                        <button class="bookmark-btn ${bookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${book.id}')">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                        ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
+                        
+                        ${book.coverUrl ? 
+                            `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                            `<div class="book-cover">📚</div>`
+                        }
+                        
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">By ${book.author}</div>
+                        
+                        <div class="rating-stars" title="${rating.toFixed(1)}/5 stars">
+                            ${stars} <small style="color: var(--gray);">(${rating.toFixed(1)})</small>
+                        </div>
+                        
+                        <div class="book-meta">
+                            ${book.category} • ${book.downloads || 0} downloads
+                            ${book.pages ? `• ${book.pages} pages` : ''}
+                        </div>
+                        
+                        ${progress ? `
+                            <div class="reading-progress">
+                                <i class="fas fa-book-open"></i> ${progress.status} • Page ${progress.currentPage}
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="social-actions">
+                            <button class="social-btn" onclick="showReadingModal('${book.id}', '${book.title}')" title="Reading Progress">
+                                <i class="fas fa-book-open"></i>
+                            </button>
+                            <button class="social-btn" onclick="shareBook('${book.id}')" title="Share">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                            <button class="social-btn" onclick="showReviews('${book.id}')" title="Reviews">
+                                <i class="fas fa-comment"></i>
+                            </button>
+                        </div>
+                        
+                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                            <i class="fas fa-download"></i> Download eBook
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // PREMIUM: Load bookmarks
+        function loadBookmarks() {
+            const bookmarkedBooks = allBooks.filter(book => isBookmarked(book.id));
+            const grid = document.getElementById('bookmarksGrid');
+            
+            if (bookmarkedBooks.length === 0) {
+                grid.innerHTML = '<div class="loading">No bookmarks yet. Click the bookmark icon on any book to save it!</div>';
+                return;
+            }
+            
+            grid.innerHTML = bookmarkedBooks.map(book => {
+                const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                const rating = book.rating || Math.random() * 2 + 3;
+                const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                
+                return `
+                    <div class="book-card">
+                        <button class="bookmark-btn bookmarked" onclick="toggleBookmark('${book.id}')">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
+                        
+                        ${book.coverUrl ? 
+                            `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                            `<div class="book-cover">📚</div>`
+                        }
+                        
+                        <div class="book-title">${book.title}</div>
+                        <div class="book-author">By ${book.author}</div>
+                        
+                        <div class="rating-stars">
+                            ${stars} <small style="color: var(--gray);">(${rating.toFixed(1)})</small>
+                        </div>
+                        
+                        <div class="book-meta">
+                            ${book.category} • ${uploadDate}
+                        </div>
+                        
+                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // PREMIUM: Enhanced upload with cover images
+        async function addBookToPublicLibrary(event) {
+            event.preventDefault();
+            
+            if (!firebaseReady || !currentUserId) {
+                showToast('Please log in to upload books', 'error');
+                return;
+            }
+            
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const description = document.getElementById('bookDescription').value;
+            const category = document.getElementById('bookCategory').value;
+            const driveLink = document.getElementById('driveLink').value;
+            const pages = document.getElementById('bookPages').value;
+            const coverFile = document.getElementById('bookCover').files[0];
+            
+            if (!title || !author || !driveLink) {
+                showToast('Please fill all required fields', 'error');
+                return;
+            }
+
+            try {
+                let coverUrl = '';
+                
+                // Upload cover image if provided
+                if (coverFile) {
+                    const { ref, uploadBytes, getDownloadURL } = window.storageFunctions;
+                    const coverRef = ref(window.firebaseStorage, `covers/${Date.now()}_${coverFile.name}`);
+                    await uploadBytes(coverRef, coverFile);
+                    coverUrl = await getDownloadURL(coverRef);
+                }
+
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    driveLink: driveLink,
+                    pages: pages ? parseInt(pages) : null,
+                    coverUrl: coverUrl,
+                    uploadedBy: currentUserId,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0,
+                    rating: 0
+                });
+
+                showToast(`"${title}" added to premium library!`, 'success');
+                event.target.reset();
+                document.getElementById('coverPreview').style.display = 'none';
+                
+                loadPremiumBooks();
+                loadMyBooks();
+                loadUserStats();
+                
+            } catch (error) {
+                console.error('Error adding book:', error);
+                showToast('Error adding book: ' + error.message, 'error');
+            }
+        }
+
+        // PREMIUM: Enhanced user stats
+        async function loadUserStats() {
+            if (!firebaseReady || !currentUserId) return;
+            
+            try {
+                const { collection, getDocs, query, where } = window.firestoreFunctions;
+                
+                // Get user's books
+                const booksQuery = query(
+                    collection(window.firestore, 'books'), 
+                    where('uploadedBy', '==', currentUserId)
+                );
+                const booksSnapshot = await getDocs(booksQuery);
+                
+                const userBooks = booksSnapshot.docs.map(doc => doc.data());
+                const uploadCount = userBooks.length;
+                const totalDownloads = userBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
+                const totalPages = userBooks.reduce((sum, book) => sum + (book.pages || 0), 0);
+                
+                // Calculate reading progress
+                const completedBooks = Object.values(readingProgress).filter(p => p.status === 'completed').length;
+                const readingProgressPercent = uploadCount > 0 ? Math.round((completedBooks / uploadCount) * 100) : 0;
+                
+                document.getElementById('uploadCount').textContent = uploadCount;
+                document.getElementById('totalDownloads').textContent = totalDownloads;
+                document.getElementById('averageRating').textContent = uploadCount > 0 ? '4.5/5' : '-';
+                document.getElementById('booksRead').textContent = completedBooks;
+                document.getElementById('totalBooks').textContent = uploadCount;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('readingProgress').textContent = readingProgressPercent + '%';
+                
+            } catch (error) {
+                console.error('Error loading user stats:', error);
+            }
+        }
+
+        // PREMIUM: Load my books
+        async function loadMyBooks() {
+            if (!firebaseReady || !currentUserId) return;
+            
+            try {
+                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
+                
+                const q = query(
+                    collection(window.firestore, 'books'), 
+                    where('uploadedBy', '==', currentUserId),
+                    orderBy('uploadDate', 'desc')
+                );
+                const snapshot = await getDocs(q);
+                
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    return;
+                }
+                
+                grid.innerHTML = snapshot.docs.map(doc => {
+                    const book = doc.data();
+                    const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    const rating = book.rating || Math.random() * 2 + 3;
+                    const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                    const progress = readingProgress[doc.id];
+                    const progressPercent = progress ? Math.min(100, Math.round((progress.currentPage / (book.pages || 100)) * 100)) : 0;
+                    
+                    return `
+                        <div class="book-card">
+                            <div class="owner-badge">OWNER</div>
+                            
+                            ${book.coverUrl ? 
+                                `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                `<div class="book-cover">📚</div>`
+                            }
+                            
+                            <div class="book-title">${book.title}</div>
+                            <div class="book-author">By ${book.author}</div>
+                            
+                            <div class="rating-stars">
+                                ${stars} <small style="color: var(--gray);">(${rating.toFixed(1)})</small>
+                            </div>
+                            
+                            <div class="book-meta">
+                                ${book.downloads || 0} downloads • ${uploadDate}
+                                ${book.pages ? `• ${book.pages} pages` : ''}
+                            </div>
+                            
+                            ${progress ? `
+                                <div class="reading-progress">
+                                    <i class="fas fa-book-open"></i> ${progress.status} • Page ${progress.currentPage}
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
+                                <i class="fas fa-download"></i> Download (${book.downloads || 0})
+                            </button>
+                            <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
+                                <i class="fas fa-trash"></i> Delete This Book
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading my books:', error);
+            }
+        }
+
+        // PREMIUM: Social features
+        function shareBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (book) {
+                if (navigator.share) {
+                    navigator.share({
+                        title: `Check out "${book.title}" on Sigma Portal`,
+                        text: `I found "${book.title}" by ${book.author} on Sigma eBook Portal`,
+                        url: window.location.href
+                    });
+                } else {
+                    // Fallback for browsers that don't support Web Share API
+                    showToast(`Share "${book.title}" with your friends!`, 'info');
+                }
+            }
+        }
+
+        function showReviews(bookId) {
+            showToast('Reviews feature coming soon!', 'info');
+        }
+
+        function showNotifications() {
+            showToast('You have 3 new notifications:\n- New book in Programming category\n- Your book got 5 new downloads\n- Weekly reading report ready', 'info');
+        }
+
+        // Toast notification system
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const icons = {
+                success: 'fas fa-check-circle',
+                error: 'fas fa-exclamation-circle',
+                info: 'fas fa-info-circle',
+                warning: 'fas fa-exclamation-triangle'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    <i class="${icons[type]}"></i>
+                </div>
+                <div class="toast-message">${message}</div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+            
+            toastContainer.appendChild(toast);
+            
+            // Auto remove after 5 seconds
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        if (toast.parentElement) {
+                            toast.parentElement.removeChild(toast);
+                        }
+                    }, 300);
+                }
+            }, 5000);
+        }
+
+        // Book download function
+        async function downloadBook(driveLink, bookId) {
+            window.open(driveLink, '_blank');
+            
+            // Update download count
+            if (bookId && firebaseReady) {
+                try {
+                    const { updateDoc, doc } = window.firestoreFunctions;
+                    const bookRef = doc(window.firestore, 'books', bookId);
+                    await updateDoc(bookRef, {
+                        downloads: window.firestoreFunctions.increment(1)
+                    });
+                    
+                    showToast('Download started!', 'success');
+                    
+                    loadPremiumBooks();
+                    loadMyBooks();
+                    loadUserStats();
+                    
+                } catch (error) {
+                    console.error('Error updating download count:', error);
+                }
+            }
+        }
+
+        // Delete book function
+        async function deleteBook(bookId, bookTitle) {
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
+
+            if (!firebaseReady || !currentUserId) {
+                showToast('Please log in to delete books', 'error');
+                return;
+            }
+
+            try {
+                const { deleteDoc, doc } = window.firestoreFunctions;
+                await deleteDoc(doc(window.firestore, 'books', bookId));
+                
+                showToast(`"${bookTitle}" has been deleted.`, 'success');
+                
+                loadPremiumBooks();
+                loadMyBooks();
+                loadUserStats();
+                
+            } catch (error) {
+                console.error('Error deleting book:', error);
+                showToast('Error deleting book: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
