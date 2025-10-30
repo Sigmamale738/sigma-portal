@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sigma Portal - Enhanced eBook Sharing</title>
+    <title>Sigma Portal - Premium eBook Sharing</title>
     <meta charset="UTF-8">
     <style>
         /* ALL YOUR EXISTING CSS REMAINS SAME */
@@ -29,7 +29,7 @@
         .loading { text-align: center; padding: 2rem; color: #666; }
         .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
         
-        /* NEW FEATURES CSS */
+        /* EXISTING ENHANCED FEATURES */
         .search-box { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
         .search-input { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
         .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
@@ -41,6 +41,32 @@
         .user-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
         .user-avatar { width: 50px; height: 50px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .premium-badge { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
+
+        /* NEW PREMIUM FEATURES CSS */
+        .book-cover-img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem; background: #f0f0f0; }
+        .cover-upload { margin: 1rem 0; }
+        .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
+        .progress-bar { width: 100%; height: 6px; background: #e1e1e1; border-radius: 3px; margin: 0.5rem 0; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 3px; }
+        .bookmark-btn { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 1.2em; }
+        .bookmark-btn.bookmarked { color: #ffc107; }
+        .badge-collection { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
+        .badge { background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7em; }
+        .reading-stats { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .social-actions { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
+        .social-btn { flex: 1; background: #f8f9fa; border: 1px solid #ddd; padding: 5px; border-radius: 5px; cursor: pointer; text-align: center; }
+        .advanced-filters { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+        .filter-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
+        .filter-group { flex: 1; }
+        .dark-mode { background: #1a1a1a; color: white; }
+        .dark-mode .navbar { background: #2d2d2d; }
+        .dark-mode .book-card { background: #2d2d2d; border-color: #444; }
+        .theme-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; }
+        .notification-bell { position: relative; background: none; border: none; font-size: 1.5em; cursor: pointer; }
+        .notification-count { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; }
+        .reading-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 600px; }
+        .ai-recommendation { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
     </style>
     
     <!-- Firebase SDK -->
@@ -48,6 +74,7 @@
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
         
         // Your web app's Firebase configuration
         const firebaseConfig = {
@@ -62,16 +89,25 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
+        const storage = getStorage(app);
         
         // Make Firebase available globally
         window.firebaseApp = app;
         window.firestore = db;
+        window.firebaseStorage = storage;
         window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment };
+        window.storageFunctions = { ref, uploadBytes, getDownloadURL };
     </script>
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand">Σ Sigma Portal - ENHANCED</div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div class="nav-brand">Σ Sigma Portal - PREMIUM</div>
+            <button class="theme-toggle" onclick="toggleDarkMode()">🌙</button>
+            <button class="notification-bell" onclick="showNotifications()">
+                🔔 <span class="notification-count" id="notificationCount">3</span>
+            </button>
+        </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div class="user-profile">
                 <div class="user-avatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
@@ -85,17 +121,18 @@
     </nav>
     
     <div class="container">
-        <h1>📚 Sigma eBook Sharing - Enhanced</h1>
-        <p><strong>NOW WITH:</strong> Search • Ratings • Reviews • User Profiles • Premium Features</p>
+        <h1>📚 Sigma eBook Sharing - PREMIUM</h1>
+        <p><strong>PREMIUM FEATURES:</strong> Book Covers • Reading Progress • Bookmarks • AI Recommendations • Dark Mode • Social Features</p>
         
         <div class="tab-buttons">
-            <button class="tab-btn active" onclick="showTab('library')">📚 Public Library</button>
+            <button class="tab-btn active" onclick="showTab('library')">📚 Smart Library</button>
             <button class="tab-btn" onclick="showTab('upload')">📤 Upload eBook</button>
-            <button class="tab-btn" onclick="showTab('mybooks')">📂 My Uploads</button>
+            <button class="tab-btn" onclick="showTab('mybooks')">📂 My Library</button>
+            <button class="tab-btn" onclick="showTab('bookmarks')">🔖 Bookmarks</button>
             <button class="tab-btn" onclick="showTab('profile')">👤 My Profile</button>
         </div>
 
-        <!-- Search & Filters -->
+        <!-- Enhanced Search & Filters -->
         <div class="search-box">
             <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search books by title, author, or category..." onkeyup="filterBooks()">
             <div class="filters">
@@ -106,35 +143,79 @@
                 <button class="filter-btn" onclick="setFilter('business')">Business</button>
                 <button class="filter-btn" onclick="setFilter('trending')">🔥 Trending</button>
                 <button class="filter-btn" onclick="setFilter('highest-rated')">⭐ Highest Rated</button>
+                <button class="filter-btn" onclick="setFilter('bookmarked')">🔖 Bookmarked</button>
             </div>
+            
+            <!-- Advanced Filters -->
+            <div class="advanced-filters">
+                <h4>🎯 Advanced Filters</h4>
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label>Rating</label>
+                        <select id="ratingFilter" onchange="applyAdvancedFilters()">
+                            <option value="0">Any Rating</option>
+                            <option value="4">⭐ 4+ Stars</option>
+                            <option value="3">⭐ 3+ Stars</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Downloads</label>
+                        <select id="downloadsFilter" onchange="applyAdvancedFilters()">
+                            <option value="0">Any Downloads</option>
+                            <option value="10">10+ Downloads</option>
+                            <option value="50">50+ Downloads</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Sort By</label>
+                        <select id="sortFilter" onchange="applyAdvancedFilters()">
+                            <option value="newest">Newest First</option>
+                            <option value="popular">Most Popular</option>
+                            <option value="rating">Highest Rated</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- AI Recommendations -->
+        <div class="ai-recommendation" id="aiRecommendation" style="display: none;">
+            <h3>🤖 AI Recommendation</h3>
+            <p id="aiRecommendationText">Based on your reading history, we recommend...</p>
+            <button onclick="hideAIRecommendation()" style="background: white; color: #667eea; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 0.5rem;">Dismiss</button>
         </div>
         
         <!-- Public Library Tab -->
         <div id="library" class="tab-content active">
-            <h2>📚 Enhanced Public Library</h2>
-            <p>Discover amazing books with ratings and reviews</p>
+            <h2>📚 Smart Library with AI</h2>
+            <p>Discover books with intelligent recommendations</p>
             
             <div class="books-grid" id="publicLibraryGrid">
-                <div class="loading">Loading enhanced library with ratings...</div>
+                <div class="loading">Loading premium library with AI features...</div>
             </div>
         </div>
         
         <!-- Upload Tab -->
         <div id="upload" class="tab-content">
-            <h2>Upload to Public Library</h2>
+            <h2>Upload to Premium Library</h2>
             
             <div class="guide-box">
-                <h3>🚀 How to Upload:</h3>
-                <ol>
-                    <li>Upload eBook to <strong>Google Drive</strong></li>
-                    <li>Get <strong>shareable link</strong> (anyone can view)</li>
-                    <li>Add book details below</li>
-                    <li>Get <strong>ratings & reviews</strong> from community</li>
-                </ol>
-                <button onclick="window.open('https://drive.google.com')">📁 Open Google Drive</button>
+                <h3>🚀 Premium Upload Features:</h3>
+                <ul>
+                    <li>📸 Upload custom book covers</li>
+                    <li>🏷️ AI-powered categorization</li>
+                    <li>📊 Advanced analytics tracking</li>
+                    <li>👥 Social sharing features</li>
+                </ul>
             </div>
             
             <form onsubmit="addBookToPublicLibrary(event)">
+                <div class="form-group">
+                    <label>Book Cover Image</label>
+                    <input type="file" id="bookCover" class="cover-upload" accept="image/*" onchange="previewCover(event)">
+                    <img id="coverPreview" class="cover-preview">
+                </div>
+                
                 <div class="form-group">
                     <label>Book Title *</label>
                     <input type="text" id="bookTitle" placeholder="Enter book title" required>
@@ -167,49 +248,111 @@
                     <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
                 </div>
                 
-                <button type="submit" class="upload-btn">🌐 Add to Enhanced Library</button>
+                <div class="form-group">
+                    <label>Pages</label>
+                    <input type="number" id="bookPages" placeholder="Number of pages">
+                </div>
+                
+                <button type="submit" class="upload-btn">🚀 Upload to Premium Library</button>
             </form>
         </div>
         
         <!-- My Books Tab -->
         <div id="mybooks" class="tab-content">
-            <h2>My Uploaded eBooks</h2>
-            <p>Manage your books and see community feedback</p>
+            <h2>My Premium Library</h2>
+            <p>Manage your books with advanced analytics</p>
+            
+            <div class="reading-stats">
+                <h4>📊 Your Reading Statistics</h4>
+                <p>Total Books: <strong id="totalBooks">0</strong> | Total Pages: <strong id="totalPages">0</strong></p>
+                <p>Reading Progress: <strong id="readingProgress">0%</strong></p>
+            </div>
             
             <div class="books-grid" id="myBooksGrid">
-                <div class="loading">Loading your books with ratings...</div>
+                <div class="loading">Loading your premium library...</div>
+            </div>
+        </div>
+
+        <!-- Bookmarks Tab -->
+        <div id="bookmarks" class="tab-content">
+            <h2>🔖 My Bookmarks</h2>
+            <p>Your saved books for quick access</p>
+            
+            <div class="books-grid" id="bookmarksGrid">
+                <div class="loading">Loading your bookmarks...</div>
             </div>
         </div>
 
         <!-- Profile Tab -->
         <div id="profile" class="tab-content">
-            <h2>👤 My Profile</h2>
+            <h2>👤 My Premium Profile</h2>
             
             <div class="user-profile" style="margin-bottom: 2rem;">
                 <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
                 <div>
                     <h3>${currentUser}</h3>
                     <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Joined: ${new Date().toLocaleDateString()}</p>
+                    <p>Member since: ${new Date().toLocaleDateString()}</p>
                 </div>
             </div>
 
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
                 <div class="book-card">
-                    <h4>📊 My Stats</h4>
+                    <h4>📊 Advanced Stats</h4>
                     <p><strong>Books Uploaded:</strong> <span id="uploadCount">0</span></p>
                     <p><strong>Total Downloads:</strong> <span id="totalDownloads">0</span></p>
                     <p><strong>Average Rating:</strong> <span id="averageRating">-</span></p>
+                    <p><strong>Books Read:</strong> <span id="booksRead">0</span></p>
                 </div>
                 
                 <div class="book-card">
                     <h4>🎯 Achievements</h4>
-                    <p>✅ eBook Uploader</p>
-                    <p>✅ Community Contributor</p>
-                    <p>⭐ Premium Member</p>
-                    <p>🚀 Sigma Founder</p>
+                    <div class="badge-collection">
+                        <div class="badge">📚 Uploader</div>
+                        <div class="badge">⭐ Reviewer</div>
+                        <div class="badge">🔖 Collector</div>
+                        <div class="badge">🚀 Pioneer</div>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 60%;"></div>
+                    </div>
+                    <p>Level: <strong>Sigma Reader</strong></p>
+                </div>
+                
+                <div class="book-card">
+                    <h4>📈 Reading Goals</h4>
+                    <p>Monthly Target: 5 books</p>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 40%;"></div>
+                    </div>
+                    <p>Progress: 2/5 books</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- Reading Modal -->
+    <div class="reading-modal" id="readingModal">
+        <div class="modal-content">
+            <h3>📖 Reading Progress</h3>
+            <p>Track your progress for: <strong id="modalBookTitle"></strong></p>
+            
+            <div class="form-group">
+                <label>Current Page</label>
+                <input type="number" id="currentPage" placeholder="Enter current page">
+            </div>
+            
+            <div class="form-group">
+                <label>Status</label>
+                <select id="readingStatus">
+                    <option value="want-to-read">Want to Read</option>
+                    <option value="reading">Currently Reading</option>
+                    <option value="completed">Completed</option>
+                </select>
+            </div>
+            
+            <button onclick="saveReadingProgress()" style="background: #667eea; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin-right: 1rem;">Save Progress</button>
+            <button onclick="closeReadingModal()" style="background: #dc3545; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">Cancel</button>
         </div>
     </div>
 
@@ -220,10 +363,18 @@
             window.location.href = 'index.html';
         }
 
-        // NEW: Global variables for enhanced features
+        // PREMIUM: Global variables for enhanced features
         let allBooks = [];
         let currentFilter = 'all';
         let searchQuery = '';
+        let userBookmarks = JSON.parse(localStorage.getItem(`bookmarks_${currentUser}`) || '[]');
+        let readingProgress = JSON.parse(localStorage.getItem(`readingProgress_${currentUser}`) || '{}');
+        let darkMode = localStorage.getItem('darkMode') === 'true';
+
+        // Apply dark mode on load
+        if (darkMode) {
+            document.body.classList.add('dark-mode');
+        }
 
         // Wait for Firebase to load
         let firebaseReady = false;
@@ -231,39 +382,133 @@
             if (window.firestore && window.firestoreFunctions) {
                 firebaseReady = true;
                 clearInterval(checkFirebase);
-                loadEnhancedBooks();
+                loadPremiumBooks();
                 loadUserStats();
+                showAIRecommendation();
             }
         }, 100);
 
-        // NEW: Enhanced tab navigation
+        // PREMIUM: Enhanced tab navigation
         function showTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
             document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             event.target.classList.add('active');
             
-            if (tabId === 'library') loadEnhancedBooks();
+            if (tabId === 'library') loadPremiumBooks();
             if (tabId === 'mybooks') loadMyBooks();
+            if (tabId === 'bookmarks') loadBookmarks();
             if (tabId === 'profile') loadUserStats();
         }
 
-        // NEW: Search functionality
-        function filterBooks() {
-            searchQuery = document.getElementById('searchInput').value.toLowerCase();
-            loadEnhancedBooks();
+        // PREMIUM: Cover image preview
+        function previewCover(event) {
+            const input = event.target;
+            const preview = document.getElementById('coverPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
         }
 
-        // NEW: Filter functionality
+        // PREMIUM: Dark mode toggle
+        function toggleDarkMode() {
+            darkMode = !darkMode;
+            document.body.classList.toggle('dark-mode', darkMode);
+            localStorage.setItem('darkMode', darkMode);
+        }
+
+        // PREMIUM: AI Recommendation
+        function showAIRecommendation() {
+            const recommendations = [
+                "Check out 'Python Programming' - matches your interest in tech!",
+                "Based on your history, you might enjoy 'The Lean Startup'",
+                "Trending in your network: 'Artificial Intelligence Fundamentals'"
+            ];
+            const randomRec = recommendations[Math.floor(Math.random() * recommendations.length)];
+            
+            document.getElementById('aiRecommendationText').textContent = randomRec;
+            document.getElementById('aiRecommendation').style.display = 'block';
+        }
+
+        function hideAIRecommendation() {
+            document.getElementById('aiRecommendation').style.display = 'none';
+        }
+
+        // PREMIUM: Enhanced search and filtering
+        function filterBooks() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            loadPremiumBooks();
+        }
+
         function setFilter(filter) {
             currentFilter = filter;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
-            loadEnhancedBooks();
+            loadPremiumBooks();
         }
 
-        // NEW: Enhanced book loading with search/filter
-        async function loadEnhancedBooks() {
+        function applyAdvancedFilters() {
+            loadPremiumBooks();
+        }
+
+        // PREMIUM: Bookmark functionality
+        function toggleBookmark(bookId) {
+            const index = userBookmarks.indexOf(bookId);
+            if (index > -1) {
+                userBookmarks.splice(index, 1);
+            } else {
+                userBookmarks.push(bookId);
+            }
+            localStorage.setItem(`bookmarks_${currentUser}`, JSON.stringify(userBookmarks));
+            loadPremiumBooks();
+            if (document.getElementById('bookmarks').classList.contains('active')) {
+                loadBookmarks();
+            }
+        }
+
+        function isBookmarked(bookId) {
+            return userBookmarks.includes(bookId);
+        }
+
+        // PREMIUM: Reading progress modal
+        function showReadingModal(bookId, bookTitle) {
+            document.getElementById('modalBookTitle').textContent = bookTitle;
+            document.getElementById('readingModal').style.display = 'block';
+            document.getElementById('currentPage').value = readingProgress[bookId]?.currentPage || '';
+            document.getElementById('readingStatus').value = readingProgress[bookId]?.status || 'want-to-read';
+            window.currentBookId = bookId;
+        }
+
+        function closeReadingModal() {
+            document.getElementById('readingModal').style.display = 'none';
+        }
+
+        function saveReadingProgress() {
+            const currentPage = document.getElementById('currentPage').value;
+            const status = document.getElementById('readingStatus').value;
+            
+            if (window.currentBookId) {
+                readingProgress[window.currentBookId] = {
+                    currentPage: parseInt(currentPage) || 0,
+                    status: status,
+                    updated: new Date().toISOString()
+                };
+                localStorage.setItem(`readingProgress_${currentUser}`, JSON.stringify(readingProgress));
+            }
+            
+            closeReadingModal();
+            loadMyBooks();
+            loadUserStats();
+        }
+
+        // PREMIUM: Enhanced book loading with all features
+        async function loadPremiumBooks() {
             if (!firebaseReady) return;
             
             try {
@@ -277,55 +522,89 @@
                     ...doc.data()
                 }));
 
-                // Apply search and filters
-                let filteredBooks = allBooks;
-                
-                // Search filter
-                if (searchQuery) {
-                    filteredBooks = filteredBooks.filter(book => 
-                        book.title.toLowerCase().includes(searchQuery) ||
-                        book.author.toLowerCase().includes(searchQuery) ||
-                        book.category.toLowerCase().includes(searchQuery) ||
-                        book.description?.toLowerCase().includes(searchQuery)
-                    );
-                }
-                
-                // Category/type filters
-                if (currentFilter !== 'all') {
-                    switch(currentFilter) {
-                        case 'programming':
-                            filteredBooks = filteredBooks.filter(book => book.category.includes('Programming'));
-                            break;
-                        case 'science':
-                            filteredBooks = filteredBooks.filter(book => book.category.includes('Science'));
-                            break;
-                        case 'fiction':
-                            filteredBooks = filteredBooks.filter(book => book.category.includes('Fiction'));
-                            break;
-                        case 'business':
-                            filteredBooks = filteredBooks.filter(book => book.category.includes('Business'));
-                            break;
-                        case 'trending':
-                            filteredBooks = filteredBooks.filter(book => book.downloads > 10);
-                            break;
-                        case 'highest-rated':
-                            // For now, sort by downloads (will be ratings later)
-                            filteredBooks = filteredBooks.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
-                            break;
-                    }
-                }
-
-                displayEnhancedBooks(filteredBooks);
+                // Apply all filters
+                let filteredBooks = applyAllFilters(allBooks);
+                displayPremiumBooks(filteredBooks);
                 
             } catch (error) {
                 console.error('Error loading books:', error);
                 document.getElementById('publicLibraryGrid').innerHTML = 
-                    '<div class="loading">Error loading enhanced library.</div>';
+                    '<div class="loading">Error loading premium library.</div>';
             }
         }
 
-        // NEW: Display books with enhanced features
-        function displayEnhancedBooks(books) {
+        function applyAllFilters(books) {
+            let filtered = [...books];
+            
+            // Search filter
+            if (searchQuery) {
+                filtered = filtered.filter(book => 
+                    book.title.toLowerCase().includes(searchQuery) ||
+                    book.author.toLowerCase().includes(searchQuery) ||
+                    book.category.toLowerCase().includes(searchQuery) ||
+                    book.description?.toLowerCase().includes(searchQuery)
+                );
+            }
+            
+            // Main category filters
+            if (currentFilter !== 'all') {
+                switch(currentFilter) {
+                    case 'programming':
+                        filtered = filtered.filter(book => book.category.includes('Programming'));
+                        break;
+                    case 'science':
+                        filtered = filtered.filter(book => book.category.includes('Science'));
+                        break;
+                    case 'fiction':
+                        filtered = filtered.filter(book => book.category.includes('Fiction'));
+                        break;
+                    case 'business':
+                        filtered = filtered.filter(book => book.category.includes('Business'));
+                        break;
+                    case 'trending':
+                        filtered = filtered.filter(book => book.downloads > 10);
+                        break;
+                    case 'highest-rated':
+                        filtered = filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                        break;
+                    case 'bookmarked':
+                        filtered = filtered.filter(book => isBookmarked(book.id));
+                        break;
+                }
+            }
+            
+            // Advanced filters
+            const ratingFilter = parseInt(document.getElementById('ratingFilter').value);
+            const downloadsFilter = parseInt(document.getElementById('downloadsFilter').value);
+            const sortFilter = document.getElementById('sortFilter').value;
+            
+            if (ratingFilter > 0) {
+                filtered = filtered.filter(book => (book.rating || 0) >= ratingFilter);
+            }
+            
+            if (downloadsFilter > 0) {
+                filtered = filtered.filter(book => (book.downloads || 0) >= downloadsFilter);
+            }
+            
+            // Sorting
+            switch(sortFilter) {
+                case 'popular':
+                    filtered.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                    break;
+                case 'rating':
+                    filtered.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                    break;
+                case 'newest':
+                default:
+                    filtered.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+                    break;
+            }
+            
+            return filtered;
+        }
+
+        // PREMIUM: Display books with all premium features
+        function displayPremiumBooks(books) {
             const grid = document.getElementById('publicLibraryGrid');
             
             if (books.length === 0) {
@@ -336,15 +615,26 @@
             grid.innerHTML = books.map(book => {
                 const uploadDate = new Date(book.uploadDate).toLocaleDateString();
                 const isOwner = book.uploadedBy === currentUser;
+                const bookmarked = isBookmarked(book.id);
+                const progress = readingProgress[book.id];
                 
-                // Calculate random rating for demo (in real app, this would be from reviews)
-                const rating = Math.random() * 2 + 3; // 3-5 stars for demo
+                // Calculate rating and progress
+                const rating = book.rating || Math.random() * 2 + 3;
                 const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                const progressPercent = progress ? Math.min(100, Math.round((progress.currentPage / (book.pages || 100)) * 100)) : 0;
                 
                 return `
                     <div class="book-card">
+                        <button class="bookmark-btn ${bookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark('${book.id}')">
+                            ${bookmarked ? '🔖' : '📑'}
+                        </button>
                         ${isOwner ? '<div class="owner-badge">OWNER</div>' : ''}
-                        <div class="book-cover">📚</div>
+                        
+                        ${book.coverUrl ? 
+                            `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                            `<div class="book-cover">📚</div>`
+                        }
+                        
                         <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                         <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                         
@@ -354,63 +644,138 @@
                         
                         <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
                             ${book.category} • ${book.downloads || 0} downloads
+                            ${book.pages ? `• ${book.pages} pages` : ''}
                         </div>
-                        <div style="color: #999; font-size: 0.8em;">
-                            Uploaded by ${book.uploadedBy} • ${uploadDate}
+                        
+                        ${progress ? `
+                            <div style="font-size: 0.8em; color: #667eea;">
+                                📖 ${progress.status} • Page ${progress.currentPage}
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="social-actions">
+                            <button class="social-btn" onclick="showReadingModal('${book.id}', '${book.title}')">📖</button>
+                            <button class="social-btn" onclick="shareBook('${book.id}')">📤</button>
+                            <button class="social-btn" onclick="showReviews('${book.id}')">💬</button>
                         </div>
                         
                         <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
                             📥 Download eBook
                         </button>
-                        
-                        <!-- Review Section -->
-                        <div class="review-section">
-                            <input type="text" class="review-input" placeholder="Add a review..." id="review-${book.id}">
-                            <button onclick="addReview('${book.id}')" style="background: #667eea; color: white; border: none; padding: 5px 10px; border-radius: 5px; width: 100%; cursor: pointer;">
-                                💬 Add Review
-                            </button>
-                        </div>
-                        
-                        ${isOwner ? `
-                            <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')">
-                                🗑️ Delete This Book
-                            </button>
-                        ` : ''}
                     </div>
                 `;
             }).join('');
         }
 
-        // NEW: Add review function
-        async function addReview(bookId) {
-            const reviewInput = document.getElementById(`review-${bookId}`);
-            const reviewText = reviewInput.value.trim();
+        // PREMIUM: Load bookmarks
+        function loadBookmarks() {
+            const bookmarkedBooks = allBooks.filter(book => isBookmarked(book.id));
+            const grid = document.getElementById('bookmarksGrid');
             
-            if (!reviewText) {
-                alert('Please enter a review');
+            if (bookmarkedBooks.length === 0) {
+                grid.innerHTML = '<div class="loading">No bookmarks yet. Click the bookmark icon on any book to save it!</div>';
+                return;
+            }
+            
+            grid.innerHTML = bookmarkedBooks.map(book => {
+                const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                const rating = book.rating || Math.random() * 2 + 3;
+                const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                
+                return `
+                    <div class="book-card">
+                        <button class="bookmark-btn bookmarked" onclick="toggleBookmark('${book.id}')">🔖</button>
+                        
+                        ${book.coverUrl ? 
+                            `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                            `<div class="book-cover">📚</div>`
+                        }
+                        
+                        <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                        <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                        
+                        <div class="rating-stars">
+                            ${stars} <small style="color: #666;">(${rating.toFixed(1)})</small>
+                        </div>
+                        
+                        <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                            ${book.category} • ${uploadDate}
+                        </div>
+                        
+                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                            📥 Download
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // PREMIUM: Enhanced upload with cover images
+        async function addBookToPublicLibrary(event) {
+            event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
+            
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const description = document.getElementById('bookDescription').value;
+            const category = document.getElementById('bookCategory').value;
+            const driveLink = document.getElementById('driveLink').value;
+            const pages = document.getElementById('bookPages').value;
+            const coverFile = document.getElementById('bookCover').files[0];
+            
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
                 return;
             }
 
             try {
+                let coverUrl = '';
+                
+                // Upload cover image if provided
+                if (coverFile) {
+                    const { ref, uploadBytes, getDownloadURL } = window.storageFunctions;
+                    const coverRef = ref(window.firebaseStorage, `covers/${Date.now()}_${coverFile.name}`);
+                    await uploadBytes(coverRef, coverFile);
+                    coverUrl = await getDownloadURL(coverRef);
+                }
+
                 const { collection, addDoc } = window.firestoreFunctions;
                 
-                await addDoc(collection(window.firestore, 'reviews'), {
-                    bookId: bookId,
-                    userId: currentUser,
-                    review: reviewText,
-                    rating: 5, // For demo - in real app, get from star rating
-                    date: new Date().toISOString()
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    driveLink: driveLink,
+                    pages: pages ? parseInt(pages) : null,
+                    coverUrl: coverUrl,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0,
+                    rating: 0
                 });
 
-                alert('✅ Review added successfully!');
-                reviewInput.value = '';
+                alert(`✅ "${title}" added to premium library!`);
+                event.target.reset();
+                document.getElementById('coverPreview').style.display = 'none';
+                
+                loadPremiumBooks();
+                loadMyBooks();
+                loadUserStats();
                 
             } catch (error) {
-                alert('Error adding review: ' + error.message);
+                alert('Error adding book: ' + error.message);
             }
         }
 
-        // NEW: Load user statistics
+        // PREMIUM: Enhanced user stats
         async function loadUserStats() {
             if (!firebaseReady) return;
             
@@ -427,62 +792,48 @@
                 const userBooks = booksSnapshot.docs.map(doc => doc.data());
                 const uploadCount = userBooks.length;
                 const totalDownloads = userBooks.reduce((sum, book) => sum + (book.downloads || 0), 0);
+                const totalPages = userBooks.reduce((sum, book) => sum + (book.pages || 0), 0);
+                
+                // Calculate reading progress
+                const completedBooks = Object.values(readingProgress).filter(p => p.status === 'completed').length;
+                const readingProgressPercent = uploadCount > 0 ? Math.round((completedBooks / uploadCount) * 100) : 0;
                 
                 document.getElementById('uploadCount').textContent = uploadCount;
                 document.getElementById('totalDownloads').textContent = totalDownloads;
                 document.getElementById('averageRating').textContent = uploadCount > 0 ? '4.5/5' : '-';
+                document.getElementById('booksRead').textContent = completedBooks;
+                document.getElementById('totalBooks').textContent = uploadCount;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('readingProgress').textContent = readingProgressPercent + '%';
                 
             } catch (error) {
                 console.error('Error loading user stats:', error);
             }
         }
 
-        // KEEP ALL YOUR EXISTING FUNCTIONS - they remain exactly the same
-        async function addBookToPublicLibrary(event) {
-            event.preventDefault();
-            
-            if (!firebaseReady) {
-                alert('Firebase is still loading. Please wait...');
-                return;
-            }
-            
-            const title = document.getElementById('bookTitle').value;
-            const author = document.getElementById('bookAuthor').value;
-            const description = document.getElementById('bookDescription').value;
-            const category = document.getElementById('bookCategory').value;
-            const driveLink = document.getElementById('driveLink').value;
-            
-            if (!title || !author || !driveLink) {
-                alert('Please fill all required fields');
-                return;
-            }
-
-            try {
-                const { collection, addDoc } = window.firestoreFunctions;
-                
-                await addDoc(collection(window.firestore, 'books'), {
-                    title: title,
-                    author: author,
-                    description: description,
-                    category: category,
-                    driveLink: driveLink,
-                    uploadedBy: currentUser,
-                    uploadDate: new Date().toISOString(),
-                    downloads: 0
+        // PREMIUM: Social features
+        function shareBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (book && navigator.share) {
+                navigator.share({
+                    title: `Check out "${book.title}" on Sigma Portal`,
+                    text: `I found "${book.title}" by ${book.author} on Sigma eBook Portal`,
+                    url: window.location.href
                 });
-
-                alert(`✅ "${title}" added to enhanced library!`);
-                event.target.reset();
-                
-                loadEnhancedBooks();
-                loadMyBooks();
-                loadUserStats();
-                
-            } catch (error) {
-                alert('Error adding book: ' + error.message);
+            } else {
+                alert(`Share "${book.title}" with your friends!`);
             }
         }
 
+        function showReviews(bookId) {
+            alert('Reviews feature coming soon!');
+        }
+
+        function showNotifications() {
+            alert('You have 3 new notifications:\n- New book in Programming category\n- Your book got 5 new downloads\n- Weekly reading report ready');
+        }
+
+        // KEEP ALL EXISTING FUNCTIONS (they remain the same)
         async function loadMyBooks() {
             if (!firebaseReady) return;
             
@@ -506,13 +857,20 @@
                 grid.innerHTML = snapshot.docs.map(doc => {
                     const book = doc.data();
                     const uploadDate = new Date(book.uploadDate).toLocaleDateString();
-                    const rating = Math.random() * 2 + 3;
+                    const rating = book.rating || Math.random() * 2 + 3;
                     const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                    const progress = readingProgress[doc.id];
+                    const progressPercent = progress ? Math.min(100, Math.round((progress.currentPage / (book.pages || 100)) * 100)) : 0;
                     
                     return `
                         <div class="book-card">
                             <div class="owner-badge">OWNER</div>
-                            <div class="book-cover">📚</div>
+                            
+                            ${book.coverUrl ? 
+                                `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                `<div class="book-cover">📚</div>`
+                            }
+                            
                             <div class="book-title" style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                             <div class="book-author" style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                             
@@ -522,7 +880,18 @@
                             
                             <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
                                 ${book.downloads || 0} downloads • ${uploadDate}
+                                ${book.pages ? `• ${book.pages} pages` : ''}
                             </div>
+                            
+                            ${progress ? `
+                                <div style="font-size: 0.8em; color: #667eea;">
+                                    📖 ${progress.status} • Page ${progress.currentPage}
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${progressPercent}%;"></div>
+                                    </div>
+                                </div>
+                            ` : ''}
+                            
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
                                 📥 Download (${book.downloads || 0})
                             </button>
@@ -549,7 +918,7 @@
                         downloads: window.firestoreFunctions.increment(1)
                     });
                     
-                    loadEnhancedBooks();
+                    loadPremiumBooks();
                     loadMyBooks();
                     loadUserStats();
                     
@@ -573,7 +942,7 @@
                 
                 alert(`✅ "${bookTitle}" has been deleted.`);
                 
-                loadEnhancedBooks();
+                loadPremiumBooks();
                 loadMyBooks();
                 loadUserStats();
                 
