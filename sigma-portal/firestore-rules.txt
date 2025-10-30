@@ -1,0 +1,27 @@
+// COPY THESE RULES TO FIREBASE CONSOLE → FIRESTORE → RULES
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow ALL operations for testing
+    match /{document=**} {
+      allow read, write: if true;
+    }
+  }
+}
+
+// TEMPORARY RULES FOR TESTING - Allows anyone to read/write
+// After testing works, change to secure rules:
+/*
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /books/{bookId} {
+      allow read: if true;
+      allow create: if request.auth != null;
+      allow update, delete: if request.auth != null 
+        && resource.data.uploadedBy == request.auth.uid;
+    }
+  }
+}
+*/

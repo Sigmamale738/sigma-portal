@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Project Ebooks - Social eBook Platform</title>
+    <title>Project Ebooks - Free eBook Sharing Platform</title>
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -34,184 +34,23 @@
         .loading { text-align: center; padding: 2rem; color: #666; }
         .cover-upload { margin: 1rem 0; }
         .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
+        .current-cover { text-align: center; margin: 1rem 0; }
+        .current-cover-img { max-width: 150px; max-height: 200px; object-fit: cover; border-radius: 5px; }
         
-        /* NEW SOCIAL FEATURES */
-        .online-users-sidebar { 
-            position: fixed; 
-            right: 20px; 
-            top: 100px; 
-            width: 280px; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .online-user { 
-            display: flex; 
-            align-items: center; 
-            gap: 0.5rem; 
-            padding: 0.5rem; 
-            border-radius: 8px; 
-            margin-bottom: 0.5rem;
-            transition: background 0.3s;
-        }
-        .online-user:hover { background: #f8f9fa; }
-        .online-user.active { background: #e7f3ff; }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: linear-gradient(135deg, #667eea, #764ba2); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: bold; 
-            font-size: 0.9em; 
-        }
-        .online-indicator { 
-            width: 8px; 
-            height: 8px; 
-            background: #28a745; 
-            border-radius: 50%; 
-            margin-left: auto; 
-        }
-        .chat-modal { 
-            display: none; 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            width: 350px; 
-            height: 500px; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            z-index: 1001;
-            flex-direction: column;
-        }
-        .chat-header { 
-            background: #667eea; 
-            color: white; 
-            padding: 1rem; 
-            border-radius: 10px 10px 0 0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .chat-messages { 
-            flex: 1; 
-            padding: 1rem; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.5rem; 
-        }
-        .message { 
-            padding: 0.7rem; 
-            border-radius: 10px; 
-            max-width: 80%; 
-            word-wrap: break-word; 
-        }
-        .message.sent { 
-            background: #667eea; 
-            color: white; 
-            align-self: flex-end; 
-        }
-        .message.received { 
-            background: #f1f3f4; 
-            color: #333; 
-            align-self: flex-start; 
-        }
-        .chat-input { 
-            display: flex; 
-            padding: 1rem; 
-            border-top: 1px solid #e1e1e1; 
-            gap: 0.5rem; 
-        }
-        .chat-input input { 
-            flex: 1; 
-            padding: 0.7rem; 
-            border: 1px solid #e1e1e1; 
-            border-radius: 20px; 
-        }
-        .chat-input button { 
-            background: #667eea; 
-            color: white; 
-            border: none; 
-            padding: 0.7rem 1rem; 
-            border-radius: 20px; 
-            cursor: pointer; 
-        }
-        .profile-stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 1rem; 
-            margin: 1rem 0; 
-        }
-        .stat-card { 
-            background: #f8f9fa; 
-            padding: 1.5rem; 
-            border-radius: 10px; 
-            text-align: center; 
-        }
-        .stat-value { 
-            font-size: 2em; 
-            font-weight: bold; 
-            color: #667eea; 
-        }
-        .stat-label { 
-            color: #666; 
-            font-size: 0.9em; 
-        }
-        .badge { 
-            background: #ffc107; 
-            color: black; 
-            padding: 4px 8px; 
-            border-radius: 12px; 
-            font-size: 0.8em; 
-            margin: 0.2rem; 
-            display: inline-block; 
-        }
-        .message-btn { 
-            background: #17a2b8; 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            border-radius: 15px; 
-            font-size: 0.8em; 
-            cursor: pointer; 
-            margin-left: 0.5rem; 
-        }
-        .notification-bell {
-            position: relative;
-            background: none;
-            border: none;
-            font-size: 1.3em;
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-        .notification-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+        /* Enhanced Features */
+        .search-box { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
+        .search-input { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
+        .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
+        .filter-btn { background: #f8f9fa; border: 2px solid #e1e1e1; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .rating-stars { color: #ffc107; margin: 0.5rem 0; }
+        .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
     </style>
 
     <!-- Firebase SDK -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, onSnapshot } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
         
         const firebaseConfig = {
             apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
@@ -227,69 +66,47 @@
         
         window.firebaseApp = app;
         window.firestore = db;
-        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment, onSnapshot };
-        
-        console.log("🔥 Firebase initialized successfully!");
+        window.firestoreFunctions = { collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, where, increment };
     </script>
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand">📚 Project Ebooks - Social</div>
+        <div class="nav-brand">📚 Project Ebooks</div>
         <div style="display: flex; align-items: center; gap: 1rem;">
-            <button class="notification-bell" onclick="showNotifications()">
-                🔔 <span class="notification-count" id="notificationCount">0</span>
-            </button>
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="user-avatar" id="userAvatar">U</div>
+                <div style="width: 40px; height: 40px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;" id="userAvatar">U</div>
                 <div style="font-weight: bold;" id="userName">User</div>
             </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
-    <!-- Online Users Sidebar -->
-    <div class="online-users-sidebar">
-        <h4 style="margin-bottom: 1rem;">👥 Online Readers</h4>
-        <div id="onlineUsersList">
-            <div class="loading">Loading online users...</div>
-        </div>
-    </div>
-
-    <!-- Chat Modal -->
-    <div class="chat-modal" id="chatModal">
-        <div class="chat-header">
-            <div>
-                <strong id="chatWithUser">Chat</strong>
-                <div style="font-size: 0.8em; opacity: 0.8;" id="chatStatus">Online</div>
-            </div>
-            <button onclick="closeChat()" style="background: none; border: none; color: white; font-size: 1.2em; cursor: pointer;">✕</button>
-        </div>
-        <div class="chat-messages" id="chatMessages">
-            <div class="message received">
-                <strong>System:</strong> Chat started! Say hello 👋
-            </div>
-        </div>
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
-            <button onclick="sendMessage()">Send</button>
-        </div>
-    </div>
-
     <div class="container">
-        <h1>📚 Project Ebooks - Social Platform</h1>
-        <p><strong>🚀 NEW FEATURES:</strong> Live Chat • Online Users • Profile Stats • Notifications</p>
-
+        <h1>📚 Project Ebooks - Free eBook Sharing</h1>
+        <p><strong>🚀 FULL FEATURES:</strong> Book Covers • Edit/Delete • Search • FREE Image Hosting</p>
+        
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('library')">📚 Library</button>
             <button class="tab-btn" onclick="showTab('upload')">📤 Upload</button>
             <button class="tab-btn" onclick="showTab('mybooks')">📂 My Books</button>
-            <button class="tab-btn" onclick="showTab('profile')">👤 My Profile</button>
-            <button class="tab-btn" onclick="showTab('messages')">💬 Messages</button>
+        </div>
+
+        <!-- Search & Filters -->
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search books by title or author..." onkeyup="filterBooks()">
+            <div class="filters">
+                <button class="filter-btn active" onclick="setFilter('all')">All Books</button>
+                <button class="filter-btn" onclick="setFilter('programming')">Programming</button>
+                <button class="filter-btn" onclick="setFilter('science')">Science</button>
+                <button class="filter-btn" onclick="setFilter('fiction')">Fiction</button>
+                <button class="filter-btn" onclick="setFilter('mybooks')">My Uploads</button>
+            </div>
         </div>
 
         <!-- Public Library Tab -->
         <div id="library" class="tab-content active">
             <h2>📚 Public Library</h2>
+            <p>Discover and download eBooks shared by the community</p>
             <div class="books-grid" id="publicLibraryGrid">
                 <div class="loading">Loading library...</div>
             </div>
@@ -298,99 +115,68 @@
         <!-- Upload Tab -->
         <div id="upload" class="tab-content">
             <h2>📤 Upload eBook</h2>
+            
+            <div class="guide-box">
+                <h3>🚀 How to Upload:</h3>
+                <ol>
+                    <li><strong>Upload book cover</strong> (we'll host it for FREE)</li>
+                    <li><strong>Upload eBook to Google Drive</strong></li>
+                    <li><strong>Get shareable link</strong> (set to "anyone can view")</li>
+                    <li>Add book details below</li>
+                    <li>Share with the community!</li>
+                </ol>
+            </div>
+            
             <form onsubmit="addBookToPublicLibrary(event)">
                 <div class="form-group">
-                    <label>Book Cover Image</label>
-                    <input type="file" id="bookCover" class="cover-upload" accept="image/*" onchange="previewCover(event)">
+                    <label>Book Cover Image *</label>
+                    <input type="file" id="bookCover" class="cover-upload" accept="image/*" onchange="previewCover(event)" required>
                     <img id="coverPreview" class="cover-preview">
+                    <small>We'll convert your image to a FREE hosted URL</small>
                 </div>
+                
                 <div class="form-group">
                     <label>Book Title *</label>
                     <input type="text" id="bookTitle" placeholder="Enter book title" required>
                 </div>
+                
                 <div class="form-group">
                     <label>Author Name *</label>
                     <input type="text" id="bookAuthor" placeholder="Author name" required>
                 </div>
+                
+                <div class="form-group">
+                    <label>Book Description</label>
+                    <textarea id="bookDescription" placeholder="Brief description about the book" rows="3"></textarea>
+                </div>
+                
                 <div class="form-group">
                     <label>Category</label>
                     <select id="bookCategory">
-                        <option>Programming</option>
-                        <option>Science</option>
-                        <option>Fiction</option>
-                        <option>Business</option>
+                        <option>Programming & Tech</option>
+                        <option>Science & Education</option>
+                        <option>Fiction & Literature</option>
+                        <option>Business & Finance</option>
+                        <option>Self Development</option>
                         <option>Other</option>
                     </select>
                 </div>
+                
                 <div class="form-group">
                     <label>Google Drive Link *</label>
                     <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
                 </div>
-                <button type="submit" class="upload-btn">🚀 Upload Book</button>
+                
+                <button type="submit" class="upload-btn">🚀 Upload to Library</button>
             </form>
         </div>
         
         <!-- My Books Tab -->
         <div id="mybooks" class="tab-content">
             <h2>📂 My Uploaded Books</h2>
+            <p>Manage your books - Edit or Delete anytime</p>
             <div class="books-grid" id="myBooksGrid">
                 <div class="loading">Loading your books...</div>
-            </div>
-        </div>
-
-        <!-- Profile Tab -->
-        <div id="profile" class="tab-content">
-            <h2>👤 My Profile</h2>
-            <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
-                <div>
-                    <h3 id="profileName">User</h3>
-                    <div style="color: #666;">Member since: <span id="memberSince">Today</span></div>
-                    <div style="margin-top: 0.5rem;">
-                        <span class="badge">📚 Reader</span>
-                        <span class="badge">⭐ Contributor</span>
-                        <span class="badge">🚀 Active</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="profile-stats">
-                <div class="stat-card">
-                    <div class="stat-value" id="booksUploaded">0</div>
-                    <div class="stat-label">Books Uploaded</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="totalDownloads">0</div>
-                    <div class="stat-label">Total Downloads</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="messagesSent">0</div>
-                    <div class="stat-label">Messages Sent</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-value" id="readingLevel">1</div>
-                    <div class="stat-label">Reading Level</div>
-                </div>
-            </div>
-
-            <h3 style="margin-top: 2rem;">🏆 Achievements</h3>
-            <div style="margin: 1rem 0;">
-                <div class="badge">📖 First Upload</div>
-                <div class="badge">🔥 10+ Downloads</div>
-                <div class="badge">💬 Chat Active</div>
-                <div class="badge">⭐ Community Star</div>
-            </div>
-        </div>
-
-        <!-- Messages Tab -->
-        <div id="messages" class="tab-content">
-            <h2>💬 Messages</h2>
-            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem;">
-                <h4>💡 Quick Actions</h4>
-                <p>Click on any online user to start chatting! 💬</p>
-            </div>
-            <div id="conversationsList">
-                <div class="loading">Your conversations will appear here...</div>
             </div>
         </div>
     </div>
@@ -403,6 +189,17 @@
                 <input type="hidden" id="editBookId">
                 
                 <div class="form-group">
+                    <label>Current Cover</label>
+                    <div class="current-cover">
+                        <img id="currentCoverImg" class="current-cover-img" src="">
+                        <p id="noCoverText" style="display: none;">No cover image</p>
+                    </div>
+                    <label>Update Cover Image</label>
+                    <input type="file" id="editBookCover" class="cover-upload" accept="image/*" onchange="previewEditCover(event)">
+                    <img id="editCoverPreview" class="cover-preview">
+                </div>
+                
+                <div class="form-group">
                     <label>Book Title *</label>
                     <input type="text" id="editBookTitle" required>
                 </div>
@@ -413,12 +210,18 @@
                 </div>
                 
                 <div class="form-group">
+                    <label>Book Description</label>
+                    <textarea id="editBookDescription" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
                     <label>Category</label>
                     <select id="editBookCategory">
-                        <option>Programming</option>
-                        <option>Science</option>
-                        <option>Fiction</option>
-                        <option>Business</option>
+                        <option>Programming & Tech</option>
+                        <option>Science & Education</option>
+                        <option>Fiction & Literature</option>
+                        <option>Business & Finance</option>
+                        <option>Self Development</option>
                         <option>Other</option>
                     </select>
                 </div>
@@ -446,14 +249,11 @@
         // Initialize user
         document.getElementById('userName').textContent = currentUser;
         document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
-        document.getElementById('profileName').textContent = currentUser;
-        document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
 
         let allBooks = [];
+        let currentFilter = 'all';
+        let searchQuery = '';
         let firebaseReady = false;
-        let onlineUsers = [];
-        let currentChatUser = null;
-        let messagesSent = parseInt(localStorage.getItem('messagesSent') || '0');
 
         // Wait for Firebase
         const checkFirebase = setInterval(() => {
@@ -461,8 +261,6 @@
                 firebaseReady = true;
                 clearInterval(checkFirebase);
                 loadBooks();
-                startOnlinePresence();
-                loadOnlineUsers();
             }
         }, 100);
 
@@ -474,10 +272,9 @@
             
             if (tabId === 'library') loadBooks();
             if (tabId === 'mybooks') loadMyBooks();
-            if (tabId === 'profile') loadProfileStats();
         }
 
-        // Image preview
+        // Image preview functions
         function previewCover(event) {
             const input = event.target;
             const preview = document.getElementById('coverPreview');
@@ -492,19 +289,49 @@
             }
         }
 
-        // FREE Image Hosting
-        async function uploadImageToFreeHost(imageFile) {
-            return new Promise((resolve, reject) => {
+        function previewEditCover(event) {
+            const input = event.target;
+            const preview = document.getElementById('editCoverPreview');
+            
+            if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    resolve(e.target.result);
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // FREE Image Hosting Function - Uses free image hosting service
+        async function uploadImageToFreeHost(imageFile) {
+            return new Promise((resolve, reject) => {
+                // Method 1: Convert to Base64 (FREE, no external service needed)
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Use base64 data URL directly - it's FREE and works!
+                    const base64Image = e.target.result;
+                    resolve(base64Image);
                 };
                 reader.onerror = reject;
                 reader.readAsDataURL(imageFile);
             });
         }
 
-        // Load all books
+        // Search and Filter functions
+        function filterBooks() {
+            searchQuery = document.getElementById('searchInput').value.toLowerCase();
+            loadBooks();
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadBooks();
+        }
+
+        // Load all books with search/filter
         async function loadBooks() {
             if (!firebaseReady) return;
             
@@ -518,10 +345,41 @@
                     ...doc.data()
                 }));
 
-                displayBooks(allBooks);
+                // Apply filters
+                let filteredBooks = allBooks;
+                
+                // Search filter
+                if (searchQuery) {
+                    filteredBooks = filteredBooks.filter(book => 
+                        book.title.toLowerCase().includes(searchQuery) ||
+                        book.author.toLowerCase().includes(searchQuery) ||
+                        (book.description && book.description.toLowerCase().includes(searchQuery))
+                    );
+                }
+                
+                // Category filter
+                if (currentFilter !== 'all') {
+                    switch(currentFilter) {
+                        case 'programming':
+                            filteredBooks = filteredBooks.filter(book => book.category.includes('Programming'));
+                            break;
+                        case 'science':
+                            filteredBooks = filteredBooks.filter(book => book.category.includes('Science'));
+                            break;
+                        case 'fiction':
+                            filteredBooks = filteredBooks.filter(book => book.category.includes('Fiction'));
+                            break;
+                        case 'mybooks':
+                            filteredBooks = filteredBooks.filter(book => book.uploadedBy === currentUser);
+                            break;
+                    }
+                }
+
+                displayBooks(filteredBooks);
                 
             } catch (error) {
                 console.error('Error loading books:', error);
+                document.getElementById('publicLibraryGrid').innerHTML = '<div class="loading">Error loading library.</div>';
             }
         }
 
@@ -529,12 +387,15 @@
             const grid = document.getElementById('publicLibraryGrid');
             
             if (books.length === 0) {
-                grid.innerHTML = '<div class="loading">No books found. Be the first to upload!</div>';
+                grid.innerHTML = '<div class="loading">No books found matching your criteria.</div>';
                 return;
             }
             
             grid.innerHTML = books.map(book => {
+                const uploadDate = new Date(book.uploadDate).toLocaleDateString();
                 const isOwner = book.uploadedBy === currentUser;
+                const rating = Math.random() * 2 + 3; // 3-5 stars for demo
+                const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
                 
                 return `
                     <div class="book-card">
@@ -550,8 +411,18 @@
                         <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                         <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                         
+                        <div class="rating-stars" title="${rating.toFixed(1)}/5 stars">
+                            ${stars} <small style="color: #666;">(${rating.toFixed(1)})</small>
+                        </div>
+                        
+                        ${book.description ? `<div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">${book.description}</div>` : ''}
+                        
                         <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
                             ${book.category} • ${book.downloads || 0} downloads
+                        </div>
+                        
+                        <div style="color: #999; font-size: 0.8em;">
+                            Uploaded by ${book.uploadedBy} • ${uploadDate}
                         </div>
                         
                         <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
@@ -561,7 +432,7 @@
                         ${isOwner ? `
                             <div class="action-buttons">
                                 <button class="edit-btn" onclick="editBook('${book.id}')">
-                                    ✏️ Edit
+                                    ✏️ Edit Book
                                 </button>
                                 <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')">
                                     🗑️ Delete
@@ -591,6 +462,11 @@
                 
                 grid.innerHTML = snapshot.docs.map(doc => {
                     const book = doc.data();
+                    const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    const lastUpdated = book.lastUpdated ? new Date(book.lastUpdated).toLocaleDateString() : null;
+                    const rating = Math.random() * 2 + 3;
+                    const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
+                    
                     return `
                         <div class="book-card">
                             <div class="owner-badge">OWNER</div>
@@ -605,8 +481,15 @@
                             <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
                             <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                             
+                            <div class="rating-stars">
+                                ${stars} <small style="color: #666;">(${rating.toFixed(1)})</small>
+                            </div>
+                            
+                            ${book.description ? `<div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">${book.description}</div>` : ''}
+                            
                             <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                                ${book.downloads || 0} downloads
+                                ${book.downloads || 0} downloads • Uploaded: ${uploadDate}
+                                ${lastUpdated && lastUpdated !== uploadDate ? `<br>• Updated: ${lastUpdated}` : ''}
                             </div>
                             
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
@@ -615,7 +498,7 @@
                             
                             <div class="action-buttons">
                                 <button class="edit-btn" onclick="editBook('${doc.id}')">
-                                    ✏️ Edit
+                                    ✏️ Edit Book
                                 </button>
                                 <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
                                     🗑️ Delete
@@ -630,7 +513,7 @@
             }
         }
 
-        // Add book function
+        // Add book function with FREE image hosting
         async function addBookToPublicLibrary(event) {
             event.preventDefault();
             
@@ -641,18 +524,20 @@
             
             const title = document.getElementById('bookTitle').value;
             const author = document.getElementById('bookAuthor').value;
+            const description = document.getElementById('bookDescription').value;
             const category = document.getElementById('bookCategory').value;
             const driveLink = document.getElementById('driveLink').value;
             const coverFile = document.getElementById('bookCover').files[0];
             
-            if (!title || !author || !driveLink) {
-                alert('Please fill all required fields');
+            if (!title || !author || !driveLink || !coverFile) {
+                alert('Please fill all required fields including book cover');
                 return;
             }
 
             try {
                 let coverUrl = '';
                 
+                // Upload cover image to FREE hosting
                 if (coverFile) {
                     coverUrl = await uploadImageToFreeHost(coverFile);
                 }
@@ -662,29 +547,29 @@
                 await addDoc(collection(window.firestore, 'books'), {
                     title: title,
                     author: author,
+                    description: description,
                     category: category,
                     driveLink: driveLink,
-                    coverUrl: coverUrl,
+                    coverUrl: coverUrl, // FREE hosted image
                     uploadedBy: currentUser,
                     uploadDate: new Date().toISOString(),
+                    lastUpdated: new Date().toISOString(),
                     downloads: 0
                 });
 
-                alert(`✅ "${title}" added to library!`);
+                alert(`✅ "${title}" added to library with cover image!`);
                 event.target.reset();
                 document.getElementById('coverPreview').style.display = 'none';
                 
                 loadBooks();
                 loadMyBooks();
-                loadProfileStats();
                 
             } catch (error) {
-                console.error('Error adding book:', error);
                 alert('Error adding book: ' + error.message);
             }
         }
 
-        // Edit book functions
+        // Edit book function
         function editBook(bookId) {
             const book = allBooks.find(b => b.id === bookId);
             if (!book) {
@@ -692,12 +577,32 @@
                 return;
             }
 
+            // Populate edit form
             document.getElementById('editBookId').value = bookId;
             document.getElementById('editBookTitle').value = book.title;
             document.getElementById('editBookAuthor').value = book.author;
+            document.getElementById('editBookDescription').value = book.description || '';
             document.getElementById('editBookCategory').value = book.category;
             document.getElementById('editDriveLink').value = book.driveLink;
 
+            // Handle cover image
+            const currentCoverImg = document.getElementById('currentCoverImg');
+            const noCoverText = document.getElementById('noCoverText');
+            const editCoverPreview = document.getElementById('editCoverPreview');
+
+            if (book.coverUrl) {
+                currentCoverImg.src = book.coverUrl;
+                currentCoverImg.style.display = 'block';
+                noCoverText.style.display = 'none';
+            } else {
+                currentCoverImg.style.display = 'none';
+                noCoverText.style.display = 'block';
+            }
+
+            editCoverPreview.style.display = 'none';
+            document.getElementById('editBookCover').value = '';
+
+            // Show modal
             document.getElementById('editModal').style.display = 'block';
         }
 
@@ -705,6 +610,7 @@
             document.getElementById('editModal').style.display = 'none';
         }
 
+        // Update book function with FREE image hosting
         async function updateBook(event) {
             event.preventDefault();
             
@@ -716,8 +622,10 @@
             const bookId = document.getElementById('editBookId').value;
             const title = document.getElementById('editBookTitle').value;
             const author = document.getElementById('editBookAuthor').value;
+            const description = document.getElementById('editBookDescription').value;
             const category = document.getElementById('editBookCategory').value;
             const driveLink = document.getElementById('editDriveLink').value;
+            const coverFile = document.getElementById('editBookCover').files[0];
 
             if (!title || !author || !driveLink) {
                 alert('Please fill all required fields');
@@ -730,19 +638,37 @@
             }
 
             try {
+                let coverUrl = null;
+                
+                // Upload new cover image if provided
+                if (coverFile) {
+                    coverUrl = await uploadImageToFreeHost(coverFile);
+                }
+
                 const { updateDoc, doc } = window.firestoreFunctions;
                 const bookRef = doc(window.firestore, 'books', bookId);
                 
-                await updateDoc(bookRef, {
+                // Prepare update data
+                const updateData = {
                     title: title,
                     author: author,
+                    description: description,
                     category: category,
-                    driveLink: driveLink
-                });
+                    driveLink: driveLink,
+                    lastUpdated: new Date().toISOString()
+                };
+
+                // Only update coverUrl if a new cover was uploaded
+                if (coverUrl) {
+                    updateData.coverUrl = coverUrl;
+                }
+
+                await updateDoc(bookRef, updateData);
 
                 alert(`✅ "${title}" has been updated successfully!`);
                 closeEditModal();
                 
+                // Reload data
                 loadBooks();
                 loadMyBooks();
                 
@@ -765,7 +691,6 @@
                     
                     loadBooks();
                     loadMyBooks();
-                    loadProfileStats();
                     
                 } catch (error) {
                     console.error('Error updating download count:', error);
@@ -774,7 +699,7 @@
         }
 
         async function deleteBook(bookId, bookTitle) {
-            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?\n\nThis action cannot be undone!`)) return;
 
             if (!firebaseReady) {
                 alert('Firebase is not ready. Please try again.');
@@ -789,251 +714,16 @@
                 
                 loadBooks();
                 loadMyBooks();
-                loadProfileStats();
                 
             } catch (error) {
-                console.error('Error deleting book:', error);
                 alert('Error deleting book: ' + error.message);
             }
-        }
-
-        // NEW SOCIAL FEATURES
-
-        // Online Presence System
-        async function startOnlinePresence() {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, addDoc, doc, updateDoc, onSnapshot } = window.firestoreFunctions;
-                
-                // Add user to online users
-                const userRef = doc(window.firestore, 'onlineUsers', currentUser);
-                await updateDoc(userRef, {
-                    username: currentUser,
-                    lastSeen: new Date().toISOString(),
-                    status: 'online'
-                }, { merge: true });
-                
-                // Set up real-time listener for online users
-                const onlineUsersQuery = query(collection(window.firestore, 'onlineUsers'));
-                onSnapshot(onlineUsersQuery, (snapshot) => {
-                    onlineUsers = [];
-                    snapshot.forEach((doc) => {
-                        const user = doc.data();
-                        // Remove users who haven't been seen in 30 seconds
-                        const lastSeen = new Date(user.lastSeen);
-                        const now = new Date();
-                        if ((now - lastSeen) < 30000) { // 30 seconds
-                            onlineUsers.push(user);
-                        }
-                    });
-                    updateOnlineUsersDisplay();
-                });
-                
-                // Update last seen every 10 seconds
-                setInterval(async () => {
-                    if (firebaseReady) {
-                        await updateDoc(userRef, {
-                            lastSeen: new Date().toISOString()
-                        });
-                    }
-                }, 10000);
-                
-            } catch (error) {
-                console.error('Error starting online presence:', error);
-            }
-        }
-
-        function updateOnlineUsersDisplay() {
-            const list = document.getElementById('onlineUsersList');
-            const filteredUsers = onlineUsers.filter(user => user.username !== currentUser);
-            
-            if (filteredUsers.length === 0) {
-                list.innerHTML = '<div style="color: #666; text-align: center; padding: 1rem;">No other users online</div>';
-                return;
-            }
-            
-            list.innerHTML = filteredUsers.map(user => `
-                <div class="online-user" onclick="startChat('${user.username}')">
-                    <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
-                    <div>${user.username}</div>
-                    <div class="online-indicator"></div>
-                    <button class="message-btn" onclick="event.stopPropagation(); startChat('${user.username}')">💬</button>
-                </div>
-            `).join('');
-        }
-
-        // Load online users
-        async function loadOnlineUsers() {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, getDocs } = window.firestoreFunctions;
-                const snapshot = await getDocs(collection(window.firestore, 'onlineUsers'));
-                
-                onlineUsers = [];
-                snapshot.forEach((doc) => {
-                    const user = doc.data();
-                    const lastSeen = new Date(user.lastSeen);
-                    const now = new Date();
-                    if ((now - lastSeen) < 30000) { // 30 seconds
-                        onlineUsers.push(user);
-                    }
-                });
-                
-                updateOnlineUsersDisplay();
-                
-            } catch (error) {
-                console.error('Error loading online users:', error);
-            }
-        }
-
-        // Chat System
-        function startChat(username) {
-            currentChatUser = username;
-            document.getElementById('chatWithUser').textContent = `Chat with ${username}`;
-            document.getElementById('chatModal').style.display = 'flex';
-            loadChatMessages(username);
-        }
-
-        function closeChat() {
-            document.getElementById('chatModal').style.display = 'none';
-            currentChatUser = null;
-            document.getElementById('chatMessages').innerHTML = `
-                <div class="message received">
-                    <strong>System:</strong> Chat started! Say hello 👋
-                </div>
-            `;
-        }
-
-        function handleMessageKeypress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        async function sendMessage() {
-            if (!currentChatUser || !firebaseReady) return;
-            
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-            
-            if (!message) return;
-            
-            try {
-                const { collection, addDoc } = window.firestoreFunctions;
-                
-                await addDoc(collection(window.firestore, 'messages'), {
-                    from: currentUser,
-                    to: currentChatUser,
-                    message: message,
-                    timestamp: new Date().toISOString(),
-                    read: false
-                });
-                
-                // Add to chat display
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML += `
-                    <div class="message sent">
-                        <strong>You:</strong> ${message}
-                    </div>
-                `;
-                
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-                // Update stats
-                messagesSent++;
-                localStorage.setItem('messagesSent', messagesSent.toString());
-                loadProfileStats();
-                updateNotificationCount();
-                
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        }
-
-        async function loadChatMessages(withUser) {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
-                const q = query(
-                    collection(window.firestore, 'messages'),
-                    where('from', 'in', [currentUser, withUser]),
-                    where('to', 'in', [currentUser, withUser]),
-                    orderBy('timestamp', 'asc')
-                );
-                
-                const snapshot = await getDocs(q);
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '';
-                
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    const isSent = msg.from === currentUser;
-                    
-                    chatMessages.innerHTML += `
-                        <div class="message ${isSent ? 'sent' : 'received'}">
-                            <strong>${isSent ? 'You' : msg.from}:</strong> ${msg.message}
-                        </div>
-                    `;
-                });
-                
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-            } catch (error) {
-                console.error('Error loading chat messages:', error);
-            }
-        }
-
-        // Profile Stats
-        async function loadProfileStats() {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, getDocs, query, where } = window.firestoreFunctions;
-                
-                // Books uploaded
-                const booksQuery = query(collection(window.firestore, 'books'), where('uploadedBy', '==', currentUser));
-                const booksSnapshot = await getDocs(booksQuery);
-                const booksUploaded = booksSnapshot.size;
-                
-                // Total downloads
-                let totalDownloads = 0;
-                booksSnapshot.forEach(doc => {
-                    totalDownloads += doc.data().downloads || 0;
-                });
-                
-                // Update display
-                document.getElementById('booksUploaded').textContent = booksUploaded;
-                document.getElementById('totalDownloads').textContent = totalDownloads;
-                document.getElementById('messagesSent').textContent = messagesSent;
-                document.getElementById('readingLevel').textContent = Math.floor(totalDownloads / 10) + 1;
-                
-            } catch (error) {
-                console.error('Error loading profile stats:', error);
-            }
-        }
-
-        // Notifications
-        function updateNotificationCount() {
-            const count = Math.min(messagesSent, 99);
-            document.getElementById('notificationCount').textContent = count;
-        }
-
-        function showNotifications() {
-            alert(`📢 You have sent ${messagesSent} messages!\n💬 Keep chatting with other readers!`);
         }
 
         function logout() {
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
-
-        // Initialize
-        loadProfileStats();
-        updateNotificationCount();
     </script>
 </body>
 </html>

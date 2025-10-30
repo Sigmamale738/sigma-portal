@@ -4,68 +4,125 @@
     <title>Sigma Portal - Premium eBook Sharing</title>
     <meta charset="UTF-8">
     <style>
-        /* ALL YOUR EXISTING CSS REMAINS SAME */
+        /* COMPLETE CSS CODE */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f8f9fa; }
-        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        body { background: #f8f9fa; transition: all 0.3s ease; }
+        
+        /* Navigation */
+        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease; }
         .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
-        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; transition: all 0.3s ease; }
+        .logout-btn:hover { background: #c82333; }
+        
+        /* Container */
         .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
+        
+        /* Tabs */
+        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease; }
+        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; transition: all 0.3s ease; }
         .tab-btn.active { background: #667eea; color: white; }
-        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-btn:hover { background: #f8f9fa; }
+        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); transition: all 0.3s ease; }
         .tab-content.active { display: block; }
+        
+        /* Forms */
         .form-group { margin-bottom: 1.5rem; }
         .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
-        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; transition: all 0.3s ease; }
+        .form-group input:focus, .form-group textarea:focus, .form-group select:focus { border-color: #667eea; outline: none; }
+        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; transition: all 0.3s ease; }
+        .upload-btn:hover { background: #5a6fd8; transform: translateY(-2px); }
+        
+        /* Book Grid */
         .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; }
+        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; transition: all 0.3s ease; }
+        .book-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.15); }
         .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 120px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; }
-        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
+        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; transition: all 0.3s ease; }
+        .download-btn:hover { background: #218838; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; transition: all 0.3s ease; }
+        .delete-btn:hover { background: #c82333; }
+        
+        /* Guide Box */
         .guide-box { background: #e7f3ff; padding: 1.5rem; border-radius: 10px; margin: 1rem 0; border-left: 4px solid #667eea; }
+        
+        /* Loading */
         .loading { text-align: center; padding: 2rem; color: #666; }
+        
+        /* Badges */
         .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
         
-        /* EXISTING ENHANCED FEATURES */
+        /* Search & Filters */
         .search-box { background: white; padding: 1.5rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); margin-bottom: 2rem; }
         .search-input { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
         .filters { display: flex; gap: 1rem; margin: 1rem 0; flex-wrap: wrap; }
-        .filter-btn { background: #f8f9fa; border: 2px solid #e1e1e1; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; }
+        .filter-btn { background: #f8f9fa; border: 2px solid #e1e1e1; padding: 0.5rem 1rem; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; }
         .filter-btn.active { background: #667eea; color: white; border-color: #667eea; }
+        .filter-btn:hover { background: #e9ecef; }
+        
+        /* Ratings */
         .rating-stars { color: #ffc107; margin: 0.5rem 0; }
+        
+        /* Reviews */
         .review-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid #e1e1e1; }
         .review-input { width: 100%; padding: 0.5rem; border: 1px solid #ddd; border-radius: 5px; margin: 0.5rem 0; }
+        
+        /* User Profile */
         .user-profile { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
         .user-avatar { width: 50px; height: 50px; background: #667eea; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
         .premium-badge { background: linear-gradient(135deg, #ffd700, #ffed4e); color: #000; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; font-weight: bold; }
 
-        /* NEW PREMIUM FEATURES CSS */
+        /* PREMIUM FEATURES */
         .book-cover-img { width: 100%; height: 160px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem; background: #f0f0f0; }
         .cover-upload { margin: 1rem 0; }
         .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
         .progress-bar { width: 100%; height: 6px; background: #e1e1e1; border-radius: 3px; margin: 0.5rem 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 3px; }
-        .bookmark-btn { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 1.2em; }
+        .progress-fill { height: 100%; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 3px; transition: width 0.3s ease; }
+        .bookmark-btn { position: absolute; top: 10px; left: 10px; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 30px; height: 30px; cursor: pointer; font-size: 1.2em; transition: all 0.3s ease; }
+        .bookmark-btn:hover { background: rgba(255,255,255,1); transform: scale(1.1); }
         .bookmark-btn.bookmarked { color: #ffc107; }
         .badge-collection { display: flex; gap: 0.5rem; flex-wrap: wrap; margin: 1rem 0; }
         .badge { background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7em; }
         .reading-stats { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
         .social-actions { display: flex; gap: 0.5rem; margin: 0.5rem 0; }
-        .social-btn { flex: 1; background: #f8f9fa; border: 1px solid #ddd; padding: 5px; border-radius: 5px; cursor: pointer; text-align: center; }
+        .social-btn { flex: 1; background: #f8f9fa; border: 1px solid #ddd; padding: 5px; border-radius: 5px; cursor: pointer; text-align: center; transition: all 0.3s ease; }
+        .social-btn:hover { background: #e9ecef; }
         .advanced-filters { background: #f8f9fa; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
         .filter-row { display: flex; gap: 1rem; margin-bottom: 1rem; }
         .filter-group { flex: 1; }
+        
+        /* Dark Mode */
         .dark-mode { background: #1a1a1a; color: white; }
         .dark-mode .navbar { background: #2d2d2d; }
         .dark-mode .book-card { background: #2d2d2d; border-color: #444; }
-        .theme-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; }
-        .notification-bell { position: relative; background: none; border: none; font-size: 1.5em; cursor: pointer; }
+        .dark-mode .search-box { background: #2d2d2d; }
+        .dark-mode .tab-content { background: #2d2d2d; }
+        .dark-mode .tab-buttons { background: #2d2d2d; }
+        .dark-mode .form-group input, 
+        .dark-mode .form-group textarea, 
+        .dark-mode .form-group select { 
+            background: #3d3d3d; 
+            border-color: #555; 
+            color: white; 
+        }
+        .dark-mode .guide-box { background: #2d3d4d; }
+        .dark-mode .reading-stats { background: #2d2d2d; }
+        .dark-mode .advanced-filters { background: #2d2d2d; }
+        
+        .theme-toggle { background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: all 0.3s ease; }
+        .theme-toggle:hover { background: #f8f9fa; }
+        .dark-mode .theme-toggle:hover { background: #3d3d3d; }
+        
+        .notification-bell { position: relative; background: none; border: none; font-size: 1.5em; cursor: pointer; padding: 0.5rem; border-radius: 50%; transition: all 0.3s ease; }
+        .notification-bell:hover { background: #f8f9fa; }
+        .dark-mode .notification-bell:hover { background: #3d3d3d; }
+        
         .notification-count { position: absolute; top: -5px; right: -5px; background: #dc3545; color: white; border-radius: 50%; width: 18px; height: 18px; font-size: 0.7em; display: flex; align-items: center; justify-content: center; }
+        
         .reading-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
-        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 600px; }
+        .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; }
+        .dark-mode .modal-content { background: #2d2d2d; }
+        
         .ai-recommendation { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
     </style>
     
@@ -110,9 +167,9 @@
         </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div class="user-profile">
-                <div class="user-avatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
+                <div class="user-avatar" id="userAvatar">U</div>
                 <div>
-                    <div style="font-weight: bold;">${currentUser}</div>
+                    <div style="font-weight: bold;" id="userName">User</div>
                     <div class="premium-badge">⭐ PREMIUM USER</div>
                 </div>
             </div>
@@ -182,7 +239,7 @@
         <div class="ai-recommendation" id="aiRecommendation" style="display: none;">
             <h3>🤖 AI Recommendation</h3>
             <p id="aiRecommendationText">Based on your reading history, we recommend...</p>
-            <button onclick="hideAIRecommendation()" style="background: white; color: #667eea; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 0.5rem;">Dismiss</button>
+            <button onclick="hideAIRecommendation()" style="background: white; color: #667eea; border: none; padding: 5px 10px; border-radius: 5px; margin-top: 0.5rem; cursor: pointer;">Dismiss</button>
         </div>
         
         <!-- Public Library Tab -->
@@ -288,11 +345,11 @@
             <h2>👤 My Premium Profile</h2>
             
             <div class="user-profile" style="margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
                 <div>
-                    <h3>${currentUser}</h3>
+                    <h3 id="profileName">User</h3>
                     <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Member since: ${new Date().toLocaleDateString()}</p>
+                    <p>Member since: <span id="memberSince">Loading...</span></p>
                 </div>
             </div>
 
@@ -357,11 +414,18 @@
     </div>
 
     <script>
-        // Check login
+        // Check login and initialize user
         const currentUser = localStorage.getItem('currentUser');
         if (!currentUser) {
             window.location.href = 'index.html';
         }
+
+        // Initialize user display
+        document.getElementById('userName').textContent = currentUser;
+        document.getElementById('profileName').textContent = currentUser;
+        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
+        document.getElementById('memberSince').textContent = new Date().toLocaleDateString();
 
         // PREMIUM: Global variables for enhanced features
         let allBooks = [];
@@ -426,9 +490,9 @@
         // PREMIUM: AI Recommendation
         function showAIRecommendation() {
             const recommendations = [
-                "Check out 'Python Programming' - matches your interest in tech!",
-                "Based on your history, you might enjoy 'The Lean Startup'",
-                "Trending in your network: 'Artificial Intelligence Fundamentals'"
+                "Check out programming books - matches your interest in tech!",
+                "Based on your history, you might enjoy business and finance books",
+                "Trending in your network: Artificial Intelligence Fundamentals"
             ];
             const randomRec = recommendations[Math.floor(Math.random() * recommendations.length)];
             
@@ -542,7 +606,7 @@
                     book.title.toLowerCase().includes(searchQuery) ||
                     book.author.toLowerCase().includes(searchQuery) ||
                     book.category.toLowerCase().includes(searchQuery) ||
-                    book.description?.toLowerCase().includes(searchQuery)
+                    (book.description && book.description.toLowerCase().includes(searchQuery))
                 );
             }
             
@@ -833,7 +897,7 @@
             alert('You have 3 new notifications:\n- New book in Programming category\n- Your book got 5 new downloads\n- Weekly reading report ready');
         }
 
-        // KEEP ALL EXISTING FUNCTIONS (they remain the same)
+        // Load user's books
         async function loadMyBooks() {
             if (!firebaseReady) return;
             
