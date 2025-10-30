@@ -35,115 +35,225 @@
         .cover-upload { margin: 1rem 0; }
         .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
         
-        /* NEW SOCIAL FEATURES */
-        .online-users-sidebar { 
-            position: fixed; 
-            right: 20px; 
-            top: 100px; 
-            width: 280px; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1); 
-            padding: 1rem;
-            max-height: 400px;
-            overflow-y: auto;
+        /* NEW SLIDING CHAT DESIGN - Clash of Clans Style */
+        .chat-toggle-btn {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 999;
+            transition: transform 0.3s ease;
         }
-        .online-user { 
-            display: flex; 
-            align-items: center; 
-            gap: 0.5rem; 
-            padding: 0.5rem; 
-            border-radius: 8px; 
-            margin-bottom: 0.5rem;
-            transition: background 0.3s;
+        .chat-toggle-btn:hover {
+            transform: scale(1.1);
         }
-        .online-user:hover { background: #f8f9fa; }
-        .online-user.active { background: #e7f3ff; }
-        .user-avatar { 
-            width: 35px; 
-            height: 35px; 
-            background: linear-gradient(135deg, #667eea, #764ba2); 
-            border-radius: 50%; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-weight: bold; 
-            font-size: 0.9em; 
-        }
-        .online-indicator { 
-            width: 8px; 
-            height: 8px; 
-            background: #28a745; 
-            border-radius: 50%; 
-            margin-left: auto; 
-        }
-        .chat-modal { 
-            display: none; 
-            position: fixed; 
-            bottom: 20px; 
-            right: 20px; 
-            width: 350px; 
-            height: 500px; 
-            background: white; 
-            border-radius: 10px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
-            z-index: 1001;
+        .chat-container {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 380px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 25px rgba(0,0,0,0.1);
+            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            z-index: 1000;
+            display: flex;
             flex-direction: column;
         }
-        .chat-header { 
-            background: #667eea; 
-            color: white; 
-            padding: 1rem; 
-            border-radius: 10px 10px 0 0; 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
+        .chat-container.open {
+            right: 0;
         }
-        .chat-messages { 
-            flex: 1; 
-            padding: 1rem; 
-            overflow-y: auto; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 0.5rem; 
+        .chat-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .message { 
-            padding: 0.7rem; 
-            border-radius: 10px; 
-            max-width: 80%; 
-            word-wrap: break-word; 
+        .chat-title {
+            font-size: 1.2em;
+            font-weight: bold;
         }
-        .message.sent { 
-            background: #667eea; 
-            color: white; 
-            align-self: flex-end; 
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5em;
+            cursor: pointer;
         }
-        .message.received { 
-            background: #f1f3f4; 
-            color: #333; 
-            align-self: flex-start; 
+        .online-users-section {
+            padding: 1rem;
+            border-bottom: 1px solid #e1e1e1;
+            max-height: 200px;
+            overflow-y: auto;
         }
-        .chat-input { 
-            display: flex; 
-            padding: 1rem; 
-            border-top: 1px solid #e1e1e1; 
-            gap: 0.5rem; 
+        .online-user {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            padding: 0.7rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: background 0.3s;
         }
-        .chat-input input { 
-            flex: 1; 
-            padding: 0.7rem; 
-            border: 1px solid #e1e1e1; 
-            border-radius: 20px; 
+        .online-user:hover {
+            background: #f8f9fa;
         }
-        .chat-input button { 
-            background: #667eea; 
-            color: white; 
-            border: none; 
-            padding: 0.7rem 1rem; 
-            border-radius: 20px; 
-            cursor: pointer; 
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 1.1em;
         }
+        .user-info {
+            flex: 1;
+        }
+        .user-name {
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+        .user-status {
+            font-size: 0.8em;
+            color: #28a745;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .online-indicator {
+            width: 8px;
+            height: 8px;
+            background: #28a745;
+            border-radius: 50%;
+        }
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+            background: #f8f9fa;
+        }
+        .message {
+            padding: 0.8rem 1rem;
+            border-radius: 15px;
+            max-width: 85%;
+            word-wrap: break-word;
+            position: relative;
+            animation: messageSlide 0.3s ease;
+        }
+        @keyframes messageSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message.sent {
+            background: #667eea;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+        .message.received {
+            background: white;
+            color: #333;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .message-sender {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 0.3rem;
+            opacity: 0.8;
+        }
+        .message-time {
+            font-size: 0.7em;
+            opacity: 0.6;
+            margin-top: 0.3rem;
+            text-align: right;
+        }
+        .chat-input-container {
+            padding: 1rem;
+            border-top: 1px solid #e1e1e1;
+            background: white;
+        }
+        .chat-input-wrapper {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        .chat-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 1px solid #e1e1e1;
+            border-radius: 25px;
+            outline: none;
+            font-size: 0.95em;
+        }
+        .chat-input:focus {
+            border-color: #667eea;
+        }
+        .send-btn {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+        .send-btn:hover {
+            transform: scale(1.05);
+        }
+        .no-chat-selected {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            color: #666;
+            text-align: center;
+            padding: 2rem;
+        }
+        .no-chat-icon {
+            font-size: 3em;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+        .chat-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 999;
+            display: none;
+        }
+        .chat-overlay.active {
+            display: block;
+        }
+        
+        /* Profile Stats */
         .profile-stats { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
@@ -173,16 +283,6 @@
             font-size: 0.8em; 
             margin: 0.2rem; 
             display: inline-block; 
-        }
-        .message-btn { 
-            background: #17a2b8; 
-            color: white; 
-            border: none; 
-            padding: 5px 10px; 
-            border-radius: 15px; 
-            font-size: 0.8em; 
-            cursor: pointer; 
-            margin-left: 0.5rem; 
         }
         .notification-bell {
             position: relative;
@@ -234,7 +334,7 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="nav-brand">📚 Project Ebooks - Social</div>
+        <div class="nav-brand">📚 Project Ebooks</div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <button class="notification-bell" onclick="showNotifications()">
                 🔔 <span class="notification-count" id="notificationCount">0</span>
@@ -247,44 +347,51 @@
         </div>
     </nav>
 
-    <!-- Online Users Sidebar -->
-    <div class="online-users-sidebar">
-        <h4 style="margin-bottom: 1rem;">👥 Online Readers</h4>
-        <div id="onlineUsersList">
-            <div class="loading">Loading online users...</div>
-        </div>
-    </div>
-
-    <!-- Chat Modal -->
-    <div class="chat-modal" id="chatModal">
+    <!-- Sliding Chat Container -->
+    <button class="chat-toggle-btn" onclick="toggleChat()">💬</button>
+    
+    <div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
+    
+    <div class="chat-container" id="chatContainer">
         <div class="chat-header">
-            <div>
-                <strong id="chatWithUser">Chat</strong>
-                <div style="font-size: 0.8em; opacity: 0.8;" id="chatStatus">Online</div>
-            </div>
-            <button onclick="closeChat()" style="background: none; border: none; color: white; font-size: 1.2em; cursor: pointer;">✕</button>
+            <div class="chat-title">💬 Community Chat</div>
+            <button class="close-chat" onclick="closeChat()">✕</button>
         </div>
+        
+        <div class="online-users-section">
+            <div style="font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9em; color: #333;">Online Readers</div>
+            <div id="onlineUsersList">
+                <div style="color: #666; text-align: center; padding: 1rem; font-size: 0.9em;">Loading online users...</div>
+            </div>
+        </div>
+        
         <div class="chat-messages" id="chatMessages">
-            <div class="message received">
-                <strong>System:</strong> Chat started! Say hello 👋
+            <div class="no-chat-selected" id="noChatSelected">
+                <div class="no-chat-icon">💭</div>
+                <div style="font-weight: 600; margin-bottom: 0.5rem;">Select a user to chat</div>
+                <div style="font-size: 0.9em; opacity: 0.7;">Click on any online user to start a conversation</div>
             </div>
         </div>
-        <div class="chat-input">
-            <input type="text" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
-            <button onclick="sendMessage()">Send</button>
+        
+        <div class="chat-input-container" id="chatInputContainer" style="display: none;">
+            <div class="chat-input-wrapper">
+                <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
+                <button class="send-btn" onclick="sendMessage()">
+                    <span style="font-size: 1.2em;">➤</span>
+                </button>
+            </div>
         </div>
     </div>
 
     <div class="container">
         <h1>📚 Project Ebooks - Social Platform</h1>
-        <p><strong>🚀 NEW FEATURES:</strong> Live Chat • Online Users • Profile Stats • Notifications</p>
+        <p><strong>🚀 NEW:</strong> Sliding Chat • Online Users • Real-time Messaging</p>
 
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('library')">📚 Library</button>
             <button class="tab-btn" onclick="showTab('upload')">📤 Upload</button>
             <button class="tab-btn" onclick="showTab('mybooks')">📂 My Books</button>
-            <button class="tab-btn" onclick="showTab('profile')">👤 My Profile</button>
-            <button class="tab-btn" onclick="showTab('messages')">💬 Messages</button>
+            <button class="tab-btn" onclick="showTab('profile')">👤 Profile</button>
         </div>
 
         <!-- Public Library Tab -->
@@ -345,11 +452,10 @@
                 <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
                 <div>
                     <h3 id="profileName">User</h3>
-                    <div style="color: #666;">Member since: <span id="memberSince">Today</span></div>
+                    <div style="color: #666;">Active Reader</div>
                     <div style="margin-top: 0.5rem;">
-                        <span class="badge">📚 Reader</span>
-                        <span class="badge">⭐ Contributor</span>
-                        <span class="badge">🚀 Active</span>
+                        <span class="badge">📚 Contributor</span>
+                        <span class="badge">💬 Chat Active</span>
                     </div>
                 </div>
             </div>
@@ -371,26 +477,6 @@
                     <div class="stat-value" id="readingLevel">1</div>
                     <div class="stat-label">Reading Level</div>
                 </div>
-            </div>
-
-            <h3 style="margin-top: 2rem;">🏆 Achievements</h3>
-            <div style="margin: 1rem 0;">
-                <div class="badge">📖 First Upload</div>
-                <div class="badge">🔥 10+ Downloads</div>
-                <div class="badge">💬 Chat Active</div>
-                <div class="badge">⭐ Community Star</div>
-            </div>
-        </div>
-
-        <!-- Messages Tab -->
-        <div id="messages" class="tab-content">
-            <h2>💬 Messages</h2>
-            <div style="background: #f8f9fa; padding: 1.5rem; border-radius: 10px; margin-bottom: 1rem;">
-                <h4>💡 Quick Actions</h4>
-                <p>Click on any online user to start chatting! 💬</p>
-            </div>
-            <div id="conversationsList">
-                <div class="loading">Your conversations will appear here...</div>
             </div>
         </div>
     </div>
@@ -797,14 +883,40 @@
             }
         }
 
-        // NEW SOCIAL FEATURES
+        // NEW SLIDING CHAT FUNCTIONS
+
+        function toggleChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            const overlay = document.getElementById('chatOverlay');
+            
+            chatContainer.classList.toggle('open');
+            overlay.classList.toggle('active');
+        }
+
+        function closeChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            const overlay = document.getElementById('chatOverlay');
+            
+            chatContainer.classList.remove('open');
+            overlay.classList.remove('active');
+            currentChatUser = null;
+            document.getElementById('chatInputContainer').style.display = 'none';
+            document.getElementById('noChatSelected').style.display = 'flex';
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="no-chat-selected" id="noChatSelected">
+                    <div class="no-chat-icon">💭</div>
+                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Select a user to chat</div>
+                    <div style="font-size: 0.9em; opacity: 0.7;">Click on any online user to start a conversation</div>
+                </div>
+            `;
+        }
 
         // Online Presence System
         async function startOnlinePresence() {
             if (!firebaseReady) return;
             
             try {
-                const { collection, addDoc, doc, updateDoc, onSnapshot } = window.firestoreFunctions;
+                const { doc, updateDoc, onSnapshot, query, collection } = window.firestoreFunctions;
                 
                 // Add user to online users
                 const userRef = doc(window.firestore, 'onlineUsers', currentUser);
@@ -849,16 +961,20 @@
             const filteredUsers = onlineUsers.filter(user => user.username !== currentUser);
             
             if (filteredUsers.length === 0) {
-                list.innerHTML = '<div style="color: #666; text-align: center; padding: 1rem;">No other users online</div>';
+                list.innerHTML = '<div style="color: #666; text-align: center; padding: 1rem; font-size: 0.9em;">No other users online</div>';
                 return;
             }
             
             list.innerHTML = filteredUsers.map(user => `
                 <div class="online-user" onclick="startChat('${user.username}')">
                     <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
-                    <div>${user.username}</div>
-                    <div class="online-indicator"></div>
-                    <button class="message-btn" onclick="event.stopPropagation(); startChat('${user.username}')">💬</button>
+                    <div class="user-info">
+                        <div class="user-name">${user.username}</div>
+                        <div class="user-status">
+                            <div class="online-indicator"></div>
+                            Online
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -891,19 +1007,13 @@
         // Chat System
         function startChat(username) {
             currentChatUser = username;
-            document.getElementById('chatWithUser').textContent = `Chat with ${username}`;
-            document.getElementById('chatModal').style.display = 'flex';
+            document.getElementById('noChatSelected').style.display = 'none';
+            document.getElementById('chatInputContainer').style.display = 'block';
+            
+            // Update chat header
+            document.querySelector('.chat-title').textContent = `💬 Chat with ${username}`;
+            
             loadChatMessages(username);
-        }
-
-        function closeChat() {
-            document.getElementById('chatModal').style.display = 'none';
-            currentChatUser = null;
-            document.getElementById('chatMessages').innerHTML = `
-                <div class="message received">
-                    <strong>System:</strong> Chat started! Say hello 👋
-                </div>
-            `;
         }
 
         function handleMessageKeypress(event) {
@@ -933,9 +1043,13 @@
                 
                 // Add to chat display
                 const chatMessages = document.getElementById('chatMessages');
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
                 chatMessages.innerHTML += `
                     <div class="message sent">
-                        <strong>You:</strong> ${message}
+                        <div class="message-sender">You</div>
+                        ${message}
+                        <div class="message-time">${time}</div>
                     </div>
                 `;
                 
@@ -972,10 +1086,13 @@
                 snapshot.forEach((doc) => {
                     const msg = doc.data();
                     const isSent = msg.from === currentUser;
+                    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     
                     chatMessages.innerHTML += `
                         <div class="message ${isSent ? 'sent' : 'received'}">
-                            <strong>${isSent ? 'You' : msg.from}:</strong> ${msg.message}
+                            <div class="message-sender">${isSent ? 'You' : msg.from}</div>
+                            ${msg.message}
+                            <div class="message-time">${time}</div>
                         </div>
                     `;
                 });
