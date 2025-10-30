@@ -67,6 +67,20 @@
         .reading-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
         .modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 600px; }
         .ai-recommendation { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem; border-radius: 8px; margin: 1rem 0; }
+
+        /* NEW EDIT & DELETE FEATURES */
+        .edit-btn { background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
+        .edit-btn:hover { background: #e0a800; }
+        .action-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .action-buttons button { flex: 1; }
+        .edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .edit-modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .dark-mode .edit-modal-content { background: #2d2d2d; color: white; }
+        .modal-header { display: flex; justify-content: between; align-items: center; margin-bottom: 1rem; }
+        .modal-title { font-size: 1.5em; font-weight: bold; }
+        .close-btn { background: none; border: none; font-size: 1.5em; cursor: pointer; }
+        .current-cover { text-align: center; margin: 1rem 0; }
+        .current-cover-img { max-width: 150px; max-height: 200px; object-fit: cover; border-radius: 5px; }
     </style>
     
     <!-- Firebase SDK -->
@@ -110,9 +124,9 @@
         </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
             <div class="user-profile">
-                <div class="user-avatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
+                <div class="user-avatar" id="userAvatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
                 <div>
-                    <div style="font-weight: bold;">${currentUser}</div>
+                    <div style="font-weight: bold;" id="userName">${currentUser}</div>
                     <div class="premium-badge">⭐ PREMIUM USER</div>
                 </div>
             </div>
@@ -122,7 +136,7 @@
     
     <div class="container">
         <h1>📚 Sigma eBook Sharing - PREMIUM</h1>
-        <p><strong>PREMIUM FEATURES:</strong> Book Covers • Reading Progress • Bookmarks • AI Recommendations • Dark Mode • Social Features</p>
+        <p><strong>PREMIUM FEATURES:</strong> Book Covers • Reading Progress • Bookmarks • AI Recommendations • Dark Mode • Edit & Delete Books</p>
         
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('library')">📚 Smart Library</button>
@@ -206,6 +220,8 @@
                     <li>🏷️ AI-powered categorization</li>
                     <li>📊 Advanced analytics tracking</li>
                     <li>👥 Social sharing features</li>
+                    <li>✏️ Edit books anytime</li>
+                    <li>🗑️ Delete books when needed</li>
                 </ul>
             </div>
             
@@ -260,7 +276,7 @@
         <!-- My Books Tab -->
         <div id="mybooks" class="tab-content">
             <h2>My Premium Library</h2>
-            <p>Manage your books with advanced analytics</p>
+            <p>Manage your books with advanced analytics - Edit or Delete any of your books</p>
             
             <div class="reading-stats">
                 <h4>📊 Your Reading Statistics</h4>
@@ -288,11 +304,11 @@
             <h2>👤 My Premium Profile</h2>
             
             <div class="user-profile" style="margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">${currentUser ? currentUser.charAt(0).toUpperCase() : 'U'}</div>
                 <div>
-                    <h3>${currentUser}</h3>
+                    <h3 id="profileName">${currentUser}</h3>
                     <div class="premium-badge">⭐ PREMIUM MEMBER</div>
-                    <p>Member since: ${new Date().toLocaleDateString()}</p>
+                    <p>Member since: <span id="memberSince">${new Date().toLocaleDateString()}</span></p>
                 </div>
             </div>
 
@@ -312,6 +328,7 @@
                         <div class="badge">⭐ Reviewer</div>
                         <div class="badge">🔖 Collector</div>
                         <div class="badge">🚀 Pioneer</div>
+                        <div class="badge">✏️ Editor</div>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 60%;"></div>
@@ -356,12 +373,85 @@
         </div>
     </div>
 
+    <!-- Edit Book Modal -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">✏️ Edit Book</h3>
+                <button class="close-btn" onclick="closeEditModal()">×</button>
+            </div>
+            
+            <form onsubmit="updateBook(event)">
+                <input type="hidden" id="editBookId">
+                
+                <div class="form-group">
+                    <label>Current Cover</label>
+                    <div class="current-cover">
+                        <img id="currentCoverImg" class="current-cover-img" src="">
+                        <p id="noCoverText" style="display: none;">No cover image</p>
+                    </div>
+                    <label>Update Cover Image</label>
+                    <input type="file" id="editBookCover" class="cover-upload" accept="image/*" onchange="previewEditCover(event)">
+                    <img id="editCoverPreview" class="cover-preview">
+                </div>
+                
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" id="editBookTitle" placeholder="Enter book title" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Author Name *</label>
+                    <input type="text" id="editBookAuthor" placeholder="Author name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Book Description</label>
+                    <textarea id="editBookDescription" placeholder="Brief description about the book" rows="3"></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="editBookCategory">
+                        <option>Programming & Tech</option>
+                        <option>Science & Education</option>
+                        <option>Fiction & Literature</option>
+                        <option>Business & Finance</option>
+                        <option>Self Development</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Google Drive Link *</label>
+                    <input type="url" id="editDriveLink" placeholder="https://drive.google.com/file/d/..." required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Pages</label>
+                    <input type="number" id="editBookPages" placeholder="Number of pages">
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 2;">💾 Save Changes</button>
+                    <button type="button" onclick="closeEditModal()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // Check login
+        // Check login and initialize user
         const currentUser = localStorage.getItem('currentUser');
         if (!currentUser) {
             window.location.href = 'index.html';
         }
+
+        // Initialize user display
+        document.getElementById('userName').textContent = currentUser;
+        document.getElementById('profileName').textContent = currentUser;
+        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+        document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
 
         // PREMIUM: Global variables for enhanced features
         let allBooks = [];
@@ -416,6 +506,20 @@
             }
         }
 
+        function previewEditCover(event) {
+            const input = event.target;
+            const preview = document.getElementById('editCoverPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
         // PREMIUM: Dark mode toggle
         function toggleDarkMode() {
             darkMode = !darkMode;
@@ -426,9 +530,9 @@
         // PREMIUM: AI Recommendation
         function showAIRecommendation() {
             const recommendations = [
-                "Check out 'Python Programming' - matches your interest in tech!",
-                "Based on your history, you might enjoy 'The Lean Startup'",
-                "Trending in your network: 'Artificial Intelligence Fundamentals'"
+                "Check out programming books - matches your interest in tech!",
+                "Based on your history, you might enjoy business and finance books",
+                "Trending in your network: Artificial Intelligence Fundamentals"
             ];
             const randomRec = recommendations[Math.floor(Math.random() * recommendations.length)];
             
@@ -507,6 +611,112 @@
             loadUserStats();
         }
 
+        // NEW: EDIT BOOK FUNCTIONALITY
+        function editBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            if (!book) return;
+
+            // Populate edit form with current book data
+            document.getElementById('editBookId').value = bookId;
+            document.getElementById('editBookTitle').value = book.title;
+            document.getElementById('editBookAuthor').value = book.author;
+            document.getElementById('editBookDescription').value = book.description || '';
+            document.getElementById('editBookCategory').value = book.category;
+            document.getElementById('editDriveLink').value = book.driveLink;
+            document.getElementById('editBookPages').value = book.pages || '';
+
+            // Handle cover image
+            const currentCoverImg = document.getElementById('currentCoverImg');
+            const noCoverText = document.getElementById('noCoverText');
+            const editCoverPreview = document.getElementById('editCoverPreview');
+            
+            if (book.coverUrl) {
+                currentCoverImg.src = book.coverUrl;
+                currentCoverImg.style.display = 'block';
+                noCoverText.style.display = 'none';
+            } else {
+                currentCoverImg.style.display = 'none';
+                noCoverText.style.display = 'block';
+            }
+            
+            editCoverPreview.style.display = 'none';
+            document.getElementById('editBookCover').value = '';
+
+            // Show edit modal
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        async function updateBook(event) {
+            event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
+
+            const bookId = document.getElementById('editBookId').value;
+            const title = document.getElementById('editBookTitle').value;
+            const author = document.getElementById('editBookAuthor').value;
+            const description = document.getElementById('editBookDescription').value;
+            const category = document.getElementById('editBookCategory').value;
+            const driveLink = document.getElementById('editDriveLink').value;
+            const pages = document.getElementById('editBookPages').value;
+            const coverFile = document.getElementById('editBookCover').files[0];
+
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            try {
+                let coverUrl = null;
+                
+                // Upload new cover image if provided
+                if (coverFile) {
+                    const { ref, uploadBytes, getDownloadURL } = window.storageFunctions;
+                    const coverRef = ref(window.firebaseStorage, `covers/${Date.now()}_${coverFile.name}`);
+                    await uploadBytes(coverRef, coverFile);
+                    coverUrl = await getDownloadURL(coverRef);
+                }
+
+                const { updateDoc, doc } = window.firestoreFunctions;
+                const bookRef = doc(window.firestore, 'books', bookId);
+                
+                // Prepare update data
+                const updateData = {
+                    title: title,
+                    author: author,
+                    description: description,
+                    category: category,
+                    driveLink: driveLink,
+                    pages: pages ? parseInt(pages) : null,
+                    lastUpdated: new Date().toISOString()
+                };
+
+                // Only update coverUrl if a new cover was uploaded
+                if (coverUrl) {
+                    updateData.coverUrl = coverUrl;
+                }
+
+                await updateDoc(bookRef, updateData);
+
+                alert(`✅ "${title}" has been updated successfully!`);
+                closeEditModal();
+                
+                // Reload all data
+                loadPremiumBooks();
+                loadMyBooks();
+                loadUserStats();
+                
+            } catch (error) {
+                alert('Error updating book: ' + error.message);
+            }
+        }
+
         // PREMIUM: Enhanced book loading with all features
         async function loadPremiumBooks() {
             if (!firebaseReady) return;
@@ -542,7 +752,7 @@
                     book.title.toLowerCase().includes(searchQuery) ||
                     book.author.toLowerCase().includes(searchQuery) ||
                     book.category.toLowerCase().includes(searchQuery) ||
-                    book.description?.toLowerCase().includes(searchQuery)
+                    (book.description && book.description.toLowerCase().includes(searchQuery))
                 );
             }
             
@@ -603,7 +813,7 @@
             return filtered;
         }
 
-        // PREMIUM: Display books with all premium features
+        // PREMIUM: Display books with all premium features including edit/delete
         function displayPremiumBooks(books) {
             const grid = document.getElementById('publicLibraryGrid');
             
@@ -665,6 +875,17 @@
                         <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
                             📥 Download eBook
                         </button>
+                        
+                        ${isOwner ? `
+                            <div class="action-buttons">
+                                <button class="edit-btn" onclick="editBook('${book.id}')">
+                                    ✏️ Edit Book
+                                </button>
+                                <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        ` : ''}
                     </div>
                 `;
             }).join('');
@@ -758,6 +979,7 @@
                     coverUrl: coverUrl,
                     uploadedBy: currentUser,
                     uploadDate: new Date().toISOString(),
+                    lastUpdated: new Date().toISOString(),
                     downloads: 0,
                     rating: 0
                 });
@@ -833,7 +1055,7 @@
             alert('You have 3 new notifications:\n- New book in Programming category\n- Your book got 5 new downloads\n- Weekly reading report ready');
         }
 
-        // KEEP ALL EXISTING FUNCTIONS (they remain the same)
+        // Load user's books with enhanced edit/delete features
         async function loadMyBooks() {
             if (!firebaseReady) return;
             
@@ -857,6 +1079,7 @@
                 grid.innerHTML = snapshot.docs.map(doc => {
                     const book = doc.data();
                     const uploadDate = new Date(book.uploadDate).toLocaleDateString();
+                    const lastUpdated = book.lastUpdated ? new Date(book.lastUpdated).toLocaleDateString() : null;
                     const rating = book.rating || Math.random() * 2 + 3;
                     const stars = '⭐'.repeat(Math.floor(rating)) + '☆'.repeat(5 - Math.floor(rating));
                     const progress = readingProgress[doc.id];
@@ -879,7 +1102,8 @@
                             </div>
                             
                             <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                                ${book.downloads || 0} downloads • ${uploadDate}
+                                ${book.downloads || 0} downloads • Uploaded: ${uploadDate}
+                                ${lastUpdated && lastUpdated !== uploadDate ? `<br>• Updated: ${lastUpdated}` : ''}
                                 ${book.pages ? `• ${book.pages} pages` : ''}
                             </div>
                             
@@ -895,9 +1119,15 @@
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
                                 📥 Download (${book.downloads || 0})
                             </button>
-                            <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
-                                🗑️ Delete This Book
-                            </button>
+                            
+                            <div class="action-buttons">
+                                <button class="edit-btn" onclick="editBook('${doc.id}')">
+                                    ✏️ Edit Book
+                                </button>
+                                <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
                         </div>
                     `;
                 }).join('');
@@ -929,7 +1159,7 @@
         }
 
         async function deleteBook(bookId, bookTitle) {
-            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?\n\nThis action cannot be undone!`)) return;
 
             if (!firebaseReady) {
                 alert('Firebase is not ready. Please try again.');
@@ -940,7 +1170,7 @@
                 const { deleteDoc, doc } = window.firestoreFunctions;
                 await deleteDoc(doc(window.firestore, 'books', bookId));
                 
-                alert(`✅ "${bookTitle}" has been deleted.`);
+                alert(`✅ "${bookTitle}" has been deleted successfully.`);
                 
                 loadPremiumBooks();
                 loadMyBooks();
