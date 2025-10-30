@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Project Ebooks - Social eBook Platform</title>
+    <title>Project Ebooks - Global Chat Platform</title>
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -35,7 +35,7 @@
         .cover-upload { margin: 1rem 0; }
         .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
         
-        /* NEW SLIDING CHAT DESIGN - Clash of Clans Style */
+        /* GLOBAL CHAT - Free Fire Style */
         .chat-toggle-btn {
             position: fixed;
             right: 20px;
@@ -83,63 +83,16 @@
             font-size: 1.2em;
             font-weight: bold;
         }
+        .online-count {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
         .close-chat {
             background: none;
             border: none;
             color: white;
             font-size: 1.5em;
             cursor: pointer;
-        }
-        .online-users-section {
-            padding: 1rem;
-            border-bottom: 1px solid #e1e1e1;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .online-user {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.7rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .online-user:hover {
-            background: #f8f9fa;
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-            font-size: 1.1em;
-        }
-        .user-info {
-            flex: 1;
-        }
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-        .user-status {
-            font-size: 0.8em;
-            color: #28a745;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .online-indicator {
-            width: 8px;
-            height: 8px;
-            background: #28a745;
-            border-radius: 50%;
         }
         .chat-messages {
             flex: 1;
@@ -174,6 +127,16 @@
             align-self: flex-start;
             border-bottom-left-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .message-system {
+            background: #ffd700;
+            color: black;
+            align-self: center;
+            text-align: center;
+            font-size: 0.9em;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            max-width: 70%;
         }
         .message-sender {
             font-weight: 600;
@@ -224,21 +187,6 @@
         .send-btn:hover {
             transform: scale(1.05);
         }
-        .no-chat-selected {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #666;
-            text-align: center;
-            padding: 2rem;
-        }
-        .no-chat-icon {
-            font-size: 3em;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
         .chat-overlay {
             position: fixed;
             top: 0;
@@ -251,6 +199,15 @@
         }
         .chat-overlay.active {
             display: block;
+        }
+        .online-users-badge {
+            display: inline-block;
+            background: #28a745;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
+            margin-left: 0.5rem;
         }
         
         /* Profile Stats */
@@ -340,43 +297,40 @@
                 🔔 <span class="notification-count" id="notificationCount">0</span>
             </button>
             <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="user-avatar" id="userAvatar">U</div>
+                <div style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;" id="userAvatar">U</div>
                 <div style="font-weight: bold;" id="userName">User</div>
             </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
-    <!-- Sliding Chat Container -->
+    <!-- Global Chat Container -->
     <button class="chat-toggle-btn" onclick="toggleChat()">💬</button>
     
     <div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
     
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
-            <div class="chat-title">💬 Community Chat</div>
+            <div>
+                <div class="chat-title">🌍 Global Chat</div>
+                <div class="online-count" id="onlineCount">0 users online</div>
+            </div>
             <button class="close-chat" onclick="closeChat()">✕</button>
         </div>
         
-        <div class="online-users-section">
-            <div style="font-weight: 600; margin-bottom: 0.8rem; font-size: 0.9em; color: #333;">Online Readers</div>
-            <div id="onlineUsersList">
-                <div style="color: #666; text-align: center; padding: 1rem; font-size: 0.9em;">Loading online users...</div>
-            </div>
-        </div>
-        
         <div class="chat-messages" id="chatMessages">
-            <div class="no-chat-selected" id="noChatSelected">
-                <div class="no-chat-icon">💭</div>
-                <div style="font-weight: 600; margin-bottom: 0.5rem;">Select a user to chat</div>
-                <div style="font-size: 0.9em; opacity: 0.7;">Click on any online user to start a conversation</div>
+            <div class="message-system">
+                🌟 Welcome to Global Chat! Everyone can see your messages.
+            </div>
+            <div class="message-system">
+                💬 Chat with readers from around the world!
             </div>
         </div>
         
-        <div class="chat-input-container" id="chatInputContainer" style="display: none;">
+        <div class="chat-input-container">
             <div class="chat-input-wrapper">
-                <input type="text" class="chat-input" id="messageInput" placeholder="Type a message..." onkeypress="handleMessageKeypress(event)">
-                <button class="send-btn" onclick="sendMessage()">
+                <input type="text" class="chat-input" id="messageInput" placeholder="Type a message to everyone..." onkeypress="handleMessageKeypress(event)">
+                <button class="send-btn" onclick="sendGlobalMessage()">
                     <span style="font-size: 1.2em;">➤</span>
                 </button>
             </div>
@@ -384,8 +338,8 @@
     </div>
 
     <div class="container">
-        <h1>📚 Project Ebooks - Social Platform</h1>
-        <p><strong>🚀 NEW:</strong> Sliding Chat • Online Users • Real-time Messaging</p>
+        <h1>📚 Project Ebooks - Global Community</h1>
+        <p><strong>🚀 NEW:</strong> Global Chat • Real-time Messaging • Worldwide Readers</p>
 
         <div class="tab-buttons">
             <button class="tab-btn active" onclick="showTab('library')">📚 Library</button>
@@ -449,13 +403,13 @@
         <div id="profile" class="tab-content">
             <h2>👤 My Profile</h2>
             <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 2em;" id="profileAvatar">U</div>
                 <div>
                     <h3 id="profileName">User</h3>
-                    <div style="color: #666;">Active Reader</div>
+                    <div style="color: #666;">Global Reader</div>
                     <div style="margin-top: 0.5rem;">
                         <span class="badge">📚 Contributor</span>
-                        <span class="badge">💬 Chat Active</span>
+                        <span class="badge">💬 Global Chatter</span>
                     </div>
                 </div>
             </div>
@@ -538,8 +492,8 @@
         let allBooks = [];
         let firebaseReady = false;
         let onlineUsers = [];
-        let currentChatUser = null;
         let messagesSent = parseInt(localStorage.getItem('messagesSent') || '0');
+        let globalMessagesListener = null;
 
         // Wait for Firebase
         const checkFirebase = setInterval(() => {
@@ -548,7 +502,7 @@
                 clearInterval(checkFirebase);
                 loadBooks();
                 startOnlinePresence();
-                loadOnlineUsers();
+                startGlobalChat();
             }
         }, 100);
 
@@ -883,7 +837,7 @@
             }
         }
 
-        // NEW SLIDING CHAT FUNCTIONS
+        // GLOBAL CHAT FUNCTIONS - Free Fire Style
 
         function toggleChat() {
             const chatContainer = document.getElementById('chatContainer');
@@ -899,16 +853,103 @@
             
             chatContainer.classList.remove('open');
             overlay.classList.remove('active');
-            currentChatUser = null;
-            document.getElementById('chatInputContainer').style.display = 'none';
-            document.getElementById('noChatSelected').style.display = 'flex';
-            document.getElementById('chatMessages').innerHTML = `
-                <div class="no-chat-selected" id="noChatSelected">
-                    <div class="no-chat-icon">💭</div>
-                    <div style="font-weight: 600; margin-bottom: 0.5rem;">Select a user to chat</div>
-                    <div style="font-size: 0.9em; opacity: 0.7;">Click on any online user to start a conversation</div>
+        }
+
+        function handleMessageKeypress(event) {
+            if (event.key === 'Enter') {
+                sendGlobalMessage();
+            }
+        }
+
+        // Global Chat System
+        async function startGlobalChat() {
+            if (!firebaseReady) return;
+            
+            try {
+                const { collection, onSnapshot, query, orderBy, limit } = window.firestoreFunctions;
+                
+                // Listen for global messages
+                const messagesQuery = query(
+                    collection(window.firestore, 'globalMessages'),
+                    orderBy('timestamp', 'desc'),
+                    limit(50)
+                );
+                
+                globalMessagesListener = onSnapshot(messagesQuery, (snapshot) => {
+                    const messages = [];
+                    snapshot.forEach((doc) => {
+                        messages.push({ id: doc.id, ...doc.data() });
+                    });
+                    
+                    // Reverse to show oldest first
+                    messages.reverse();
+                    displayGlobalMessages(messages);
+                });
+                
+            } catch (error) {
+                console.error('Error starting global chat:', error);
+            }
+        }
+
+        function displayGlobalMessages(messages) {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            // Keep system messages
+            let html = `
+                <div class="message-system">
+                    🌟 Welcome to Global Chat! Everyone can see your messages.
+                </div>
+                <div class="message-system">
+                    💬 Chat with readers from around the world!
                 </div>
             `;
+            
+            messages.forEach(msg => {
+                const isSent = msg.sender === currentUser;
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                html += `
+                    <div class="message ${isSent ? 'sent' : 'received'}">
+                        <div class="message-sender">${msg.sender}</div>
+                        ${msg.message}
+                        <div class="message-time">${time}</div>
+                    </div>
+                `;
+            });
+            
+            chatMessages.innerHTML = html;
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        async function sendGlobalMessage() {
+            if (!firebaseReady) return;
+            
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message) return;
+            
+            try {
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                await addDoc(collection(window.firestore, 'globalMessages'), {
+                    sender: currentUser,
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                messageInput.value = '';
+                
+                // Update stats
+                messagesSent++;
+                localStorage.setItem('messagesSent', messagesSent.toString());
+                loadProfileStats();
+                updateNotificationCount();
+                
+            } catch (error) {
+                console.error('Error sending global message:', error);
+                alert('Error sending message: ' + error.message);
+            }
         }
 
         // Online Presence System
@@ -939,7 +980,10 @@
                             onlineUsers.push(user);
                         }
                     });
-                    updateOnlineUsersDisplay();
+                    
+                    // Update online count
+                    document.getElementById('onlineCount').textContent = `${onlineUsers.length} users online`;
+                    updateNotificationCount();
                 });
                 
                 // Update last seen every 10 seconds
@@ -953,154 +997,6 @@
                 
             } catch (error) {
                 console.error('Error starting online presence:', error);
-            }
-        }
-
-        function updateOnlineUsersDisplay() {
-            const list = document.getElementById('onlineUsersList');
-            const filteredUsers = onlineUsers.filter(user => user.username !== currentUser);
-            
-            if (filteredUsers.length === 0) {
-                list.innerHTML = '<div style="color: #666; text-align: center; padding: 1rem; font-size: 0.9em;">No other users online</div>';
-                return;
-            }
-            
-            list.innerHTML = filteredUsers.map(user => `
-                <div class="online-user" onclick="startChat('${user.username}')">
-                    <div class="user-avatar">${user.username.charAt(0).toUpperCase()}</div>
-                    <div class="user-info">
-                        <div class="user-name">${user.username}</div>
-                        <div class="user-status">
-                            <div class="online-indicator"></div>
-                            Online
-                        </div>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        // Load online users
-        async function loadOnlineUsers() {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, getDocs } = window.firestoreFunctions;
-                const snapshot = await getDocs(collection(window.firestore, 'onlineUsers'));
-                
-                onlineUsers = [];
-                snapshot.forEach((doc) => {
-                    const user = doc.data();
-                    const lastSeen = new Date(user.lastSeen);
-                    const now = new Date();
-                    if ((now - lastSeen) < 30000) { // 30 seconds
-                        onlineUsers.push(user);
-                    }
-                });
-                
-                updateOnlineUsersDisplay();
-                
-            } catch (error) {
-                console.error('Error loading online users:', error);
-            }
-        }
-
-        // Chat System
-        function startChat(username) {
-            currentChatUser = username;
-            document.getElementById('noChatSelected').style.display = 'none';
-            document.getElementById('chatInputContainer').style.display = 'block';
-            
-            // Update chat header
-            document.querySelector('.chat-title').textContent = `💬 Chat with ${username}`;
-            
-            loadChatMessages(username);
-        }
-
-        function handleMessageKeypress(event) {
-            if (event.key === 'Enter') {
-                sendMessage();
-            }
-        }
-
-        async function sendMessage() {
-            if (!currentChatUser || !firebaseReady) return;
-            
-            const messageInput = document.getElementById('messageInput');
-            const message = messageInput.value.trim();
-            
-            if (!message) return;
-            
-            try {
-                const { collection, addDoc } = window.firestoreFunctions;
-                
-                await addDoc(collection(window.firestore, 'messages'), {
-                    from: currentUser,
-                    to: currentChatUser,
-                    message: message,
-                    timestamp: new Date().toISOString(),
-                    read: false
-                });
-                
-                // Add to chat display
-                const chatMessages = document.getElementById('chatMessages');
-                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                
-                chatMessages.innerHTML += `
-                    <div class="message sent">
-                        <div class="message-sender">You</div>
-                        ${message}
-                        <div class="message-time">${time}</div>
-                    </div>
-                `;
-                
-                messageInput.value = '';
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-                // Update stats
-                messagesSent++;
-                localStorage.setItem('messagesSent', messagesSent.toString());
-                loadProfileStats();
-                updateNotificationCount();
-                
-            } catch (error) {
-                console.error('Error sending message:', error);
-            }
-        }
-
-        async function loadChatMessages(withUser) {
-            if (!firebaseReady) return;
-            
-            try {
-                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
-                const q = query(
-                    collection(window.firestore, 'messages'),
-                    where('from', 'in', [currentUser, withUser]),
-                    where('to', 'in', [currentUser, withUser]),
-                    orderBy('timestamp', 'asc')
-                );
-                
-                const snapshot = await getDocs(q);
-                const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML = '';
-                
-                snapshot.forEach((doc) => {
-                    const msg = doc.data();
-                    const isSent = msg.from === currentUser;
-                    const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                    
-                    chatMessages.innerHTML += `
-                        <div class="message ${isSent ? 'sent' : 'received'}">
-                            <div class="message-sender">${isSent ? 'You' : msg.from}</div>
-                            ${msg.message}
-                            <div class="message-time">${time}</div>
-                        </div>
-                    `;
-                });
-                
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-                
-            } catch (error) {
-                console.error('Error loading chat messages:', error);
             }
         }
 
@@ -1135,15 +1031,19 @@
 
         // Notifications
         function updateNotificationCount() {
-            const count = Math.min(messagesSent, 99);
+            const count = Math.min(messagesSent + onlineUsers.length, 99);
             document.getElementById('notificationCount').textContent = count;
         }
 
         function showNotifications() {
-            alert(`📢 You have sent ${messagesSent} messages!\n💬 Keep chatting with other readers!`);
+            alert(`🌍 Global Chat Stats:\n📨 Messages Sent: ${messagesSent}\n👥 Online Now: ${onlineUsers.length}\n💬 Keep the conversation going!`);
         }
 
         function logout() {
+            // Clean up listeners
+            if (globalMessagesListener) {
+                globalMessagesListener();
+            }
             localStorage.removeItem('currentUser');
             window.location.href = 'index.html';
         }
