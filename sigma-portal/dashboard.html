@@ -441,25 +441,36 @@
             }).join('');
         }
 
-        // Load user's books
+        // Load user's books - FIXED VERSION
         async function loadMyBooks() {
             try {
-                const snapshot = await db.collection('books')
-                    .where('uploadedBy', '==', currentUser)
-                    .orderBy('uploadDate', 'desc')
-                    .get();
+                console.log("📂 Loading my books for user:", currentUser);
                 
-                const grid = document.getElementById('myBooksGrid');
+                // Get all books and filter by current user
+                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
                 
                 if (snapshot.empty) {
-                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    document.getElementById('myBooksGrid').innerHTML = 
+                        '<div class="loading">You haven\'t uploaded any books yet.</div>';
                     return;
                 }
                 
-                const myBooks = snapshot.docs.map(doc => ({
+                const allBooks = snapshot.docs.map(doc => ({
                     id: doc.id,
                     ...doc.data()
                 }));
+                
+                // Filter books by current user
+                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
+                
+                console.log(`✅ Found ${myBooks.length} books for user ${currentUser}`);
+                
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (myBooks.length === 0) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    return;
+                }
                 
                 grid.innerHTML = myBooks.map(book => {
                     return `
@@ -477,7 +488,7 @@
                             <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
                             
                             <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                                ${book.downloads || 0} downloads
+                                ${book.category} • ${book.downloads || 0} downloads
                             </div>
                             
                             <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
@@ -497,9 +508,9 @@
                 }).join('');
                 
             } catch (error) {
-                console.error('Error loading my books:', error);
+                console.error('❌ Error loading my books:', error);
                 document.getElementById('myBooksGrid').innerHTML = 
-                    '<div class="loading" style="color: #dc3545;">Error loading your books.</div>';
+                    '<div class="loading" style="color: #dc3545;">Error loading your books. Please refresh.</div>';
             }
         }
 
@@ -684,6 +695,85 @@
             }
         }
 
+        // ==================== ADMIN PAGE FUNCTIONS ====================
+
+        async function loadSystemStats() {
+            if (!isAdmin) return;
+            
+            try {
+                console.log("⚡ Loading system stats for admin...");
+                
+                // Get all books
+                const booksSnapshot = await db.collection('books').get();
+                const totalBooks = booksSnapshot.size;
+                
+                // Calculate total downloads
+                let totalDownloads = 0;
+                booksSnapshot.forEach(doc => {
+                    totalDownloads += doc.data().downloads || 0;
+                });
+                
+                // Get unique users (this is a simplified approach)
+                const allBooks = booksSnapshot.docs.map(doc => doc.data());
+                const uniqueUsers = [...new Set(allBooks.map(book => book.uploadedBy))].length;
+                
+                // Update admin dashboard
+                document.getElementById('totalUsers').textContent = uniqueUsers;
+                document.getElementById('totalBooks').textContent = totalBooks;
+                document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
+                
+                // Load users list
+                loadUsersList(allBooks);
+                
+            } catch (error) {
+                console.error("❌ Error loading system stats:", error);
+            }
+        }
+
+        function loadUsersList(allBooks) {
+            // Group books by user to show user stats
+            const userStats = {};
+            
+            allBooks.forEach(book => {
+                const user = book.uploadedBy;
+                if (!userStats[user]) {
+                    userStats[user] = {
+                        books: 0,
+                        downloads: 0
+                    };
+                }
+                userStats[user].books += 1;
+                userStats[user].downloads += (book.downloads || 0);
+            });
+            
+            const usersList = document.getElementById('usersList');
+            
+            if (Object.keys(userStats).length === 0) {
+                usersList.innerHTML = '<div class="loading">No users found</div>';
+                return;
+            }
+            
+            usersList.innerHTML = Object.entries(userStats).map(([user, stats]) => {
+                const isCurrentUser = user === currentUser;
+                return `
+                    <div style="background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid ${isCurrentUser ? '#dc3545' : '#667eea'};">
+                        <div style="font-weight: bold; display: flex; justify-content: space-between;">
+                            <span>${user} ${isCurrentUser ? '(You)' : ''}</span>
+                            ${user === 'Admin' || user === 'Sigma' ? '<span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em;">ADMIN</span>' : ''}
+                        </div>
+                        <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                            📚 ${stats.books} books • 📥 ${stats.downloads} downloads
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function showAllUsers() {
+            showTab('admin');
+            loadSystemStats();
+        }
+
         // ==================== UI FUNCTIONS ====================
 
         function showTab(tabId) {
@@ -700,15 +790,16 @@
 
         async function loadProfileStats() {
             try {
-                const snapshot = await db.collection('books')
-                    .where('uploadedBy', '==', currentUser)
-                    .get();
+                // Get all books and filter by current user for stats
+                const snapshot = await db.collection('books').get();
+                const allBooks = snapshot.docs.map(doc => doc.data());
                 
-                const booksUploaded = snapshot.size;
+                const myBooks = allBooks.filter(book => book.uploadedBy === currentUser);
+                const booksUploaded = myBooks.length;
+                
                 let totalDownloads = 0;
-                
-                snapshot.forEach(doc => {
-                    totalDownloads += doc.data().downloads || 0;
+                myBooks.forEach(book => {
+                    totalDownloads += book.downloads || 0;
                 });
                 
                 document.getElementById('booksUploaded').textContent = booksUploaded;
