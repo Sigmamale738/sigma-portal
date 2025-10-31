@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Sigma Portal - True Cloud Database</title>
+    <title>Project Ebooks - Open to Anyone</title>
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
@@ -35,7 +35,7 @@
 <body>
     <div class="container">
         <div class="welcome-section">
-            <h1>Sigma Portal</h1>
+            <h1>Project Ebooks</h1>
             <p>True Cloud Database - Login from any device</p>
         </div>
         
@@ -43,27 +43,27 @@
             <div class="form-container">
                 <div class="form-toggle">
                     <button class="toggle-btn" onclick="showForm('login')">Login</button>
-                    <button class="toggle-btn active" onclick="showForm('signup')">Join Sigma</button>
+                    <button class="toggle-btn active" onclick="showForm('signup')">Sign Up</button>
                 </div>
                 
                 <!-- Login Form -->
                 <form id="loginForm" class="form">
                     <div class="form-group">
-                        <label for="loginUsername">Sigma ID</label>
+                        <label for="loginUsername">Username</label>
                         <input type="text" id="loginUsername" required>
                     </div>
                     <div class="form-group">
                         <label for="loginPassword">Password</label>
                         <input type="password" id="loginPassword" required>
                     </div>
-                    <button type="button" class="submit-btn" onclick="loginUser()">Login to Sigma Network</button>
+                    <button type="button" class="submit-btn" onclick="loginUser()">Login to Project Ebooks</button>
                     <div id="loginMessage" class="message"></div>
                 </form>
                 
                 <!-- Signup Form with OTP -->
                 <form id="signupForm" class="form active">
                     <div class="form-group">
-                        <label for="signupUsername">Choose Sigma ID</label>
+                        <label for="signupUsername">Choose Username</label>
                         <input type="text" id="signupUsername" required>
                     </div>
                     <div class="form-group">
