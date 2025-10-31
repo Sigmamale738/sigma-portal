@@ -5,161 +5,58 @@
     <meta charset="UTF-8">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f8f9fa; min-height: 100vh; }
+        body { background: #f8f9fa; }
+        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
+        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
+        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
+        .tab-btn.active { background: #667eea; color: white; }
+        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .tab-content.active { display: block; }
+        .form-group { margin-bottom: 1.5rem; }
+        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
+        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
+        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
+        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
+        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; }
+        .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 160px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; overflow: hidden; }
+        .book-cover-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
+        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
+        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
+        .edit-btn { background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
+        .action-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
+        .action-buttons button { flex: 1; }
+        .edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
+        .edit-modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; }
+        .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
+        .admin-badge { position: absolute; top: 10px; right: 10px; background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
+        .loading { text-align: center; padding: 2rem; color: #666; }
+        .cover-upload { margin: 1rem 0; }
+        .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
         
-        .navbar { 
-            background: white; 
-            padding: 1rem 2rem; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-        }
-        .nav-brand { 
-            font-size: 1.5em; 
-            font-weight: bold; 
-            color: #667eea; 
-        }
-        .logout-btn { 
-            background: #dc3545; 
-            color: white; 
-            padding: 8px 16px; 
-            border: none; 
-            border-radius: 5px; 
-            cursor: pointer; 
-        }
-        
-        .container { 
-            max-width: 1200px; 
-            margin: 2rem auto; 
-            padding: 0 2rem; 
-        }
-        
-        .tab-buttons { 
-            display: flex; 
-            margin-bottom: 2rem; 
-            background: white; 
-            border-radius: 10px; 
-            overflow: hidden; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-        }
-        .tab-btn { 
-            flex: 1; 
-            padding: 1rem; 
-            text-align: center; 
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            font-size: 1.1em; 
-        }
-        .tab-btn.active { 
-            background: #667eea; 
-            color: white; 
-        }
-        .tab-content { 
-            display: none; 
-            background: white; 
-            padding: 2rem; 
-            border-radius: 10px; 
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
-        }
-        .tab-content.active { 
-            display: block; 
-        }
-        
-        .form-group { 
-            margin-bottom: 1.5rem; 
-        }
-        .form-group label { 
-            display: block; 
-            margin-bottom: 0.5rem; 
-            font-weight: 600; 
-            color: #333; 
-        }
-        .form-group input, 
-        .form-group select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 2px solid #e1e1e1; 
-            border-radius: 8px; 
-            font-size: 1em; 
-        }
-        
-        .upload-btn { 
-            background: #667eea; 
-            color: white; 
-            padding: 12px 24px; 
-            border: none; 
-            border-radius: 8px; 
-            font-size: 1.1em; 
-            cursor: pointer; 
-            width: 100%; 
-        }
-        
-        .books-grid { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
-            gap: 1.5rem; 
-            margin-top: 2rem; 
-        }
-        .book-card { 
-            background: white; 
-            border-radius: 10px; 
-            padding: 1.5rem; 
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
-            border: 1px solid #e1e1e1; 
-            position: relative;
-        }
-        .book-cover { 
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-            width: 100%; 
-            height: 160px; 
-            border-radius: 8px; 
-            margin-bottom: 1rem; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            color: white; 
-            font-size: 2em; 
-        }
-        .download-btn { 
-            background: #28a745; 
-            color: white; 
-            border: none; 
-            padding: 10px 15px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            width: 100%; 
-            margin-top: 1rem; 
-        }
-        
-        .admin-badge { 
-            background: #dc3545; 
-            color: white; 
-            padding: 4px 12px; 
-            border-radius: 15px; 
-            font-size: 0.8em; 
-            font-weight: bold;
-            margin-left: 10px;
-        }
+        /* Admin Controls */
         .admin-controls {
             background: #fff3cd;
             border: 2px solid #ffeaa7;
             border-radius: 10px;
             padding: 15px;
             margin: 15px 0;
+            display: none;
         }
         .admin-btn {
             background: #dc3545;
             color: white;
             border: none;
-            padding: 10px 15px;
+            padding: 8px 15px;
             border-radius: 5px;
             cursor: pointer;
             margin: 5px;
             font-weight: bold;
         }
         
+        /* Profile Stats */
         .profile-stats { 
             display: grid; 
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
@@ -181,50 +78,21 @@
             color: #666; 
             font-size: 0.9em; 
         }
-        
-        .owner-badge {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: #667eea;
-            color: white;
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 0.8em;
+        .badge { 
+            background: #ffc107; 
+            color: black; 
+            padding: 4px 8px; 
+            border-radius: 12px; 
+            font-size: 0.8em; 
+            margin: 0.2rem; 
+            display: inline-block; 
         }
-        
-        .loading { 
-            text-align: center; 
-            padding: 2rem; 
-            color: #666; 
-        }
-        
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 0.5rem;
-        }
-        .edit-btn {
-            background: #ffc107;
-            color: black;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            flex: 1;
-            font-size: 0.9em;
-        }
-        .delete-btn {
+        .admin-indicator {
             background: #dc3545;
             color: white;
-            border: none;
-            padding: 8px 12px;
-            border-radius: 5px;
-            cursor: pointer;
-            flex: 1;
-            font-size: 0.9em;
         }
         
+        /* Firebase Status */
         .firebase-status {
             position: fixed;
             top: 10px;
@@ -241,37 +109,40 @@
         }
     </style>
 
-    <!-- FIREBASE SDK (Compat version - more reliable) -->
+    <!-- Firebase SDK (Compat Version - More Reliable) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
-    <div id="firebaseStatus" class="firebase-status">Connecting to Firebase...</div>
+    <div id="firebaseStatus" class="firebase-status">🔄 Connecting to Firebase...</div>
 
     <nav class="navbar">
         <div class="nav-brand">📚 Project Ebooks 
-            <span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span>
+            <span id="adminNavBadge" style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.7em; margin-left: 10px; display: none;">ADMIN</span>
         </div>
-        <div>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <div class="user-avatar" style="width: 40px; height: 40px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;" id="userAvatar">U</div>
+                <div style="font-weight: bold;" id="userName">User</div>
+            </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
     <div class="container">
         <h1>📚 Project Ebooks - Social Platform 
-            <span id="adminWelcome" style="display: none; color: #dc3545; font-size: 0.8em;">(Admin Mode)</span>
+            <span id="adminWelcome" style="color: #dc3545; font-size: 0.8em; display: none;"> (Admin Mode)</span>
         </h1>
-        <p style="color: #666; margin-bottom: 1.5rem;"><strong>🚀 NEW:</strong> Global Cloud Storage • Real-time Sync • Admin Controls</p>
+        <p><strong>🚀 NEW:</strong> Global Cloud Storage • Real-time Sync • Admin Controls</p>
 
-        <!-- ADMIN CONTROLS -->
-        <div id="adminControls" class="admin-controls" style="display: none;">
+        <!-- ADMIN CONTROL PANEL -->
+        <div id="adminControls" class="admin-controls">
             <h3 style="color: #dc3545; margin-bottom: 15px;">🔧 ADMIN CONTROL PANEL</h3>
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="admin-btn" onclick="showAllUsers()">👥 Manage Users</button>
-                <button class="admin-btn" onclick="showSystemStats()">📊 System Stats</button>
                 <button class="admin-btn" onclick="addSampleBooks()">📚 Add Sample Books</button>
                 <button class="admin-btn" onclick="clearAllBooks()">🗑️ Clear All Books</button>
                 <button class="admin-btn" onclick="resetSystem()">🔄 Reset System</button>
+                <button class="admin-btn" onclick="showAllUsers()">👥 View All Users</button>
             </div>
         </div>
 
@@ -287,7 +158,7 @@
         <div id="library" class="tab-content active">
             <h2>📚 Public Library</h2>
             <div class="books-grid" id="publicLibraryGrid">
-                <div class="loading">Loading library from Firebase...</div>
+                <div class="loading">Loading library from cloud...</div>
             </div>
         </div>
         
@@ -325,7 +196,7 @@
         <div id="mybooks" class="tab-content">
             <h2>📂 My Uploaded Books</h2>
             <div class="books-grid" id="myBooksGrid">
-                <div class="loading">Loading your books from Firebase...</div>
+                <div class="loading">Loading your books...</div>
             </div>
         </div>
 
@@ -333,13 +204,13 @@
         <div id="profile" class="tab-content">
             <h2>👤 My Profile</h2>
             <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em;" id="profileAvatar">U</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
                 <div>
                     <h3 id="profileName">User</h3>
                     <div style="color: #666;">Active Reader</div>
                     <div style="margin-top: 0.5rem;">
-                        <span style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px;">📚 Contributor</span>
-                        <span id="adminProfileBadge" style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; display: none;">⚡ ADMIN</span>
+                        <span class="badge">📚 Contributor</span>
+                        <span id="adminProfileBadge" class="badge admin-indicator" style="display: none;">⚡ ADMIN</span>
                     </div>
                 </div>
             </div>
@@ -381,10 +252,6 @@
                     <div class="stat-value" id="totalDownloadsAdmin">0</div>
                     <div class="stat-label">Total Downloads</div>
                 </div>
-                <div class="stat-card" style="background: #dc3545; color: white;">
-                    <div class="stat-value" id="totalMessages">0</div>
-                    <div class="stat-label">Total Messages</div>
-                </div>
             </div>
 
             <div class="admin-controls">
@@ -397,16 +264,56 @@
             <div class="admin-controls">
                 <h3>User Management</h3>
                 <div id="usersList">
-                    <div class="loading">Loading users from Firebase...</div>
+                    <div class="loading">Loading users...</div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Edit Book Modal -->
+    <div class="edit-modal" id="editModal">
+        <div class="edit-modal-content">
+            <h3>✏️ Edit Book</h3>
+            <form onsubmit="updateBook(event)">
+                <input type="hidden" id="editBookId">
+                
+                <div class="form-group">
+                    <label>Book Title *</label>
+                    <input type="text" id="editBookTitle" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Author Name *</label>
+                    <input type="text" id="editBookAuthor" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Category</label>
+                    <select id="editBookCategory">
+                        <option>Programming</option>
+                        <option>Science</option>
+                        <option>Fiction</option>
+                        <option>Business</option>
+                        <option>Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>Google Drive Link *</label>
+                    <input type="url" id="editDriveLink" required>
+                </div>
+                
+                <div class="action-buttons">
+                    <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 2;">💾 Save Changes</button>
+                    <button type="button" onclick="closeEditModal()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 1;">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <script>
-        // ==================== FIREBASE CONFIGURATION ====================
+        // ==================== FIREBASE INITIALIZATION ====================
         
-        // Your Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
             authDomain: "sigma-ebooks.firebaseapp.com",
@@ -417,24 +324,22 @@
         };
 
         // Initialize Firebase
+        let db;
         try {
             firebase.initializeApp(firebaseConfig);
-            console.log("🔥 Firebase initialized successfully!");
+            db = firebase.firestore();
             document.getElementById('firebaseStatus').textContent = "✅ Connected to Firebase";
+            console.log("🔥 Firebase initialized successfully!");
         } catch (error) {
             console.error("❌ Firebase initialization error:", error);
             document.getElementById('firebaseStatus').textContent = "❌ Firebase Error";
             document.getElementById('firebaseStatus').classList.add('firebase-error');
         }
 
-        // Initialize Firestore
-        const db = firebase.firestore();
+        // ==================== USER & ADMIN MANAGEMENT ====================
         
-        // ==================== INITIALIZATION ====================
-        
-        // Check login and admin status
         const currentUser = localStorage.getItem('currentUser');
-        const isAdmin = localStorage.getItem('isAdmin') === 'true';
+        const isAdmin = localStorage.getItem('isAdmin') === 'true' || currentUser === 'Sigma';
         
         if (!currentUser) {
             window.location.href = 'index.html';
@@ -442,43 +347,36 @@
 
         // Initialize user display
         document.getElementById('userName').textContent = currentUser;
+        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
         document.getElementById('profileName').textContent = currentUser;
         document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
 
-        // ==================== ADMIN DETECTION ====================
-        
-        function checkAdminStatus() {
-            const userIsAdmin = currentUser === 'Sigma' || localStorage.getItem('isAdmin') === 'true';
-            
-            if (userIsAdmin) {
-                activateAdminMode();
-            }
+        // Activate admin mode if user is admin
+        if (isAdmin) {
+            activateAdminMode();
         }
 
         function activateAdminMode() {
-            document.getElementById('adminBadge').style.display = 'inline-block';
+            document.getElementById('adminNavBadge').style.display = 'inline-block';
             document.getElementById('adminWelcome').style.display = 'inline';
             document.getElementById('adminProfileBadge').style.display = 'inline-block';
             document.getElementById('adminControls').style.display = 'block';
             document.getElementById('adminTab').style.display = 'block';
-            
             localStorage.setItem('isAdmin', 'true');
             console.log('🔓 ADMIN MODE ACTIVATED for user: ' + currentUser);
         }
 
-        // ==================== FIREBASE BOOKS SYSTEM ====================
-        
         let allBooks = [];
+
+        // ==================== BOOK MANAGEMENT ====================
 
         // Load books from Firebase
         async function loadBooks() {
             try {
                 console.log("📚 Loading books from Firebase...");
-                
                 const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
                 
                 if (snapshot.empty) {
-                    console.log("No books found in Firebase");
                     document.getElementById('publicLibraryGrid').innerHTML = 
                         '<div class="loading">No books found. Be the first to upload!</div>';
                     return;
@@ -488,12 +386,12 @@
                     id: doc.id,
                     ...doc.data()
                 }));
-                
-                console.log(`✅ Loaded ${allBooks.length} books from Firebase`);
+
+                console.log(`✅ Loaded ${allBooks.length} books`);
                 displayBooks(allBooks);
                 
             } catch (error) {
-                console.error("❌ Error loading books from Firebase:", error);
+                console.error("❌ Error loading books:", error);
                 document.getElementById('publicLibraryGrid').innerHTML = 
                     '<div class="loading" style="color: #dc3545;">Error loading books. Please refresh.</div>';
             }
@@ -504,17 +402,17 @@
             
             grid.innerHTML = books.map(book => {
                 const isOwner = book.uploadedBy === currentUser;
-                const showAdminControls = isAdmin;
+                const showControls = isOwner || isAdmin;
                 
                 return `
                     <div class="book-card">
-                        ${(isOwner || isAdmin) ? 
-                            `<div class="owner-badge">${isAdmin ? 'ADMIN' : 'OWNER'}</div>` : 
-                            ''
-                        }
+                        ${showControls ? `<div class="${isAdmin ? 'admin-badge' : 'owner-badge'}">${isAdmin ? 'ADMIN' : 'OWNER'}</div>` : ''}
                         
                         <div class="book-cover">
-                            📚
+                            ${book.coverUrl ? 
+                                `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                '📚'
+                            }
                         </div>
                         
                         <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
@@ -528,7 +426,7 @@
                             📥 Download eBook
                         </button>
                         
-                        ${(isOwner || isAdmin) ? `
+                        ${showControls ? `
                             <div class="action-buttons">
                                 <button class="edit-btn" onclick="editBook('${book.id}')">
                                     ✏️ Edit
@@ -543,7 +441,7 @@
             }).join('');
         }
 
-        // Load user's books from Firebase
+        // Load user's books
         async function loadMyBooks() {
             try {
                 const snapshot = await db.collection('books')
@@ -569,7 +467,10 @@
                             <div class="owner-badge">OWNER</div>
                             
                             <div class="book-cover">
-                                📚
+                                ${book.coverUrl ? 
+                                    `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                    '📚'
+                                }
                             </div>
                             
                             <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
@@ -596,14 +497,13 @@
                 }).join('');
                 
             } catch (error) {
-                console.error("Error loading my books:", error);
+                console.error('Error loading my books:', error);
                 document.getElementById('myBooksGrid').innerHTML = 
                     '<div class="loading" style="color: #dc3545;">Error loading your books.</div>';
             }
         }
 
-        // ==================== FIREBASE BOOK MANAGEMENT ====================
-
+        // Add book to Firebase
         async function addBookToPublicLibrary(event) {
             event.preventDefault();
             
@@ -628,34 +528,30 @@
                     downloads: 0
                 };
                 
-                // Add to Firebase
                 await db.collection('books').add(newBook);
-                
                 alert(`✅ "${title}" added to global library!`);
                 event.target.reset();
                 
-                // Reload books
                 loadBooks();
                 loadMyBooks();
                 loadProfileStats();
                 
             } catch (error) {
-                console.error("Error adding book to Firebase:", error);
+                console.error("Error adding book:", error);
                 alert('Error adding book: ' + error.message);
             }
         }
 
+        // Download book
         async function downloadBook(driveLink, bookId) {
             window.open(driveLink, '_blank');
             
-            // Update download count in Firebase
             try {
                 const bookRef = db.collection('books').doc(bookId);
                 await bookRef.update({
                     downloads: firebase.firestore.FieldValue.increment(1)
                 });
                 
-                // Reload to show updated counts
                 loadBooks();
                 loadMyBooks();
                 loadProfileStats();
@@ -665,6 +561,7 @@
             }
         }
 
+        // Delete book (admin can delete any book)
         async function deleteBook(bookId) {
             const book = allBooks.find(b => b.id === bookId);
             
@@ -682,76 +579,20 @@
             if (!confirm(`Are you sure you want to delete "${book.title}"?`)) return;
 
             try {
-                // Delete from Firebase
                 await db.collection('books').doc(bookId).delete();
-                
                 alert(`✅ "${book.title}" has been deleted from global storage.`);
                 
-                // Reload books
                 loadBooks();
                 loadMyBooks();
                 loadProfileStats();
                 
-                if (isAdmin) {
-                    loadSystemStats();
-                }
-                
             } catch (error) {
-                console.error("Error deleting book from Firebase:", error);
+                console.error("Error deleting book:", error);
                 alert('Error deleting book: ' + error.message);
             }
         }
 
         // ==================== ADMIN FUNCTIONS ====================
-
-        async function loadSystemStats() {
-            try {
-                // Get total books
-                const booksSnapshot = await db.collection('books').get();
-                document.getElementById('totalBooks').textContent = booksSnapshot.size;
-                
-                // Get total downloads
-                let totalDownloads = 0;
-                booksSnapshot.forEach(doc => {
-                    totalDownloads += doc.data().downloads || 0;
-                });
-                document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
-                
-                // Get total users (from a separate users collection)
-                try {
-                    const usersSnapshot = await db.collection('users').get();
-                    document.getElementById('totalUsers').textContent = usersSnapshot.size;
-                    
-                    // Display users list
-                    const usersList = document.getElementById('usersList');
-                    if (usersSnapshot.empty) {
-                        usersList.innerHTML = '<div class="loading">No users found in database</div>';
-                    } else {
-                        usersList.innerHTML = usersSnapshot.docs.map(doc => {
-                            const user = doc.data();
-                            return `
-                                <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0; border: 1px solid #e1e1e1;">
-                                    <strong>${user.username || doc.id}</strong> 
-                                    <span style="color: #28a745; margin-left: 10px;">🟢 Active</span>
-                                    <div style="margin-top: 5px;">
-                                        <button class="admin-btn" onclick="viewUserBooks('${user.username || doc.id}')">View Books</button>
-                                        ${user.username !== 'Sigma' ? `<button class="admin-btn" style="background: #ff6b6b;" onclick="deleteUser('${doc.id}')">Delete User</button>` : ''}
-                                    </div>
-                                </div>
-                            `;
-                        }).join('');
-                    }
-                } catch (userError) {
-                    console.log("Users collection not available");
-                    document.getElementById('totalUsers').textContent = 'N/A';
-                }
-                
-                document.getElementById('totalMessages').textContent = '0';
-                
-            } catch (error) {
-                console.error("Error loading system stats:", error);
-            }
-        }
 
         async function addSampleBooks() {
             if (!isAdmin) {
@@ -761,36 +602,33 @@
 
             const sampleBooks = [
                 {
-                    title: 'Python Crash Course - Global Edition',
-                    author: 'Eric Matthes',
+                    title: 'JavaScript: The Good Parts',
+                    author: 'Douglas Crockford',
                     category: 'Programming',
-                    driveLink: 'https://drive.google.com/file/d/python-sample/view',
+                    driveLink: 'https://drive.google.com/file/d/sample1/view',
                     uploadedBy: 'Admin',
                     uploadDate: new Date().toISOString(),
-                    downloads: 0
+                    downloads: 15
                 },
                 {
-                    title: 'Deep Learning - Global Edition',
-                    author: 'Ian Goodfellow',
-                    category: 'Science',
-                    driveLink: 'https://drive.google.com/file/d/deep-learning-sample/view',
+                    title: 'Clean Code',
+                    author: 'Robert C. Martin',
+                    category: 'Programming',
+                    driveLink: 'https://drive.google.com/file/d/sample2/view',
                     uploadedBy: 'Admin',
                     uploadDate: new Date().toISOString(),
-                    downloads: 0
+                    downloads: 23
                 }
             ];
 
             try {
-                // Add sample books to Firebase
                 const addPromises = sampleBooks.map(book => 
                     db.collection('books').add(book)
                 );
                 
                 await Promise.all(addPromises);
-                
                 alert('✅ Sample books added to global library!');
                 loadBooks();
-                loadSystemStats();
                 
             } catch (error) {
                 console.error("Error adding sample books:", error);
@@ -813,10 +651,8 @@
                 );
                 
                 await Promise.all(deletePromises);
-                
                 alert('✅ All books have been deleted from global storage!');
                 loadBooks();
-                loadSystemStats();
                 
             } catch (error) {
                 console.error("Error clearing all books:", error);
@@ -830,57 +666,22 @@
                 return;
             }
 
-            if (!confirm('💥 Are you sure you want to reset the entire global system?')) return;
+            if (!confirm('💥 Are you sure you want to reset the entire system?')) return;
             
             try {
-                // Clear all books
-                const booksSnapshot = await db.collection('books').get();
-                const bookDeletes = booksSnapshot.docs.map(doc => 
+                const snapshot = await db.collection('books').get();
+                const deletePromises = snapshot.docs.map(doc => 
                     db.collection('books').doc(doc.id).delete()
                 );
                 
-                await Promise.all(bookDeletes);
-                
-                alert('💥 Global system has been reset!');
+                await Promise.all(deletePromises);
+                alert('💥 System has been reset!');
                 loadBooks();
-                loadSystemStats();
                 
             } catch (error) {
                 console.error("Error resetting system:", error);
                 alert('Error resetting system: ' + error.message);
             }
-        }
-
-        async function viewUserBooks(username) {
-            try {
-                const snapshot = await db.collection('books')
-                    .where('uploadedBy', '==', username)
-                    .get();
-                
-                if (snapshot.empty) {
-                    alert(`User "${username}" has not uploaded any books.`);
-                    return;
-                }
-                
-                const bookList = snapshot.docs.map(doc => {
-                    const book = doc.data();
-                    return `• ${book.title} (${book.downloads || 0} downloads)`;
-                }).join('\n');
-                
-                alert(`Books uploaded by ${username}:\n\n${bookList}`);
-                
-            } catch (error) {
-                console.error("Error viewing user books:", error);
-                alert('Error loading user books: ' + error.message);
-            }
-        }
-
-        function showAllUsers() {
-            showTab('admin');
-        }
-
-        function showSystemStats() {
-            showTab('admin');
         }
 
         // ==================== UI FUNCTIONS ====================
@@ -926,17 +727,15 @@
             window.location.href = 'index.html';
         }
 
-        // ==================== START APPLICATION ====================
+        // ==================== INITIALIZE ====================
         
-        // Initialize the application
-        checkAdminStatus();
+        // Load initial data
         loadBooks();
         loadProfileStats();
         
-        console.log("🚀 Project Ebooks Dashboard Started");
-        console.log("👤 Current User:", currentUser);
-        console.log("🔧 Admin Mode:", isAdmin);
-        console.log("🔥 Firebase Connected:", !!firebase.apps.length);
+        console.log("🚀 Dashboard initialized");
+        console.log("👤 User:", currentUser);
+        console.log("🔧 Admin:", isAdmin);
     </script>
 </body>
 </html>
