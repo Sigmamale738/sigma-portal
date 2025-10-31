@@ -4,39 +4,229 @@
     <title>Project Ebooks - Social eBook Platform</title>
     <meta charset="UTF-8">
     <style>
-        /* ... (your existing CSS remains the same) ... */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: #f8f9fa; }
-        .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
-        .nav-brand { font-size: 1.5em; font-weight: bold; color: #667eea; }
-        .logout-btn { background: #dc3545; color: white; padding: 8px 16px; border: none; border-radius: 5px; cursor: pointer; }
-        .container { max-width: 1200px; margin: 2rem auto; padding: 0 2rem; }
-        .tab-buttons { display: flex; margin-bottom: 2rem; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab-btn { flex: 1; padding: 1rem; text-align: center; background: none; border: none; cursor: pointer; font-size: 1.1em; }
-        .tab-btn.active { background: #667eea; color: white; }
-        .tab-content { display: none; background: white; padding: 2rem; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
-        .tab-content.active { display: block; }
-        .form-group { margin-bottom: 1.5rem; }
-        .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 600; color: #333; }
-        .form-group input, .form-group textarea, .form-group select { width: 100%; padding: 1rem; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; }
-        .upload-btn { background: #667eea; color: white; padding: 1rem 2rem; border: none; border-radius: 8px; font-size: 1.1em; cursor: pointer; width: 100%; }
-        .books-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 2rem; }
-        .book-card { background: white; border-radius: 10px; padding: 1.5rem; box-shadow: 0 3px 10px rgba(0,0,0,0.1); border: 1px solid #e1e1e1; position: relative; }
-        .book-cover { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); width: 100%; height: 160px; border-radius: 8px; margin-bottom: 1rem; display: flex; align-items: center; justify-content: center; color: white; font-size: 2em; overflow: hidden; }
-        .book-cover-img { width: 100%; height: 100%; object-fit: cover; border-radius: 8px; }
-        .download-btn { background: #28a745; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; width: 100%; margin-top: 1rem; }
-        .delete-btn { background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
-        .edit-btn { background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; margin-top: 0.5rem; width: 100%; font-size: 0.9em; }
-        .action-buttons { display: flex; gap: 0.5rem; margin-top: 0.5rem; }
-        .action-buttons button { flex: 1; }
-        .edit-modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; }
-        .edit-modal-content { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px; }
-        .owner-badge { position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; }
-        .loading { text-align: center; padding: 2rem; color: #666; }
-        .cover-upload { margin: 1rem 0; }
-        .cover-preview { width: 100px; height: 140px; object-fit: cover; border-radius: 5px; border: 2px dashed #ddd; display: none; }
+        body { background: #f8f9fa; min-height: 100vh; }
         
-        /* NEW SLIDING CHAT DESIGN - Clash of Clans Style */
+        /* Navbar */
+        .navbar { 
+            background: white; 
+            padding: 1rem 2rem; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .nav-brand { 
+            font-size: 1.5em; 
+            font-weight: bold; 
+            color: #667eea; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .logout-btn { 
+            background: #dc3545; 
+            color: white; 
+            padding: 8px 16px; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+        }
+        
+        /* Main Container */
+        .container { 
+            max-width: 1200px; 
+            margin: 80px auto 2rem; 
+            padding: 0 2rem; 
+        }
+        
+        /* Tabs */
+        .tab-buttons { 
+            display: flex; 
+            margin-bottom: 2rem; 
+            background: white; 
+            border-radius: 10px; 
+            overflow: hidden; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+        }
+        .tab-btn { 
+            flex: 1; 
+            padding: 1rem; 
+            text-align: center; 
+            background: none; 
+            border: none; 
+            cursor: pointer; 
+            font-size: 1.1em; 
+            transition: all 0.3s ease;
+        }
+        .tab-btn.active { 
+            background: #667eea; 
+            color: white; 
+        }
+        .tab-content { 
+            display: none; 
+            background: white; 
+            padding: 2rem; 
+            border-radius: 10px; 
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+            min-height: 400px;
+        }
+        .tab-content.active { 
+            display: block; 
+        }
+        
+        /* Forms */
+        .form-group { 
+            margin-bottom: 1.5rem; 
+        }
+        .form-group label { 
+            display: block; 
+            margin-bottom: 0.5rem; 
+            font-weight: 600; 
+            color: #333; 
+        }
+        .form-group input, 
+        .form-group textarea, 
+        .form-group select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 2px solid #e1e1e1; 
+            border-radius: 8px; 
+            font-size: 1em; 
+            transition: border-color 0.3s ease;
+        }
+        .form-group input:focus { 
+            outline: none; 
+            border-color: #667eea; 
+        }
+        .upload-btn { 
+            background: #667eea; 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            cursor: pointer; 
+            width: 100%; 
+            transition: transform 0.2s ease;
+        }
+        .upload-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Books Grid */
+        .books-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 1.5rem; 
+            margin-top: 2rem; 
+        }
+        .book-card { 
+            background: white; 
+            border-radius: 10px; 
+            padding: 1.5rem; 
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
+            border: 1px solid #e1e1e1; 
+            transition: transform 0.3s ease;
+        }
+        .book-card:hover {
+            transform: translateY(-5px);
+        }
+        .book-cover { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            width: 100%; 
+            height: 160px; 
+            border-radius: 8px; 
+            margin-bottom: 1rem; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 2em; 
+            overflow: hidden; 
+        }
+        .book-cover-img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            border-radius: 8px; 
+        }
+        .download-btn { 
+            background: #28a745; 
+            color: white; 
+            border: none; 
+            padding: 10px 15px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            width: 100%; 
+            margin-top: 1rem; 
+            transition: background 0.3s ease;
+        }
+        .download-btn:hover {
+            background: #218838;
+        }
+        
+        /* Admin Styles */
+        .admin-badge { 
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24); 
+            color: white; 
+            padding: 4px 12px; 
+            border-radius: 15px; 
+            font-size: 0.8em; 
+            font-weight: bold;
+        }
+        .admin-controls {
+            background: #fff3cd;
+            border: 2px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .admin-btn {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: bold;
+            transition: transform 0.2s ease;
+        }
+        .admin-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Profile */
+        .profile-stats { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
+            gap: 1rem; 
+            margin: 1rem 0; 
+        }
+        .stat-card { 
+            background: #f8f9fa; 
+            padding: 1.5rem; 
+            border-radius: 10px; 
+            text-align: center; 
+            border-left: 4px solid #667eea;
+        }
+        .stat-value { 
+            font-size: 2em; 
+            font-weight: bold; 
+            color: #667eea; 
+        }
+        .stat-label { 
+            color: #666; 
+            font-size: 0.9em; 
+        }
+        
+        /* Chat System */
         .chat-toggle-btn {
             position: fixed;
             right: 20px;
@@ -56,6 +246,7 @@
         .chat-toggle-btn:hover {
             transform: scale(1.1);
         }
+        
         .chat-container {
             position: fixed;
             right: -400px;
@@ -64,7 +255,7 @@
             height: 100vh;
             background: white;
             box-shadow: -5px 0 25px rgba(0,0,0,0.1);
-            transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            transition: right 0.4s ease;
             z-index: 1000;
             display: flex;
             flex-direction: column;
@@ -72,294 +263,34 @@
         .chat-container.open {
             right: 0;
         }
-        .chat-header {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .chat-title {
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-        .close-chat {
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.5em;
-            cursor: pointer;
-        }
-        .online-users-section {
-            padding: 1rem;
-            border-bottom: 1px solid #e1e1e1;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .online-user {
-            display: flex;
-            align-items: center;
-            gap: 0.8rem;
-            padding: 0.7rem;
-            border-radius: 8px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: background 0.3s;
-        }
-        .online-user:hover {
-            background: #f8f9fa;
-        }
-        .user-avatar {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
+        
+        /* Loading States */
+        .loading { 
+            text-align: center; 
+            padding: 2rem; 
+            color: #666; 
             font-size: 1.1em;
         }
-        .user-info {
-            flex: 1;
-        }
-        .user-name {
-            font-weight: 600;
-            font-size: 0.95em;
-        }
-        .user-status {
-            font-size: 0.8em;
-            color: #28a745;
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-        }
-        .online-indicator {
-            width: 8px;
-            height: 8px;
-            background: #28a745;
-            border-radius: 50%;
-        }
-        .chat-messages {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 0.8rem;
-            background: #f8f9fa;
-        }
-        .message {
-            padding: 0.8rem 1rem;
-            border-radius: 15px;
-            max-width: 85%;
-            word-wrap: break-word;
-            position: relative;
-            animation: messageSlide 0.3s ease;
-        }
-        @keyframes messageSlide {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .message.sent {
-            background: #667eea;
-            color: white;
-            align-self: flex-end;
-            border-bottom-right-radius: 5px;
-        }
-        .message.received {
-            background: white;
-            color: #333;
-            align-self: flex-start;
-            border-bottom-left-radius: 5px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-        .message-sender {
-            font-weight: 600;
-            font-size: 0.85em;
-            margin-bottom: 0.3rem;
-            opacity: 0.8;
-        }
-        .message-time {
-            font-size: 0.7em;
-            opacity: 0.6;
-            margin-top: 0.3rem;
-            text-align: right;
-        }
-        .chat-input-container {
-            padding: 1rem;
-            border-top: 1px solid #e1e1e1;
-            background: white;
-        }
-        .chat-input-wrapper {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        .chat-input {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            border: 1px solid #e1e1e1;
-            border-radius: 25px;
-            outline: none;
-            font-size: 0.95em;
-        }
-        .chat-input:focus {
-            border-color: #667eea;
-        }
-        .send-btn {
-            width: 45px;
-            height: 45px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: none;
-            border-radius: 50%;
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.2s;
-        }
-        .send-btn:hover {
-            transform: scale(1.05);
-        }
-        .no-chat-selected {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: #666;
-            text-align: center;
-            padding: 2rem;
-        }
-        .no-chat-icon {
-            font-size: 3em;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-        .chat-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 999;
-            display: none;
-        }
-        .chat-overlay.active {
-            display: block;
-        }
         
-        /* Profile Stats */
-        .profile-stats { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); 
-            gap: 1rem; 
-            margin: 1rem 0; 
-        }
-        .stat-card { 
-            background: #f8f9fa; 
-            padding: 1.5rem; 
-            border-radius: 10px; 
-            text-align: center; 
-        }
-        .stat-value { 
-            font-size: 2em; 
-            font-weight: bold; 
-            color: #667eea; 
-        }
-        .stat-label { 
-            color: #666; 
-            font-size: 0.9em; 
-        }
-        .badge { 
-            background: #ffc107; 
-            color: black; 
-            padding: 4px 8px; 
-            border-radius: 12px; 
-            font-size: 0.8em; 
-            margin: 0.2rem; 
-            display: inline-block; 
-        }
-        .notification-bell {
-            position: relative;
-            background: none;
-            border: none;
-            font-size: 1.3em;
-            cursor: pointer;
-            margin-right: 1rem;
-        }
-        .notification-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #dc3545;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }        
-        /* NEW ADMIN STYLES */
-        .admin-badge { 
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24); 
-            color: white; 
-            padding: 4px 12px; 
-            border-radius: 15px; 
-            font-size: 0.8em; 
-            font-weight: bold;
-            margin-left: 10px;
-        }
-        .admin-controls {
-            background: #fff3cd;
-            border: 2px solid #ffeaa7;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .admin-btn {
-            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            margin: 5px;
-            font-weight: bold;
-        }
-        .admin-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-        .user-controls {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 10px;
-            margin: 10px 0;
-        }
-        .system-stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin: 1rem 0;
-        }
-        .stat-card.admin {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-        }
-        .danger-zone {
-            background: #f8d7da;
-            border: 2px solid #f5c6cb;
-            border-radius: 10px;
-            padding: 15px;
-            margin: 15px 0;
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                margin: 70px auto 1rem;
+                padding: 0 1rem;
+            }
+            
+            .tab-buttons {
+                flex-direction: column;
+            }
+            
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chat-container {
+                width: 100%;
+                right: -100%;
+            }
         }
     </style>
 
@@ -393,21 +324,12 @@
             <span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span>
         </div>
         <div style="display: flex; align-items: center; gap: 1rem;">
-            <button class="notification-bell" onclick="showNotifications()">
-                🔔 <span class="notification-count" id="notificationCount">0</span>
-            </button>
-            <div style="display: flex; align-items: center; gap: 1rem;">
-                <div class="user-avatar" id="userAvatar">U</div>
-                <div style="font-weight: bold;" id="userName">User</div>
-            </div>
             <button class="logout-btn" onclick="logout()">Logout</button>
         </div>
     </nav>
 
     <!-- Sliding Chat Container -->
     <button class="chat-toggle-btn" onclick="toggleChat()">💬</button>
-    
-    <div class="chat-overlay" id="chatOverlay" onclick="closeChat()"></div>
     
     <div class="chat-container" id="chatContainer">
         <div class="chat-header">
@@ -444,17 +366,17 @@
         <h1>📚 Project Ebooks - Social Platform 
             <span id="adminWelcome" style="display: none; color: #ee5a24; font-size: 0.8em;">(Admin Mode)</span>
         </h1>
-        <p><strong>🚀 NEW:</strong> Sliding Chat • Online Users • Real-time Messaging</p>
+        <p style="color: #666; margin-bottom: 1.5rem;"><strong>🚀 NEW:</strong> Sliding Chat • Online Users • Real-time Messaging</p>
 
-        <!-- ADMIN CONTROLS SECTION (Only visible to admin) -->
+        <!-- ADMIN CONTROLS SECTION -->
         <div id="adminControls" class="admin-controls" style="display: none;">
             <h3 style="color: #ee5a24; margin-bottom: 15px;">🔧 ADMIN CONTROL PANEL</h3>
             <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-                <button class="admin-btn" onclick="showAllUsers()">👥 Manage All Users</button>
-                <button class="admin-btn" onclick="showSystemStats()">📊 System Statistics</button>
-                <button class="admin-btn" onclick="deleteAllMessages()">🗑️ Clear All Messages</button>
-                <button class="admin-btn" onclick="exportAllData()">📤 Export All Data</button>
-                <button class="admin-btn" onclick="showAdminChat()">💬 Admin Broadcast</button>
+                <button class="admin-btn" onclick="showAllUsers()">👥 Manage Users</button>
+                <button class="admin-btn" onclick="showSystemStats()">📊 System Stats</button>
+                <button class="admin-btn" onclick="deleteAllMessages()">🗑️ Clear Messages</button>
+                <button class="admin-btn" onclick="exportAllData()">📤 Export Data</button>
+                <button class="admin-btn" onclick="showAdminChat()">💬 Admin Chat</button>
             </div>
         </div>
 
@@ -521,14 +443,13 @@
         <div id="profile" class="tab-content">
             <h2>👤 My Profile</h2>
             <div style="display: flex; align-items: center; gap: 1.5rem; margin-bottom: 2rem;">
-                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em;" id="profileAvatar">U</div>
+                <div class="user-avatar" style="width: 80px; height: 80px; font-size: 2em; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white;" id="profileAvatar">U</div>
                 <div>
                     <h3 id="profileName">User</h3>
                     <div style="color: #666;">Active Reader</div>
                     <div style="margin-top: 0.5rem;">
-                        <span class="badge">📚 Contributor</span>
-                        <span class="badge">💬 Chat Active</span>
-                        <span id="adminProfileBadge" class="badge" style="background: #ee5a24; color: white; display: none;">⚡ ADMIN</span>
+                        <span class="badge" style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">📚 Contributor</span>
+                        <span id="adminProfileBadge" class="badge" style="background: #ee5a24; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; display: none;">⚡ ADMIN</span>
                     </div>
                 </div>
             </div>
@@ -553,24 +474,24 @@
             </div>
         </div>
 
-        <!-- ADMIN TAB (Only visible to admin) -->
+        <!-- ADMIN TAB -->
         <div id="admin" class="tab-content" style="display: none;">
             <h2 style="color: #ee5a24;">⚡ ADMINISTRATION PANEL</h2>
             
             <div class="system-stats">
-                <div class="stat-card admin">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
                     <div class="stat-value" id="totalUsers">0</div>
                     <div class="stat-label">Total Users</div>
                 </div>
-                <div class="stat-card admin">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
                     <div class="stat-value" id="totalBooks">0</div>
                     <div class="stat-label">Total Books</div>
                 </div>
-                <div class="stat-card admin">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
                     <div class="stat-value" id="totalMessages">0</div>
                     <div class="stat-label">Total Messages</div>
                 </div>
-                <div class="stat-card admin">
+                <div class="stat-card" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white;">
                     <div class="stat-value" id="totalDownloadsAdmin">0</div>
                     <div class="stat-label">Total Downloads</div>
                 </div>
@@ -578,7 +499,7 @@
 
             <div class="admin-controls">
                 <h3>User Management</h3>
-                <div id="usersList" class="user-controls">
+                <div id="usersList" class="user-controls" style="background: #f8f9fa; border-radius: 8px; padding: 10px;">
                     Loading users...
                 </div>
             </div>
@@ -589,18 +510,17 @@
                 <button class="admin-btn" onclick="fixBrokenBooks()">🔧 Fix Broken Books</button>
             </div>
 
-            <div class="danger-zone">
+            <div class="danger-zone" style="background: #f8d7da; border: 2px solid #f5c6cb; border-radius: 10px; padding: 15px; margin: 15px 0;">
                 <h3 style="color: #dc3545;">⚠️ DANGER ZONE</h3>
                 <p style="color: #721c24; margin-bottom: 15px;">These actions cannot be undone!</p>
                 <button class="admin-btn" style="background: #dc3545;" onclick="resetEntireSystem()">💥 RESET ENTIRE SYSTEM</button>
-                <button class="admin-btn" style="background: #dc3545;" onclick="deleteAllUserData()">🔥 DELETE ALL USER DATA</button>
             </div>
         </div>
     </div>
 
     <!-- Edit Book Modal -->
-    <div class="edit-modal" id="editModal">
-        <div class="edit-modal-content">
+    <div class="edit-modal" id="editModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000;">
+        <div class="edit-modal-content" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; padding: 2rem; border-radius: 10px; width: 90%; max-width: 500px;">
             <h3>✏️ Edit Book</h3>
             <form onsubmit="updateBook(event)">
                 <input type="hidden" id="editBookId">
@@ -631,7 +551,7 @@
                     <input type="url" id="editDriveLink" required>
                 </div>
                 
-                <div class="action-buttons">
+                <div style="display: flex; gap: 0.5rem; margin-top: 1rem;">
                     <button type="submit" style="background: #28a745; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 2;">💾 Save Changes</button>
                     <button type="button" onclick="closeEditModal()" style="background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; flex: 1;">Cancel</button>
                 </div>
@@ -650,7 +570,6 @@
 
         // Initialize user and admin features
         document.getElementById('userName').textContent = currentUser;
-        document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
         document.getElementById('profileName').textContent = currentUser;
         document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
 
@@ -667,9 +586,6 @@
 
         let allBooks = [];
         let firebaseReady = false;
-        let onlineUsers = [];
-        let currentChatUser = null;
-        let messagesSent = parseInt(localStorage.getItem('messagesSent') || '0');
 
         // Wait for Firebase
         const checkFirebase = setInterval(() => {
@@ -677,18 +593,353 @@
                 firebaseReady = true;
                 clearInterval(checkFirebase);
                 loadBooks();
-                startOnlinePresence();
-                loadOnlineUsers();
                 
                 // Load admin data if admin
                 if (isAdmin) {
                     loadSystemStats();
-                    loadAllUsers();
                 }
             }
         }, 100);
 
-        // ... (your existing functions remain the same until we add admin functions) ...
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabId === 'library') loadBooks();
+            if (tabId === 'mybooks') loadMyBooks();
+            if (tabId === 'profile') loadProfileStats();
+            if (tabId === 'admin' && isAdmin) {
+                loadSystemStats();
+                loadAllUsers();
+            }
+        }
+
+        function previewCover(event) {
+            const input = event.target;
+            const preview = document.getElementById('coverPreview');
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        async function loadBooks() {
+            if (!firebaseReady) return;
+            
+            try {
+                const { collection, getDocs, query, orderBy } = window.firestoreFunctions;
+                const q = query(collection(window.firestore, 'books'), orderBy('uploadDate', 'desc'));
+                const snapshot = await getDocs(q);
+                
+                allBooks = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+
+                displayBooks(allBooks);
+                
+            } catch (error) {
+                console.error('Error loading books:', error);
+            }
+        }
+
+        function displayBooks(books) {
+            const grid = document.getElementById('publicLibraryGrid');
+            
+            if (books.length === 0) {
+                grid.innerHTML = '<div class="loading">No books found. Be the first to upload!</div>';
+                return;
+            }
+            
+            grid.innerHTML = books.map(book => {
+                const isOwner = book.uploadedBy === currentUser;
+                
+                return `
+                    <div class="book-card">
+                        ${isOwner || isAdmin ? '<div class="owner-badge" style="position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">' + (isAdmin ? 'ADMIN' : 'OWNER') + '</div>' : ''}
+                        
+                        <div class="book-cover">
+                            ${book.coverUrl ? 
+                                `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                '📚'
+                            }
+                        </div>
+                        
+                        <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                        <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                        
+                        <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                            ${book.category} • ${book.downloads || 0} downloads
+                        </div>
+                        
+                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                            📥 Download eBook
+                        </button>
+                        
+                        ${(isOwner || isAdmin) ? `
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="edit-btn" onclick="editBook('${book.id}')" style="background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                                    ✏️ Edit
+                                </button>
+                                <button class="delete-btn" onclick="deleteBook('${book.id}', '${book.title}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+        }
+
+        async function loadMyBooks() {
+            if (!firebaseReady) return;
+            
+            try {
+                const { collection, getDocs, query, where, orderBy } = window.firestoreFunctions;
+                const q = query(collection(window.firestore, 'books'), where('uploadedBy', '==', currentUser), orderBy('uploadDate', 'desc'));
+                const snapshot = await getDocs(q);
+                
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    return;
+                }
+                
+                grid.innerHTML = snapshot.docs.map(doc => {
+                    const book = doc.data();
+                    return `
+                        <div class="book-card">
+                            <div class="owner-badge" style="position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">OWNER</div>
+                            
+                            <div class="book-cover">
+                                ${book.coverUrl ? 
+                                    `<img src="${book.coverUrl}" class="book-cover-img" alt="${book.title}">` :
+                                    '📚'
+                                }
+                            </div>
+                            
+                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            
+                            <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                                ${book.downloads || 0} downloads
+                            </div>
+                            
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${doc.id}')">
+                                📥 Download (${book.downloads || 0})
+                            </button>
+                            
+                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                                <button class="edit-btn" onclick="editBook('${doc.id}')" style="background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                                    ✏️ Edit
+                                </button>
+                                <button class="delete-btn" onclick="deleteBook('${doc.id}', '${book.title}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error('Error loading my books:', error);
+            }
+        }
+
+        async function addBookToPublicLibrary(event) {
+            event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
+            
+            const title = document.getElementById('bookTitle').value;
+            const author = document.getElementById('bookAuthor').value;
+            const category = document.getElementById('bookCategory').value;
+            const driveLink = document.getElementById('driveLink').value;
+            const coverFile = document.getElementById('bookCover').files[0];
+            
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            try {
+                let coverUrl = '';
+                
+                if (coverFile) {
+                    const reader = new FileReader();
+                    coverUrl = await new Promise((resolve) => {
+                        reader.onload = function(e) {
+                            resolve(e.target.result);
+                        };
+                        reader.readAsDataURL(coverFile);
+                    });
+                }
+
+                const { collection, addDoc } = window.firestoreFunctions;
+                
+                await addDoc(collection(window.firestore, 'books'), {
+                    title: title,
+                    author: author,
+                    category: category,
+                    driveLink: driveLink,
+                    coverUrl: coverUrl,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
+                });
+
+                alert(`✅ "${title}" added to library!`);
+                event.target.reset();
+                document.getElementById('coverPreview').style.display = 'none';
+                
+                loadBooks();
+                loadMyBooks();
+                loadProfileStats();
+                
+            } catch (error) {
+                console.error('Error adding book:', error);
+                alert('Error adding book: ' + error.message);
+            }
+        }
+
+        function editBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
+            const isOwner = book && book.uploadedBy === currentUser;
+            
+            if (!isOwner && !isAdmin) {
+                alert('❌ You can only edit your own books!');
+                return;
+            }
+            
+            if (!book) {
+                alert('Book not found!');
+                return;
+            }
+
+            document.getElementById('editBookId').value = bookId;
+            document.getElementById('editBookTitle').value = book.title;
+            document.getElementById('editBookAuthor').value = book.author;
+            document.getElementById('editBookCategory').value = book.category;
+            document.getElementById('editDriveLink').value = book.driveLink;
+
+            document.getElementById('editModal').style.display = 'block';
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').style.display = 'none';
+        }
+
+        async function updateBook(event) {
+            event.preventDefault();
+            
+            if (!firebaseReady) {
+                alert('Firebase is still loading. Please wait...');
+                return;
+            }
+
+            const bookId = document.getElementById('editBookId').value;
+            const title = document.getElementById('editBookTitle').value;
+            const author = document.getElementById('editBookAuthor').value;
+            const category = document.getElementById('editBookCategory').value;
+            const driveLink = document.getElementById('editDriveLink').value;
+
+            if (!title || !author || !driveLink) {
+                alert('Please fill all required fields');
+                return;
+            }
+
+            if (!bookId) {
+                alert('Book ID is missing!');
+                return;
+            }
+
+            try {
+                const { updateDoc, doc } = window.firestoreFunctions;
+                const bookRef = doc(window.firestore, 'books', bookId);
+                
+                await updateDoc(bookRef, {
+                    title: title,
+                    author: author,
+                    category: category,
+                    driveLink: driveLink
+                });
+
+                alert(`✅ "${title}" has been updated successfully!`);
+                closeEditModal();
+                
+                loadBooks();
+                loadMyBooks();
+                
+            } catch (error) {
+                console.error('Error updating book:', error);
+                alert('Error updating book: ' + error.message);
+            }
+        }
+
+        async function downloadBook(driveLink, bookId) {
+            window.open(driveLink, '_blank');
+            
+            if (bookId && firebaseReady) {
+                try {
+                    const { updateDoc, doc } = window.firestoreFunctions;
+                    const bookRef = doc(window.firestore, 'books', bookId);
+                    await updateDoc(bookRef, {
+                        downloads: window.firestoreFunctions.increment(1)
+                    });
+                    
+                    loadBooks();
+                    loadMyBooks();
+                    loadProfileStats();
+                    
+                } catch (error) {
+                    console.error('Error updating download count:', error);
+                }
+            }
+        }
+
+        async function deleteBook(bookId, bookTitle) {
+            const book = allBooks.find(b => b.id === bookId);
+            const isOwner = book && book.uploadedBy === currentUser;
+            
+            if (!isOwner && !isAdmin) {
+                alert('❌ You can only delete your own books!');
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
+
+            if (!firebaseReady) {
+                alert('Firebase is not ready. Please try again.');
+                return;
+            }
+
+            try {
+                const { deleteDoc, doc } = window.firestoreFunctions;
+                await deleteDoc(doc(window.firestore, 'books', bookId));
+                
+                alert(`✅ "${bookTitle}" has been deleted successfully.`);
+                
+                loadBooks();
+                loadMyBooks();
+                loadProfileStats();
+                if (isAdmin) loadSystemStats();
+                
+            } catch (error) {
+                console.error('Error deleting book:', error);
+                alert('Error deleting book: ' + error.message);
+            }
+        }
 
         // ==================== ADMIN FUNCTIONS ====================
 
@@ -738,7 +989,7 @@
                     const isOnline = (new Date() - lastSeen) < 30000;
                     
                     usersList.innerHTML += `
-                        <div class="user-controls">
+                        <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0;">
                             <strong>${user.username}</strong> 
                             <span style="color: ${isOnline ? '#28a745' : '#6c757d'}">
                                 ${isOnline ? '🟢 Online' : '⚫ Offline'}
@@ -751,60 +1002,6 @@
                 
             } catch (error) {
                 console.error('Error loading users:', error);
-            }
-        }
-
-        async function viewUserBooks(username) {
-            if (!firebaseReady || !isAdmin) return;
-            
-            try {
-                const { collection, getDocs, query, where } = window.firestoreFunctions;
-                const q = query(collection(window.firestore, 'books'), where('uploadedBy', '==', username));
-                const snapshot = await getDocs(q);
-                
-                let booksInfo = `Books by ${username}:\n\n`;
-                snapshot.forEach(doc => {
-                    const book = doc.data();
-                    booksInfo += `📚 ${book.title} (${book.downloads || 0} downloads)\n`;
-                });
-                
-                alert(booksInfo);
-                
-            } catch (error) {
-                console.error('Error viewing user books:', error);
-            }
-        }
-
-        async function deleteUser(username) {
-            if (!firebaseReady || !isAdmin) return;
-            
-            if (!confirm(`⚠️ Are you sure you want to delete ALL data for user "${username}"? This cannot be undone!`)) {
-                return;
-            }
-            
-            try {
-                const { collection, getDocs, query, where, deleteDoc, doc } = window.firestoreFunctions;
-                
-                // Delete user's books
-                const booksQuery = query(collection(window.firestore, 'books'), where('uploadedBy', '==', username));
-                const booksSnapshot = await getDocs(booksQuery);
-                
-                const deletePromises = booksSnapshot.docs.map(bookDoc => 
-                    deleteDoc(doc(window.firestore, 'books', bookDoc.id))
-                );
-                
-                // Delete user's online presence
-                await deleteDoc(doc(window.firestore, 'onlineUsers', username));
-                
-                await Promise.all(deletePromises);
-                
-                alert(`✅ User "${username}" and all their data has been deleted!`);
-                loadAllUsers();
-                loadSystemStats();
-                
-            } catch (error) {
-                console.error('Error deleting user:', error);
-                alert('Error deleting user: ' + error.message);
             }
         }
 
@@ -835,40 +1032,10 @@
             }
         }
 
-        async function deleteAllMessages() {
-            if (!firebaseReady || !isAdmin) return;
-            
-            if (!confirm('⚠️ Are you sure you want to delete ALL chat messages? This cannot be undone!')) {
-                return;
-            }
-            
-            try {
-                const { collection, getDocs, deleteDoc, doc } = window.firestoreFunctions;
-                const snapshot = await getDocs(collection(window.firestore, 'messages'));
-                
-                const deletePromises = snapshot.docs.map(messageDoc => 
-                    deleteDoc(doc(window.firestore, 'messages', messageDoc.id))
-                );
-                
-                await Promise.all(deletePromises);
-                
-                alert('✅ All chat messages have been deleted!');
-                loadSystemStats();
-                
-            } catch (error) {
-                console.error('Error deleting all messages:', error);
-                alert('Error deleting messages: ' + error.message);
-            }
-        }
-
         async function resetEntireSystem() {
             if (!firebaseReady || !isAdmin) return;
             
             if (!confirm('💥 NUCLEAR OPTION: Are you absolutely sure you want to reset the ENTIRE system? This will delete ALL data including users, books, and messages!')) {
-                return;
-            }
-            
-            if (!confirm('🚨 THIS IS YOUR LAST WARNING! All data will be permanently lost!')) {
                 return;
             }
             
@@ -887,13 +1054,7 @@
                     deleteDoc(doc(window.firestore, 'messages', messageDoc.id))
                 );
                 
-                // Delete all users
-                const usersSnapshot = await getDocs(collection(window.firestore, 'onlineUsers'));
-                const userDeletes = usersSnapshot.docs.map(userDoc => 
-                    deleteDoc(doc(window.firestore, 'onlineUsers', userDoc.id))
-                );
-                
-                await Promise.all([...bookDeletes, ...messageDeletes, ...userDeletes]);
+                await Promise.all([...bookDeletes, ...messageDeletes]);
                 
                 alert('💥 System has been completely reset! All data has been deleted.');
                 loadBooks();
@@ -912,100 +1073,72 @@
 
         function showSystemStats() {
             showTab('admin');
-            loadSystemStats();
         }
 
         function showAdminChat() {
-            // Admin can chat with anyone without restriction
             toggleChat();
         }
 
-        function exportAllData() {
-            if (!isAdmin) return;
-            
-            // Create a comprehensive data export
-            const exportData = {
-                exportedBy: currentUser,
-                timestamp: new Date().toISOString(),
-                books: allBooks,
-                onlineUsers: onlineUsers,
-                systemInfo: {
-                    totalBooks: allBooks.length,
-                    totalDownloads: allBooks.reduce((sum, book) => sum + (book.downloads || 0), 0),
-                    admin: true
-                }
-            };
-            
-            const dataStr = JSON.stringify(exportData, null, 2);
-            const dataBlob = new Blob([dataStr], {type: 'application/json'});
-            
-            const link = document.createElement('a');
-            link.href = URL.createObjectURL(dataBlob);
-            link.download = `project-ebooks-export-${new Date().toISOString().split('T')[0]}.json`;
-            link.click();
-            
-            alert('📤 All system data has been exported!');
-        }
+        // ==================== PROFILE FUNCTIONS ====================
 
-        // Override book deletion to allow admin to delete any book
-        async function deleteBook(bookId, bookTitle) {
-            const book = allBooks.find(b => b.id === bookId);
-            const isOwner = book && book.uploadedBy === currentUser;
+        async function loadProfileStats() {
+            if (!firebaseReady) return;
             
-            if (!isOwner && !isAdmin) {
-                alert('❌ You can only delete your own books!');
-                return;
-            }
-            
-            if (!confirm(`Are you sure you want to delete "${bookTitle}"?`)) return;
-
-            if (!firebaseReady) {
-                alert('Firebase is not ready. Please try again.');
-                return;
-            }
-
             try {
-                const { deleteDoc, doc } = window.firestoreFunctions;
-                await deleteDoc(doc(window.firestore, 'books', bookId));
+                const { collection, getDocs, query, where } = window.firestoreFunctions;
                 
-                alert(`✅ "${bookTitle}" has been deleted successfully.`);
+                // Books uploaded
+                const booksQuery = query(collection(window.firestore, 'books'), where('uploadedBy', '==', currentUser));
+                const booksSnapshot = await getDocs(booksQuery);
+                const booksUploaded = booksSnapshot.size;
                 
-                loadBooks();
-                loadMyBooks();
-                loadProfileStats();
-                if (isAdmin) loadSystemStats();
+                // Total downloads
+                let totalDownloads = 0;
+                booksSnapshot.forEach(doc => {
+                    totalDownloads += doc.data().downloads || 0;
+                });
+                
+                // Update display
+                document.getElementById('booksUploaded').textContent = booksUploaded;
+                document.getElementById('totalDownloads').textContent = totalDownloads;
+                document.getElementById('messagesSent').textContent = 0;
+                document.getElementById('readingLevel').textContent = Math.floor(totalDownloads / 10) + 1;
                 
             } catch (error) {
-                console.error('Error deleting book:', error);
-                alert('Error deleting book: ' + error.message);
+                console.error('Error loading profile stats:', error);
             }
         }
 
-        // Override book editing to allow admin to edit any book
-        function editBook(bookId) {
-            const book = allBooks.find(b => b.id === bookId);
-            const isOwner = book && book.uploadedBy === currentUser;
-            
-            if (!isOwner && !isAdmin) {
-                alert('❌ You can only edit your own books!');
-                return;
-            }
-            
-            if (!book) {
-                alert('Book not found!');
-                return;
-            }
+        // ==================== CHAT FUNCTIONS ====================
 
-            document.getElementById('editBookId').value = bookId;
-            document.getElementById('editBookTitle').value = book.title;
-            document.getElementById('editBookAuthor').value = book.author;
-            document.getElementById('editBookCategory').value = book.category;
-            document.getElementById('editDriveLink').value = book.driveLink;
-
-            document.getElementById('editModal').style.display = 'block';
+        function toggleChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.classList.toggle('open');
         }
 
-        // ... (rest of your existing functions remain unchanged) ...
+        function closeChat() {
+            const chatContainer = document.getElementById('chatContainer');
+            chatContainer.classList.remove('open');
+        }
+
+        function handleMessageKeypress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+
+        function sendMessage() {
+            alert('💬 Chat feature coming soon!');
+        }
+
+        function logout() {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('isAdmin');
+            window.location.href = 'index.html';
+        }
+
+        // Initialize
+        loadProfileStats();
     </script>
 </body>
 </html>
