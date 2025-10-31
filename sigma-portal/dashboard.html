@@ -224,9 +224,30 @@
             flex: 1;
             font-size: 0.9em;
         }
+        
+        .firebase-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            z-index: 1000;
+        }
+        .firebase-error {
+            background: #dc3545;
+        }
     </style>
+
+    <!-- FIREBASE SDK (Compat version - more reliable) -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 </head>
 <body>
+    <div id="firebaseStatus" class="firebase-status">Connecting to Firebase...</div>
+
     <nav class="navbar">
         <div class="nav-brand">📚 Project Ebooks 
             <span id="adminBadge" class="admin-badge" style="display: none;">ADMIN</span>
@@ -240,7 +261,7 @@
         <h1>📚 Project Ebooks - Social Platform 
             <span id="adminWelcome" style="display: none; color: #dc3545; font-size: 0.8em;">(Admin Mode)</span>
         </h1>
-        <p style="color: #666; margin-bottom: 1.5rem;"><strong>🚀 NEW:</strong> Sliding Chat • Online Users • Real-time Messaging</p>
+        <p style="color: #666; margin-bottom: 1.5rem;"><strong>🚀 NEW:</strong> Global Cloud Storage • Real-time Sync • Admin Controls</p>
 
         <!-- ADMIN CONTROLS -->
         <div id="adminControls" class="admin-controls" style="display: none;">
@@ -266,7 +287,7 @@
         <div id="library" class="tab-content active">
             <h2>📚 Public Library</h2>
             <div class="books-grid" id="publicLibraryGrid">
-                <div class="loading">Loading library...</div>
+                <div class="loading">Loading library from Firebase...</div>
             </div>
         </div>
         
@@ -296,7 +317,7 @@
                     <label>Google Drive Link *</label>
                     <input type="url" id="driveLink" placeholder="https://drive.google.com/file/d/..." required>
                 </div>
-                <button type="submit" class="upload-btn">🚀 Upload Book</button>
+                <button type="submit" class="upload-btn">🚀 Upload to Cloud</button>
             </form>
         </div>
         
@@ -304,7 +325,7 @@
         <div id="mybooks" class="tab-content">
             <h2>📂 My Uploaded Books</h2>
             <div class="books-grid" id="myBooksGrid">
-                <div class="loading">Loading your books...</div>
+                <div class="loading">Loading your books from Firebase...</div>
             </div>
         </div>
 
@@ -376,13 +397,39 @@
             <div class="admin-controls">
                 <h3>User Management</h3>
                 <div id="usersList">
-                    <div class="loading">Loading users...</div>
+                    <div class="loading">Loading users from Firebase...</div>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // ==================== FIREBASE CONFIGURATION ====================
+        
+        // Your Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
+            authDomain: "sigma-ebooks.firebaseapp.com",
+            projectId: "sigma-ebooks",
+            storageBucket: "sigma-ebooks.firebasestorage.app",
+            messagingSenderId: "916594333041",
+            appId: "1:916594333041:web:8085ad7e4082530248d2d0"
+        };
+
+        // Initialize Firebase
+        try {
+            firebase.initializeApp(firebaseConfig);
+            console.log("🔥 Firebase initialized successfully!");
+            document.getElementById('firebaseStatus').textContent = "✅ Connected to Firebase";
+        } catch (error) {
+            console.error("❌ Firebase initialization error:", error);
+            document.getElementById('firebaseStatus').textContent = "❌ Firebase Error";
+            document.getElementById('firebaseStatus').classList.add('firebase-error');
+        }
+
+        // Initialize Firestore
+        const db = firebase.firestore();
+        
         // ==================== INITIALIZATION ====================
         
         // Check login and admin status
@@ -400,18 +447,8 @@
 
         // ==================== ADMIN DETECTION ====================
         
-        // Check if user is admin (Sigma with password RASHIM0789)
         function checkAdminStatus() {
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            const currentUserData = users[currentUser];
-            
-            // User is admin if:
-            // 1. Username is "Sigma" OR 
-            // 2. User data has isAdmin: true OR
-            // 3. localStorage has isAdmin: true
-            const userIsAdmin = currentUser === 'Sigma' || 
-                              (currentUserData && currentUserData.isAdmin) || 
-                              localStorage.getItem('isAdmin') === 'true';
+            const userIsAdmin = currentUser === 'Sigma' || localStorage.getItem('isAdmin') === 'true';
             
             if (userIsAdmin) {
                 activateAdminMode();
@@ -425,80 +462,49 @@
             document.getElementById('adminControls').style.display = 'block';
             document.getElementById('adminTab').style.display = 'block';
             
-            // Ensure admin status is saved
             localStorage.setItem('isAdmin', 'true');
-            
             console.log('🔓 ADMIN MODE ACTIVATED for user: ' + currentUser);
-            console.log('🎯 Admin has FULL CONTROL over the system');
         }
 
-        // ==================== BOOKS SYSTEM ====================
+        // ==================== FIREBASE BOOKS SYSTEM ====================
         
         let allBooks = [];
 
-        // Initialize books system with sample data if empty
-        function initializeBooks() {
-            let books = JSON.parse(localStorage.getItem('books') || '[]');
-            
-            // Add sample books if none exist
-            if (books.length === 0) {
-                books = [
-                    {
-                        id: '1',
-                        title: 'JavaScript: The Good Parts',
-                        author: 'Douglas Crockford',
-                        category: 'Programming',
-                        driveLink: 'https://drive.google.com/file/d/1/view',
-                        uploadedBy: 'System',
-                        uploadDate: new Date().toISOString(),
-                        downloads: 15
-                    },
-                    {
-                        id: '2',
-                        title: 'Clean Code',
-                        author: 'Robert C. Martin',
-                        category: 'Programming',
-                        driveLink: 'https://drive.google.com/file/d/2/view',
-                        uploadedBy: 'System',
-                        uploadDate: new Date().toISOString(),
-                        downloads: 23
-                    },
-                    {
-                        id: '3',
-                        title: 'The Pragmatic Programmer',
-                        author: 'Andrew Hunt',
-                        category: 'Programming',
-                        driveLink: 'https://drive.google.com/file/d/3/view',
-                        uploadedBy: 'System',
-                        uploadDate: new Date().toISOString(),
-                        downloads: 18
-                    }
-                ];
-                localStorage.setItem('books', JSON.stringify(books));
+        // Load books from Firebase
+        async function loadBooks() {
+            try {
+                console.log("📚 Loading books from Firebase...");
+                
+                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
+                
+                if (snapshot.empty) {
+                    console.log("No books found in Firebase");
+                    document.getElementById('publicLibraryGrid').innerHTML = 
+                        '<div class="loading">No books found. Be the first to upload!</div>';
+                    return;
+                }
+                
+                allBooks = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                console.log(`✅ Loaded ${allBooks.length} books from Firebase`);
+                displayBooks(allBooks);
+                
+            } catch (error) {
+                console.error("❌ Error loading books from Firebase:", error);
+                document.getElementById('publicLibraryGrid').innerHTML = 
+                    '<div class="loading" style="color: #dc3545;">Error loading books. Please refresh.</div>';
             }
-            
-            allBooks = books;
-            loadBooks();
-        }
-
-        // Load and display books
-        function loadBooks() {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            allBooks = books;
-            displayBooks(books);
         }
 
         function displayBooks(books) {
             const grid = document.getElementById('publicLibraryGrid');
             
-            if (books.length === 0) {
-                grid.innerHTML = '<div class="loading">No books found. Be the first to upload!</div>';
-                return;
-            }
-            
             grid.innerHTML = books.map(book => {
                 const isOwner = book.uploadedBy === currentUser;
-                const showAdminControls = isAdmin; // Admin can control all books
+                const showAdminControls = isAdmin;
                 
                 return `
                     <div class="book-card">
@@ -537,52 +543,68 @@
             }).join('');
         }
 
-        function loadMyBooks() {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const myBooks = books.filter(book => book.uploadedBy === currentUser);
-            const grid = document.getElementById('myBooksGrid');
-            
-            if (myBooks.length === 0) {
-                grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
-                return;
+        // Load user's books from Firebase
+        async function loadMyBooks() {
+            try {
+                const snapshot = await db.collection('books')
+                    .where('uploadedBy', '==', currentUser)
+                    .orderBy('uploadDate', 'desc')
+                    .get();
+                
+                const grid = document.getElementById('myBooksGrid');
+                
+                if (snapshot.empty) {
+                    grid.innerHTML = '<div class="loading">You haven\'t uploaded any books yet.</div>';
+                    return;
+                }
+                
+                const myBooks = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                grid.innerHTML = myBooks.map(book => {
+                    return `
+                        <div class="book-card">
+                            <div class="owner-badge">OWNER</div>
+                            
+                            <div class="book-cover">
+                                📚
+                            </div>
+                            
+                            <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
+                            <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
+                            
+                            <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
+                                ${book.downloads || 0} downloads
+                            </div>
+                            
+                            <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
+                                📥 Download (${book.downloads || 0})
+                            </button>
+                            
+                            <div class="action-buttons">
+                                <button class="edit-btn" onclick="editBook('${book.id}')">
+                                    ✏️ Edit
+                                </button>
+                                <button class="delete-btn" onclick="deleteBook('${book.id}')">
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (error) {
+                console.error("Error loading my books:", error);
+                document.getElementById('myBooksGrid').innerHTML = 
+                    '<div class="loading" style="color: #dc3545;">Error loading your books.</div>';
             }
-            
-            grid.innerHTML = myBooks.map(book => {
-                return `
-                    <div class="book-card">
-                        <div class="owner-badge">OWNER</div>
-                        
-                        <div class="book-cover">
-                            📚
-                        </div>
-                        
-                        <div style="font-weight: bold; font-size: 1.1em;">${book.title}</div>
-                        <div style="color: #666; margin: 0.5rem 0;">By ${book.author}</div>
-                        
-                        <div style="color: #888; font-size: 0.9em; margin: 0.5rem 0;">
-                            ${book.downloads || 0} downloads
-                        </div>
-                        
-                        <button class="download-btn" onclick="downloadBook('${book.driveLink}', '${book.id}')">
-                            📥 Download (${book.downloads || 0})
-                        </button>
-                        
-                        <div class="action-buttons">
-                            <button class="edit-btn" onclick="editBook('${book.id}')">
-                                ✏️ Edit
-                            </button>
-                            <button class="delete-btn" onclick="deleteBook('${book.id}')">
-                                🗑️ Delete
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
         }
 
-        // ==================== BOOK MANAGEMENT ====================
+        // ==================== FIREBASE BOOK MANAGEMENT ====================
 
-        function addBookToPublicLibrary(event) {
+        async function addBookToPublicLibrary(event) {
             event.preventDefault();
             
             const title = document.getElementById('bookTitle').value;
@@ -595,49 +617,56 @@
                 return;
             }
 
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const newBook = {
-                id: Date.now().toString(),
-                title: title,
-                author: author,
-                category: category,
-                driveLink: driveLink,
-                uploadedBy: currentUser,
-                uploadDate: new Date().toISOString(),
-                downloads: 0
-            };
-            
-            books.push(newBook);
-            localStorage.setItem('books', JSON.stringify(books));
-            
-            alert(`✅ "${title}" added to library!`);
-            event.target.reset();
-            
-            loadBooks();
-            loadMyBooks();
-            loadProfileStats();
-        }
-
-        function downloadBook(driveLink, bookId) {
-            window.open(driveLink, '_blank');
-            
-            // Update download count
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const bookIndex = books.findIndex(book => book.id === bookId);
-            if (bookIndex !== -1) {
-                books[bookIndex].downloads = (books[bookIndex].downloads || 0) + 1;
-                localStorage.setItem('books', JSON.stringify(books));
+            try {
+                const newBook = {
+                    title: title,
+                    author: author,
+                    category: category,
+                    driveLink: driveLink,
+                    uploadedBy: currentUser,
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
+                };
                 
+                // Add to Firebase
+                await db.collection('books').add(newBook);
+                
+                alert(`✅ "${title}" added to global library!`);
+                event.target.reset();
+                
+                // Reload books
                 loadBooks();
                 loadMyBooks();
                 loadProfileStats();
+                
+            } catch (error) {
+                console.error("Error adding book to Firebase:", error);
+                alert('Error adding book: ' + error.message);
             }
         }
 
-        function deleteBook(bookId) {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const bookIndex = books.findIndex(book => book.id === bookId);
-            const book = books[bookIndex];
+        async function downloadBook(driveLink, bookId) {
+            window.open(driveLink, '_blank');
+            
+            // Update download count in Firebase
+            try {
+                const bookRef = db.collection('books').doc(bookId);
+                await bookRef.update({
+                    downloads: firebase.firestore.FieldValue.increment(1)
+                });
+                
+                // Reload to show updated counts
+                loadBooks();
+                loadMyBooks();
+                loadProfileStats();
+                
+            } catch (error) {
+                console.error("Error updating download count:", error);
+            }
+        }
+
+        async function deleteBook(bookId) {
+            const book = allBooks.find(b => b.id === bookId);
             
             if (!book) {
                 alert('Book not found!');
@@ -652,58 +681,79 @@
 
             if (!confirm(`Are you sure you want to delete "${book.title}"?`)) return;
 
-            books.splice(bookIndex, 1);
-            localStorage.setItem('books', JSON.stringify(books));
-            
-            alert(`✅ "${book.title}" has been deleted successfully.`);
-            
-            loadBooks();
-            loadMyBooks();
-            loadProfileStats();
-            
-            if (isAdmin) {
-                loadSystemStats();
+            try {
+                // Delete from Firebase
+                await db.collection('books').doc(bookId).delete();
+                
+                alert(`✅ "${book.title}" has been deleted from global storage.`);
+                
+                // Reload books
+                loadBooks();
+                loadMyBooks();
+                loadProfileStats();
+                
+                if (isAdmin) {
+                    loadSystemStats();
+                }
+                
+            } catch (error) {
+                console.error("Error deleting book from Firebase:", error);
+                alert('Error deleting book: ' + error.message);
             }
         }
 
         // ==================== ADMIN FUNCTIONS ====================
 
-        function loadSystemStats() {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            
-            document.getElementById('totalBooks').textContent = books.length;
-            document.getElementById('totalUsers').textContent = Object.keys(users).length;
-            
-            let totalDownloads = 0;
-            books.forEach(book => {
-                totalDownloads += book.downloads || 0;
-            });
-            document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
-            document.getElementById('totalMessages').textContent = '0'; // Placeholder
-            
-            // Load users list
-            const usersList = document.getElementById('usersList');
-            const userKeys = Object.keys(users);
-            
-            if (userKeys.length === 0) {
-                usersList.innerHTML = '<div class="loading">No users found</div>';
-                return;
+        async function loadSystemStats() {
+            try {
+                // Get total books
+                const booksSnapshot = await db.collection('books').get();
+                document.getElementById('totalBooks').textContent = booksSnapshot.size;
+                
+                // Get total downloads
+                let totalDownloads = 0;
+                booksSnapshot.forEach(doc => {
+                    totalDownloads += doc.data().downloads || 0;
+                });
+                document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
+                
+                // Get total users (from a separate users collection)
+                try {
+                    const usersSnapshot = await db.collection('users').get();
+                    document.getElementById('totalUsers').textContent = usersSnapshot.size;
+                    
+                    // Display users list
+                    const usersList = document.getElementById('usersList');
+                    if (usersSnapshot.empty) {
+                        usersList.innerHTML = '<div class="loading">No users found in database</div>';
+                    } else {
+                        usersList.innerHTML = usersSnapshot.docs.map(doc => {
+                            const user = doc.data();
+                            return `
+                                <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0; border: 1px solid #e1e1e1;">
+                                    <strong>${user.username || doc.id}</strong> 
+                                    <span style="color: #28a745; margin-left: 10px;">🟢 Active</span>
+                                    <div style="margin-top: 5px;">
+                                        <button class="admin-btn" onclick="viewUserBooks('${user.username || doc.id}')">View Books</button>
+                                        ${user.username !== 'Sigma' ? `<button class="admin-btn" style="background: #ff6b6b;" onclick="deleteUser('${doc.id}')">Delete User</button>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                } catch (userError) {
+                    console.log("Users collection not available");
+                    document.getElementById('totalUsers').textContent = 'N/A';
+                }
+                
+                document.getElementById('totalMessages').textContent = '0';
+                
+            } catch (error) {
+                console.error("Error loading system stats:", error);
             }
-            
-            usersList.innerHTML = userKeys.map(username => `
-                <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0; border: 1px solid #e1e1e1;">
-                    <strong>${username}</strong> 
-                    <span style="color: #28a745; margin-left: 10px;">🟢 Active</span>
-                    <div style="margin-top: 5px;">
-                        <button class="admin-btn" onclick="viewUserBooks('${username}')">View Books</button>
-                        ${username !== 'Sigma' ? `<button class="admin-btn" style="background: #ff6b6b;" onclick="deleteUser('${username}')">Delete User</button>` : ''}
-                    </div>
-                </div>
-            `).join('');
         }
 
-        function addSampleBooks() {
+        async function addSampleBooks() {
             if (!isAdmin) {
                 alert('❌ Admin access required!');
                 return;
@@ -711,97 +761,118 @@
 
             const sampleBooks = [
                 {
-                    id: 'sample-' + Date.now(),
-                    title: 'Python Crash Course',
+                    title: 'Python Crash Course - Global Edition',
                     author: 'Eric Matthes',
                     category: 'Programming',
                     driveLink: 'https://drive.google.com/file/d/python-sample/view',
-                    uploadedBy: 'System',
+                    uploadedBy: 'Admin',
                     uploadDate: new Date().toISOString(),
                     downloads: 0
                 },
                 {
-                    id: 'sample-' + (Date.now() + 1),
-                    title: 'Deep Learning',
+                    title: 'Deep Learning - Global Edition',
                     author: 'Ian Goodfellow',
                     category: 'Science',
                     driveLink: 'https://drive.google.com/file/d/deep-learning-sample/view',
-                    uploadedBy: 'System',
+                    uploadedBy: 'Admin',
                     uploadDate: new Date().toISOString(),
                     downloads: 0
                 }
             ];
 
-            const existingBooks = JSON.parse(localStorage.getItem('books') || '[]');
-            const newBooks = [...existingBooks, ...sampleBooks];
-            localStorage.setItem('books', JSON.stringify(newBooks));
-            
-            alert('✅ Sample books added to library!');
-            loadBooks();
-            loadSystemStats();
+            try {
+                // Add sample books to Firebase
+                const addPromises = sampleBooks.map(book => 
+                    db.collection('books').add(book)
+                );
+                
+                await Promise.all(addPromises);
+                
+                alert('✅ Sample books added to global library!');
+                loadBooks();
+                loadSystemStats();
+                
+            } catch (error) {
+                console.error("Error adding sample books:", error);
+                alert('Error adding sample books: ' + error.message);
+            }
         }
 
-        function clearAllBooks() {
+        async function clearAllBooks() {
             if (!isAdmin) {
                 alert('❌ Admin access required!');
                 return;
             }
 
-            if (!confirm('⚠️ Are you sure you want to delete ALL books from the system?')) return;
+            if (!confirm('⚠️ Are you sure you want to delete ALL books from the global database?')) return;
             
-            localStorage.setItem('books', JSON.stringify([]));
-            alert('✅ All books have been deleted!');
-            loadBooks();
-            loadSystemStats();
+            try {
+                const snapshot = await db.collection('books').get();
+                const deletePromises = snapshot.docs.map(doc => 
+                    db.collection('books').doc(doc.id).delete()
+                );
+                
+                await Promise.all(deletePromises);
+                
+                alert('✅ All books have been deleted from global storage!');
+                loadBooks();
+                loadSystemStats();
+                
+            } catch (error) {
+                console.error("Error clearing all books:", error);
+                alert('Error clearing books: ' + error.message);
+            }
         }
 
-        function resetSystem() {
+        async function resetSystem() {
             if (!isAdmin) {
                 alert('❌ Admin access required!');
                 return;
             }
 
-            if (!confirm('💥 Are you sure you want to reset the entire system? This will delete ALL data!')) return;
+            if (!confirm('💥 Are you sure you want to reset the entire global system?')) return;
             
-            localStorage.removeItem('books');
-            localStorage.removeItem('users');
-            alert('✅ System has been completely reset!');
-            loadBooks();
-            loadSystemStats();
+            try {
+                // Clear all books
+                const booksSnapshot = await db.collection('books').get();
+                const bookDeletes = booksSnapshot.docs.map(doc => 
+                    db.collection('books').doc(doc.id).delete()
+                );
+                
+                await Promise.all(bookDeletes);
+                
+                alert('💥 Global system has been reset!');
+                loadBooks();
+                loadSystemStats();
+                
+            } catch (error) {
+                console.error("Error resetting system:", error);
+                alert('Error resetting system: ' + error.message);
+            }
         }
 
-        function viewUserBooks(username) {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const userBooks = books.filter(book => book.uploadedBy === username);
-            
-            if (userBooks.length === 0) {
-                alert(`User "${username}" has not uploaded any books.`);
-                return;
+        async function viewUserBooks(username) {
+            try {
+                const snapshot = await db.collection('books')
+                    .where('uploadedBy', '==', username)
+                    .get();
+                
+                if (snapshot.empty) {
+                    alert(`User "${username}" has not uploaded any books.`);
+                    return;
+                }
+                
+                const bookList = snapshot.docs.map(doc => {
+                    const book = doc.data();
+                    return `• ${book.title} (${book.downloads || 0} downloads)`;
+                }).join('\n');
+                
+                alert(`Books uploaded by ${username}:\n\n${bookList}`);
+                
+            } catch (error) {
+                console.error("Error viewing user books:", error);
+                alert('Error loading user books: ' + error.message);
             }
-            
-            const bookList = userBooks.map(book => `• ${book.title} (${book.downloads} downloads)`).join('\n');
-            alert(`Books uploaded by ${username}:\n\n${bookList}`);
-        }
-
-        function deleteUser(username) {
-            if (username === 'Sigma') {
-                alert('❌ Cannot delete the main admin account!');
-                return;
-            }
-
-            if (!confirm(`⚠️ Delete user "${username}" and all their data?`)) return;
-            
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            delete users[username];
-            localStorage.setItem('users', JSON.stringify(users));
-            
-            // Also remove their books
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const filteredBooks = books.filter(book => book.uploadedBy !== username);
-            localStorage.setItem('books', JSON.stringify(filteredBooks));
-            
-            alert(`✅ User "${username}" has been deleted!`);
-            loadSystemStats();
         }
 
         function showAllUsers() {
@@ -826,20 +897,27 @@
             if (tabId === 'admin' && isAdmin) loadSystemStats();
         }
 
-        function loadProfileStats() {
-            const books = JSON.parse(localStorage.getItem('books') || '[]');
-            const myBooks = books.filter(book => book.uploadedBy === currentUser);
-            const booksUploaded = myBooks.length;
-            
-            let totalDownloads = 0;
-            myBooks.forEach(book => {
-                totalDownloads += book.downloads || 0;
-            });
-            
-            document.getElementById('booksUploaded').textContent = booksUploaded;
-            document.getElementById('totalDownloads').textContent = totalDownloads;
-            document.getElementById('messagesSent').textContent = 0;
-            document.getElementById('readingLevel').textContent = Math.floor(totalDownloads / 5) + 1;
+        async function loadProfileStats() {
+            try {
+                const snapshot = await db.collection('books')
+                    .where('uploadedBy', '==', currentUser)
+                    .get();
+                
+                const booksUploaded = snapshot.size;
+                let totalDownloads = 0;
+                
+                snapshot.forEach(doc => {
+                    totalDownloads += doc.data().downloads || 0;
+                });
+                
+                document.getElementById('booksUploaded').textContent = booksUploaded;
+                document.getElementById('totalDownloads').textContent = totalDownloads;
+                document.getElementById('messagesSent').textContent = 0;
+                document.getElementById('readingLevel').textContent = Math.floor(totalDownloads / 5) + 1;
+                
+            } catch (error) {
+                console.error("Error loading profile stats:", error);
+            }
         }
 
         function logout() {
@@ -852,8 +930,13 @@
         
         // Initialize the application
         checkAdminStatus();
-        initializeBooks();
+        loadBooks();
         loadProfileStats();
+        
+        console.log("🚀 Project Ebooks Dashboard Started");
+        console.log("👤 Current User:", currentUser);
+        console.log("🔧 Admin Mode:", isAdmin);
+        console.log("🔥 Firebase Connected:", !!firebase.apps.length);
     </script>
 </body>
 </html>
