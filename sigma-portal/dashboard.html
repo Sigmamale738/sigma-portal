@@ -108,6 +108,7 @@
             padding: 1.5rem; 
             box-shadow: 0 3px 10px rgba(0,0,0,0.1); 
             border: 1px solid #e1e1e1; 
+            position: relative;
         }
         .book-cover { 
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
@@ -181,10 +182,47 @@
             font-size: 0.9em; 
         }
         
+        .owner-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #667eea;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 0.8em;
+        }
+        
         .loading { 
             text-align: center; 
             padding: 2rem; 
             color: #666; 
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+        }
+        .edit-btn {
+            background: #ffc107;
+            color: black;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.9em;
+        }
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            flex: 1;
+            font-size: 0.9em;
         }
     </style>
 </head>
@@ -211,6 +249,7 @@
                 <button class="admin-btn" onclick="showAllUsers()">👥 Manage Users</button>
                 <button class="admin-btn" onclick="showSystemStats()">📊 System Stats</button>
                 <button class="admin-btn" onclick="addSampleBooks()">📚 Add Sample Books</button>
+                <button class="admin-btn" onclick="clearAllBooks()">🗑️ Clear All Books</button>
                 <button class="admin-btn" onclick="resetSystem()">🔄 Reset System</button>
             </div>
         </div>
@@ -278,7 +317,7 @@
                     <h3 id="profileName">User</h3>
                     <div style="color: #666;">Active Reader</div>
                     <div style="margin-top: 0.5rem;">
-                        <span style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">📚 Contributor</span>
+                        <span style="background: #ffc107; color: black; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; margin-right: 5px;">📚 Contributor</span>
                         <span id="adminProfileBadge" style="background: #dc3545; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em; display: none;">⚡ ADMIN</span>
                     </div>
                 </div>
@@ -321,6 +360,10 @@
                     <div class="stat-value" id="totalDownloadsAdmin">0</div>
                     <div class="stat-label">Total Downloads</div>
                 </div>
+                <div class="stat-card" style="background: #dc3545; color: white;">
+                    <div class="stat-value" id="totalMessages">0</div>
+                    <div class="stat-label">Total Messages</div>
+                </div>
             </div>
 
             <div class="admin-controls">
@@ -340,6 +383,8 @@
     </div>
 
     <script>
+        // ==================== INITIALIZATION ====================
+        
         // Check login and admin status
         const currentUser = localStorage.getItem('currentUser');
         const isAdmin = localStorage.getItem('isAdmin') === 'true';
@@ -348,39 +393,95 @@
             window.location.href = 'index.html';
         }
 
-        // Initialize user
+        // Initialize user display
         document.getElementById('userName').textContent = currentUser;
         document.getElementById('profileName').textContent = currentUser;
         document.getElementById('profileAvatar').textContent = currentUser.charAt(0).toUpperCase();
 
-        // Show admin features if user is admin
-        if (isAdmin && currentUser === 'Sigma') {
+        // ==================== ADMIN DETECTION ====================
+        
+        // Check if user is admin (Sigma with password RASHIM0789)
+        function checkAdminStatus() {
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            const currentUserData = users[currentUser];
+            
+            // User is admin if:
+            // 1. Username is "Sigma" OR 
+            // 2. User data has isAdmin: true OR
+            // 3. localStorage has isAdmin: true
+            const userIsAdmin = currentUser === 'Sigma' || 
+                              (currentUserData && currentUserData.isAdmin) || 
+                              localStorage.getItem('isAdmin') === 'true';
+            
+            if (userIsAdmin) {
+                activateAdminMode();
+            }
+        }
+
+        function activateAdminMode() {
             document.getElementById('adminBadge').style.display = 'inline-block';
             document.getElementById('adminWelcome').style.display = 'inline';
             document.getElementById('adminProfileBadge').style.display = 'inline-block';
             document.getElementById('adminControls').style.display = 'block';
             document.getElementById('adminTab').style.display = 'block';
+            
+            // Ensure admin status is saved
+            localStorage.setItem('isAdmin', 'true');
+            
             console.log('🔓 ADMIN MODE ACTIVATED for user: ' + currentUser);
+            console.log('🎯 Admin has FULL CONTROL over the system');
         }
 
+        // ==================== BOOKS SYSTEM ====================
+        
         let allBooks = [];
 
-        // Load books immediately
-        loadBooks();
-
-        function showTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            event.target.classList.add('active');
+        // Initialize books system with sample data if empty
+        function initializeBooks() {
+            let books = JSON.parse(localStorage.getItem('books') || '[]');
             
-            if (tabId === 'library') loadBooks();
-            if (tabId === 'mybooks') loadMyBooks();
-            if (tabId === 'profile') loadProfileStats();
-            if (tabId === 'admin' && isAdmin) loadSystemStats();
+            // Add sample books if none exist
+            if (books.length === 0) {
+                books = [
+                    {
+                        id: '1',
+                        title: 'JavaScript: The Good Parts',
+                        author: 'Douglas Crockford',
+                        category: 'Programming',
+                        driveLink: 'https://drive.google.com/file/d/1/view',
+                        uploadedBy: 'System',
+                        uploadDate: new Date().toISOString(),
+                        downloads: 15
+                    },
+                    {
+                        id: '2',
+                        title: 'Clean Code',
+                        author: 'Robert C. Martin',
+                        category: 'Programming',
+                        driveLink: 'https://drive.google.com/file/d/2/view',
+                        uploadedBy: 'System',
+                        uploadDate: new Date().toISOString(),
+                        downloads: 23
+                    },
+                    {
+                        id: '3',
+                        title: 'The Pragmatic Programmer',
+                        author: 'Andrew Hunt',
+                        category: 'Programming',
+                        driveLink: 'https://drive.google.com/file/d/3/view',
+                        uploadedBy: 'System',
+                        uploadDate: new Date().toISOString(),
+                        downloads: 18
+                    }
+                ];
+                localStorage.setItem('books', JSON.stringify(books));
+            }
+            
+            allBooks = books;
+            loadBooks();
         }
 
-        // SIMPLE LOCALSTORAGE FUNCTIONS (No Firebase)
+        // Load and display books
         function loadBooks() {
             const books = JSON.parse(localStorage.getItem('books') || '[]');
             allBooks = books;
@@ -397,10 +498,14 @@
             
             grid.innerHTML = books.map(book => {
                 const isOwner = book.uploadedBy === currentUser;
+                const showAdminControls = isAdmin; // Admin can control all books
                 
                 return `
                     <div class="book-card">
-                        ${isOwner || isAdmin ? '<div style="position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">' + (isAdmin ? 'ADMIN' : 'OWNER') + '</div>' : ''}
+                        ${(isOwner || isAdmin) ? 
+                            `<div class="owner-badge">${isAdmin ? 'ADMIN' : 'OWNER'}</div>` : 
+                            ''
+                        }
                         
                         <div class="book-cover">
                             📚
@@ -418,11 +523,11 @@
                         </button>
                         
                         ${(isOwner || isAdmin) ? `
-                            <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                                <button onclick="editBook('${book.id}')" style="background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                            <div class="action-buttons">
+                                <button class="edit-btn" onclick="editBook('${book.id}')">
                                     ✏️ Edit
                                 </button>
-                                <button onclick="deleteBook('${book.id}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                                <button class="delete-btn" onclick="deleteBook('${book.id}')">
                                     🗑️ Delete
                                 </button>
                             </div>
@@ -445,7 +550,7 @@
             grid.innerHTML = myBooks.map(book => {
                 return `
                     <div class="book-card">
-                        <div style="position: absolute; top: 10px; right: 10px; background: #667eea; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.8em;">OWNER</div>
+                        <div class="owner-badge">OWNER</div>
                         
                         <div class="book-cover">
                             📚
@@ -462,11 +567,11 @@
                             📥 Download (${book.downloads || 0})
                         </button>
                         
-                        <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
-                            <button onclick="editBook('${book.id}')" style="background: #ffc107; color: black; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                        <div class="action-buttons">
+                            <button class="edit-btn" onclick="editBook('${book.id}')">
                                 ✏️ Edit
                             </button>
-                            <button onclick="deleteBook('${book.id}')" style="background: #dc3545; color: white; border: none; padding: 8px 12px; border-radius: 5px; cursor: pointer; flex: 1; font-size: 0.9em;">
+                            <button class="delete-btn" onclick="deleteBook('${book.id}')">
                                 🗑️ Delete
                             </button>
                         </div>
@@ -474,6 +579,8 @@
                 `;
             }).join('');
         }
+
+        // ==================== BOOK MANAGEMENT ====================
 
         function addBookToPublicLibrary(event) {
             event.preventDefault();
@@ -553,6 +660,10 @@
             loadBooks();
             loadMyBooks();
             loadProfileStats();
+            
+            if (isAdmin) {
+                loadSystemStats();
+            }
         }
 
         // ==================== ADMIN FUNCTIONS ====================
@@ -569,6 +680,7 @@
                 totalDownloads += book.downloads || 0;
             });
             document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
+            document.getElementById('totalMessages').textContent = '0'; // Placeholder
             
             // Load users list
             const usersList = document.getElementById('usersList');
@@ -580,10 +692,13 @@
             }
             
             usersList.innerHTML = userKeys.map(username => `
-                <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0;">
+                <div style="background: white; padding: 10px; border-radius: 5px; margin: 5px 0; border: 1px solid #e1e1e1;">
                     <strong>${username}</strong> 
-                    <span style="color: #28a745">🟢 Active</span>
-                    <button class="admin-btn" onclick="viewUserBooks('${username}')">View Books</button>
+                    <span style="color: #28a745; margin-left: 10px;">🟢 Active</span>
+                    <div style="margin-top: 5px;">
+                        <button class="admin-btn" onclick="viewUserBooks('${username}')">View Books</button>
+                        ${username !== 'Sigma' ? `<button class="admin-btn" style="background: #ff6b6b;" onclick="deleteUser('${username}')">Delete User</button>` : ''}
+                    </div>
                 </div>
             `).join('');
         }
@@ -596,31 +711,24 @@
 
             const sampleBooks = [
                 {
-                    id: '1',
-                    title: 'JavaScript: The Good Parts',
-                    author: 'Douglas Crockford',
+                    id: 'sample-' + Date.now(),
+                    title: 'Python Crash Course',
+                    author: 'Eric Matthes',
                     category: 'Programming',
-                    driveLink: 'https://drive.google.com/file/d/sample1/view',
+                    driveLink: 'https://drive.google.com/file/d/python-sample/view',
                     uploadedBy: 'System',
-                    downloads: 15
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
                 },
                 {
-                    id: '2', 
-                    title: 'Clean Code',
-                    author: 'Robert C. Martin',
-                    category: 'Programming',
-                    driveLink: 'https://drive.google.com/file/d/sample2/view',
+                    id: 'sample-' + (Date.now() + 1),
+                    title: 'Deep Learning',
+                    author: 'Ian Goodfellow',
+                    category: 'Science',
+                    driveLink: 'https://drive.google.com/file/d/deep-learning-sample/view',
                     uploadedBy: 'System',
-                    downloads: 23
-                },
-                {
-                    id: '3',
-                    title: 'The Pragmatic Programmer',
-                    author: 'Andrew Hunt',
-                    category: 'Programming', 
-                    driveLink: 'https://drive.google.com/file/d/sample3/view',
-                    uploadedBy: 'System',
-                    downloads: 18
+                    uploadDate: new Date().toISOString(),
+                    downloads: 0
                 }
             ];
 
@@ -639,7 +747,7 @@
                 return;
             }
 
-            if (!confirm('⚠️ Are you sure you want to delete ALL books?')) return;
+            if (!confirm('⚠️ Are you sure you want to delete ALL books from the system?')) return;
             
             localStorage.setItem('books', JSON.stringify([]));
             alert('✅ All books have been deleted!');
@@ -653,12 +761,46 @@
                 return;
             }
 
-            if (!confirm('💥 Are you sure you want to reset the entire system?')) return;
+            if (!confirm('💥 Are you sure you want to reset the entire system? This will delete ALL data!')) return;
             
             localStorage.removeItem('books');
             localStorage.removeItem('users');
-            alert('✅ System has been reset!');
+            alert('✅ System has been completely reset!');
             loadBooks();
+            loadSystemStats();
+        }
+
+        function viewUserBooks(username) {
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            const userBooks = books.filter(book => book.uploadedBy === username);
+            
+            if (userBooks.length === 0) {
+                alert(`User "${username}" has not uploaded any books.`);
+                return;
+            }
+            
+            const bookList = userBooks.map(book => `• ${book.title} (${book.downloads} downloads)`).join('\n');
+            alert(`Books uploaded by ${username}:\n\n${bookList}`);
+        }
+
+        function deleteUser(username) {
+            if (username === 'Sigma') {
+                alert('❌ Cannot delete the main admin account!');
+                return;
+            }
+
+            if (!confirm(`⚠️ Delete user "${username}" and all their data?`)) return;
+            
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            delete users[username];
+            localStorage.setItem('users', JSON.stringify(users));
+            
+            // Also remove their books
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            const filteredBooks = books.filter(book => book.uploadedBy !== username);
+            localStorage.setItem('books', JSON.stringify(filteredBooks));
+            
+            alert(`✅ User "${username}" has been deleted!`);
             loadSystemStats();
         }
 
@@ -670,7 +812,19 @@
             showTab('admin');
         }
 
-        // ==================== PROFILE FUNCTIONS ====================
+        // ==================== UI FUNCTIONS ====================
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            event.target.classList.add('active');
+            
+            if (tabId === 'library') loadBooks();
+            if (tabId === 'mybooks') loadMyBooks();
+            if (tabId === 'profile') loadProfileStats();
+            if (tabId === 'admin' && isAdmin) loadSystemStats();
+        }
 
         function loadProfileStats() {
             const books = JSON.parse(localStorage.getItem('books') || '[]');
@@ -694,7 +848,11 @@
             window.location.href = 'index.html';
         }
 
-        // Initialize profile stats
+        // ==================== START APPLICATION ====================
+        
+        // Initialize the application
+        checkAdminStatus();
+        initializeBooks();
         loadProfileStats();
     </script>
 </body>
