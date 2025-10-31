@@ -3,10 +3,6 @@
 <head>
     <title>Project Ebooks - Open to Anyone</title>
     <meta charset="UTF-8">
-    <!-- Firebase SDK -->
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
@@ -34,13 +30,11 @@
         .otp-input { text-align: center; font-size: 1.2em; letter-spacing: 8px; font-weight: bold; }
         .resend-btn { background: #28a745 !important; margin-top: 10px; }
         .loading { opacity: 0.6; pointer-events: none; }
-        .firebase-status { position: fixed; top: 10px; right: 10px; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; }
-        .firebase-connected { background: #d4edda; color: #155724; }
-        .firebase-disconnected { background: #f8d7da; color: #721c24; }
+        .admin-indicator { position: fixed; top: 10px; right: 10px; background: #ffc107; color: #856404; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; display: none; }
     </style>
 </head>
 <body>
-    <div class="firebase-status" id="firebaseStatus">Connecting to Firebase...</div>
+    <div class="admin-indicator" id="adminIndicator">🔒 Admin Mode Active</div>
     
     <div class="container">
         <div class="welcome-section">
@@ -103,21 +97,6 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script>
-        // Firebase configuration - Replace with your actual Firebase config
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_PROJECT_ID.appspot.com",
-            messagingSenderId: "YOUR_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        
-        // Initialize Firebase
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-        const auth = firebase.auth();
-        
         // Initialize EmailJS with YOUR credentials
         emailjs.init("6xeycUj5CInWKYKTr");
         
@@ -125,17 +104,9 @@
         let currentUsername = '';
         let currentOTP = '';
         
-        // Monitor Firebase connection status
-        db.enableNetwork()
-          .then(() => {
-              document.getElementById('firebaseStatus').textContent = 'Connected to Firebase';
-              document.getElementById('firebaseStatus').className = 'firebase-status firebase-connected';
-          })
-          .catch((error) => {
-              document.getElementById('firebaseStatus').textContent = 'Firebase Connection Error';
-              document.getElementById('firebaseStatus').className = 'firebase-status firebase-disconnected';
-              console.error('Firebase connection error:', error);
-          });
+        // Admin credentials
+        const ADMIN_USERNAME = "Sigma";
+        const ADMIN_PASSWORD = "RASHIM0789";
 
         function showForm(formType) {
             document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
@@ -170,17 +141,6 @@
             return Math.floor(100000 + Math.random() * 900000).toString();
         }
 
-        // Check if username already exists in Firestore
-        async function isUsernameTaken(username) {
-            try {
-                const userDoc = await db.collection('users').doc(username).get();
-                return userDoc.exists;
-            } catch (error) {
-                console.error('Error checking username:', error);
-                return false;
-            }
-        }
-
         // Send OTP using EmailJS
         async function sendOTP() {
             const username = document.getElementById('signupUsername').value;
@@ -192,10 +152,9 @@
                 return;
             }
 
-            // Check if username already exists
-            const usernameTaken = await isUsernameTaken(username);
-            if (usernameTaken) {
-                showMessage('signupMessage', 'Username already exists. Please choose another.', 'error');
+            // Prevent using admin username
+            if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
+                showMessage('signupMessage', 'This username is reserved. Please choose another.', 'error');
                 return;
             }
 
@@ -236,10 +195,9 @@
             }
         }
 
-        // Verify OTP and register user in Firestore
-        async function verifyOTP() {
+        // Verify OTP
+        function verifyOTP() {
             const enteredOTP = document.getElementById('otpCode').value;
-            const password = document.getElementById('signupPassword').value;
             
             if (enteredOTP.length !== 6) {
                 showMessage('signupMessage', 'Please enter 6-digit OTP', 'error');
@@ -247,65 +205,59 @@
             }
 
             if (enteredOTP === currentOTP) {
-                try {
-                    // Store user in Firestore
-                    await db.collection('users').doc(currentUsername).set({
-                        email: currentEmail,
-                        password: password, // In production, you should hash this
-                        verified: true,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    // Also store in localStorage for session management
-                    localStorage.setItem('currentUser', currentUsername);
-                    
-                    showMessage('signupMessage', '✅ OTP verified! Welcome to Project Ebooks!', 'success');
-                    setTimeout(() => {
-                        window.location.href = 'dashboard.html';
-                    }, 2000);
-                } catch (error) {
-                    console.error('Error saving user to Firestore:', error);
-                    showMessage('signupMessage', '❌ Registration failed. Please try again.', 'error');
-                }
+                // Store user in localStorage
+                const users = JSON.parse(localStorage.getItem('users') || '{}');
+                users[currentUsername] = { 
+                    email: currentEmail, 
+                    password: document.getElementById('signupPassword').value,
+                    verified: true,
+                    isAdmin: false
+                };
+                localStorage.setItem('users', JSON.stringify(users));
+                
+                showMessage('signupMessage', '✅ OTP verified! Welcome to Project Ebooks!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
             } else {
                 showMessage('signupMessage', '❌ Invalid OTP! Please try again.', 'error');
             }
         }
 
-        // Login user with Firestore verification
-        async function loginUser() {
+        // Login user
+        function loginUser() {
             const username = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
             
-            try {
-                const userDoc = await db.collection('users').doc(username).get();
+            // Check for admin login
+            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+                // Set admin session
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('isAdmin', 'true');
                 
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    
-                    if (userData.password === password) {
-                        // Update last login time
-                        await db.collection('users').doc(username).update({
-                            lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        
-                        // Store in localStorage for session management
-                        localStorage.setItem('currentUser', username);
-                        
-                        showMessage('loginMessage', '✅ Login successful!', 'success');
-                        setTimeout(() => {
-                            window.location.href = 'dashboard.html';
-                        }, 1000);
-                    } else {
-                        showMessage('loginMessage', '❌ Invalid password!', 'error');
-                    }
-                } else {
-                    showMessage('loginMessage', '❌ User not found!', 'error');
-                }
-            } catch (error) {
-                console.error('Error during login:', error);
-                showMessage('loginMessage', '❌ Login failed. Please try again.', 'error');
+                showMessage('loginMessage', '🔓 Admin login successful! Full access granted.', 'success');
+                document.getElementById('adminIndicator').style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+                return;
+            }
+            
+            // Regular user login
+            const users = JSON.parse(localStorage.getItem('users') || '{}');
+            
+            if (users[username] && users[username].password === password) {
+                localStorage.setItem('currentUser', username);
+                localStorage.setItem('isAdmin', 'false');
+                
+                showMessage('loginMessage', '✅ Login successful!', 'success');
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 1000);
+            } else {
+                showMessage('loginMessage', '❌ Invalid username or password!', 'error');
             }
         }
 
@@ -315,6 +267,16 @@
             sendOTP();
             showMessage('signupMessage', '📧 New OTP sent!', 'success');
         }
+        
+        // Check if admin is already logged in
+        function checkAdminStatus() {
+            if (localStorage.getItem('isAdmin') === 'true') {
+                document.getElementById('adminIndicator').style.display = 'block';
+            }
+        }
+        
+        // Run on page load
+        window.onload = checkAdminStatus;
     </script>
 </body>
 </html>
