@@ -237,38 +237,37 @@
 
         <!-- ADMIN TAB -->
         <div id="admin" class="tab-content" style="display: none;">
-            <h2 style="color: #dc3545;">⚡ ADMINISTRATION PANEL</h2>
-            
-            <div class="profile-stats">
-                <div class="stat-card" style="background: #dc3545; color: white;">
-                    <div class="stat-value" id="totalUsers">0</div>
-                    <div class="stat-label">Total Users</div>
-                </div>
-                <div class="stat-card" style="background: #dc3545; color: white;">
-                    <div class="stat-value" id="totalBooks">0</div>
-                    <div class="stat-label">Total Books</div>
-                </div>
-                <div class="stat-card" style="background: #dc3545; color: white;">
-                    <div class="stat-value" id="totalDownloadsAdmin">0</div>
-                    <div class="stat-label">Total Downloads</div>
-                </div>
-            </div>
-
-            <div class="admin-controls">
-                <h3>Quick Actions</h3>
-                <button class="admin-btn" onclick="addSampleBooks()">📚 Add Sample Books</button>
-                <button class="admin-btn" onclick="clearAllBooks()">🗑️ Clear All Books</button>
-                <button class="admin-btn" onclick="resetSystem()">🔄 Reset System</button>
-            </div>
-
-            <div class="admin-controls">
-                <h3>User Management</h3>
-                <div id="usersList">
-                    <div class="loading">Loading users...</div>
-                </div>
-            </div>
+    <h2 style="color: #dc3545;">⚡ ADMINISTRATION PANEL</h2>
+    
+    <div class="profile-stats">
+        <div class="stat-card" style="background: #dc3545; color: white;">
+            <div class="stat-value" id="totalUsers">0</div>
+            <div class="stat-label">Total Users</div>
+        </div>
+        <div class="stat-card" style="background: #dc3545; color: white;">
+            <div class="stat-value" id="totalBooks">0</div>
+            <div class="stat-label">Total Books</div>
+        </div>
+        <div class="stat-card" style="background: #dc3545; color: white;">
+            <div class="stat-value" id="totalDownloadsAdmin">0</div>
+            <div class="stat-label">Total Downloads</div>
         </div>
     </div>
+
+    <div class="admin-controls">
+        <h3>Quick Actions</h3>
+        <button class="admin-btn" onclick="addSampleBooks()">📚 Add Sample Books</button>
+        <button class="admin-btn" onclick="clearAllBooks()">🗑️ Clear All Books</button>
+        <button class="admin-btn" onclick="resetSystem()">🔄 Reset System</button>
+    </div>
+
+    <div class="admin-controls">
+        <h3>User Management</h3>
+        <div id="usersList">
+            <div class="loading">Loading users...</div>
+        </div>
+    </div>
+</div>
 
     <!-- Edit Book Modal -->
     <div class="edit-modal" id="editModal">
@@ -696,7 +695,97 @@
         }
 
         // ==================== ADMIN PAGE FUNCTIONS ====================
+          async function loadSystemStats() {
+        if (!isAdmin) return;
+        
+        try {
+            console.log("⚡ Loading system stats for admin...");
+            
+            // Get all books
+            const booksSnapshot = await db.collection('books').get();
+            const totalBooks = booksSnapshot.size;
+            
+            // Calculate total downloads
+            let totalDownloads = 0;
+            booksSnapshot.forEach(doc => {
+                totalDownloads += doc.data().downloads || 0;
+            });
+            
+            // Get unique users (this is a simplified approach)
+            const allBooks = booksSnapshot.docs.map(doc => doc.data());
+            const uniqueUsers = [...new Set(allBooks.map(book => book.uploadedBy))].length;
+            
+            // Update admin dashboard
+            document.getElementById('totalUsers').textContent = uniqueUsers;
+            document.getElementById('totalBooks').textContent = totalBooks;
+            document.getElementById('totalDownloadsAdmin').textContent = totalDownloads;
+            
+            // Load users list
+            loadUsersList(allBooks);
+            
+        } catch (error) {
+            console.error("❌ Error loading system stats:", error);
+            document.getElementById('usersList').innerHTML = 
+                '<div class="loading" style="color: #dc3545;">Error loading system data</div>';
+        }
+    }
 
+    function loadUsersList(allBooks) {
+        // Group books by user to show user stats
+        const userStats = {};
+        
+        allBooks.forEach(book => {
+            const user = book.uploadedBy;
+            if (!userStats[user]) {
+                userStats[user] = {
+                    books: 0,
+                    downloads: 0
+                };
+            }
+            userStats[user].books += 1;
+            userStats[user].downloads += (book.downloads || 0);
+        });
+        
+        const usersList = document.getElementById('usersList');
+        
+        if (Object.keys(userStats).length === 0) {
+            usersList.innerHTML = '<div class="loading">No users found</div>';
+            return;
+        }
+        
+        usersList.innerHTML = Object.entries(userStats).map(([user, stats]) => {
+            const isCurrentUser = user === currentUser;
+            return `
+                <div style="background: white; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid ${isCurrentUser ? '#dc3545' : '#667eea'};">
+                    <div style="font-weight: bold; display: flex; justify-content: space-between;">
+                        <span>${user} ${isCurrentUser ? '(You)' : ''}</span>
+                        ${user === 'Admin' || user === 'Sigma' ? '<span style="background: #dc3545; color: white; padding: 2px 8px; border-radius: 10px; font-size: 0.8em;">ADMIN</span>' : ''}
+                    </div>
+                    <div style="color: #666; font-size: 0.9em; margin-top: 5px;">
+                        📚 ${stats.books} books • 📥 ${stats.downloads} downloads
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function showAllUsers() {
+        showTab('admin');
+    }
+
+    // ==================== UI FUNCTIONS ====================
+
+    function showTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.target.classList.add('active');
+        
+        if (tabId === 'library') loadBooks();
+        if (tabId === 'mybooks') loadMyBooks();
+        if (tabId === 'profile') loadProfileStats();
+        if (tabId === 'admin' && isAdmin) loadSystemStats();
+    }
         async function loadSystemStats() {
             if (!isAdmin) return;
             
