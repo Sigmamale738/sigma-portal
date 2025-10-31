@@ -236,6 +236,7 @@
             border-radius: 6px;
             width: 100%;
             cursor: pointer;
+            font-size: 0.9em;
         }
 
         /* Forms */
@@ -315,6 +316,7 @@
             border: none;
             color: white;
             cursor: pointer;
+            font-size: 1.2em;
         }
 
         .chat-messages {
@@ -348,6 +350,25 @@
             height: 40px;
             border-radius: 50%;
             cursor: pointer;
+        }
+
+        /* Toast Notifications */
+        .toast {
+            position: fixed;
+            top: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            z-index: 1000;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { transform: translate(-50%, -20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
         }
 
         /* Responsive */
@@ -429,12 +450,12 @@
                 <h3>Upload New Book</h3>
                 <form onsubmit="uploadBook(event)">
                     <div class="form-group">
-                        <label>Book Title</label>
-                        <input type="text" id="bookTitle" required>
+                        <label>Book Title *</label>
+                        <input type="text" id="bookTitle" placeholder="Enter book title" required>
                     </div>
                     <div class="form-group">
-                        <label>Author</label>
-                        <input type="text" id="bookAuthor" required>
+                        <label>Author *</label>
+                        <input type="text" id="bookAuthor" placeholder="Author name" required>
                     </div>
                     <div class="form-group">
                         <label>Category</label>
@@ -443,13 +464,16 @@
                             <option>Science</option>
                             <option>Fiction</option>
                             <option>Business</option>
+                            <option>Self-Help</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Google Drive Link</label>
-                        <input type="url" id="bookLink" required>
+                        <label>Google Drive Link *</label>
+                        <input type="url" id="bookLink" placeholder="https://drive.google.com/file/d/..." required>
                     </div>
-                    <button type="submit" class="upload-btn">Upload Book</button>
+                    <button type="submit" class="upload-btn">
+                        <i class="fas fa-upload"></i> Upload Book
+                    </button>
                 </form>
             </div>
 
@@ -468,6 +492,7 @@
                         <span id="profileAvatar">U</span>
                     </div>
                     <h3 id="profileName">User</h3>
+                    <p style="color: #666;">Ebook Contributor</p>
                 </div>
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -477,6 +502,14 @@
                     <div class="stat-card">
                         <div class="stat-value" id="profileDownloads">0</div>
                         <div class="stat-label">Downloads</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="profileMessages">0</div>
+                        <div class="stat-label">Messages</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="profileLevel">1</div>
+                        <div class="stat-label">Level</div>
                     </div>
                 </div>
             </div>
@@ -496,7 +529,7 @@
             </button>
         </div>
         <div class="chat-messages" id="chatMessages">
-            <div>Welcome to global chat!</div>
+            <div>Welcome to global chat! Start a conversation with other readers.</div>
         </div>
         <div class="chat-input-container">
             <div class="chat-input-wrapper">
@@ -529,10 +562,11 @@
     </div>
 
     <script>
-        // Simple state management
-        let currentUser = localStorage.getItem('username') || 'User';
+        // State management
+        let currentUser = localStorage.getItem('username') || 'Reader';
         let books = [];
         let myBooks = [];
+        let messagesSent = 0;
 
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
@@ -583,10 +617,21 @@
         }
 
         function showNotifications() {
-            alert('You have 3 new notifications!');
+            showToast('🔔 You have new messages and updates!');
         }
 
-        // Book Management
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // Book Management with REAL DOWNLOAD FUNCTIONALITY
         function loadSampleBooks() {
             books = [
                 {
@@ -594,21 +639,32 @@
                     title: 'The Intelligent Investor',
                     author: 'Benjamin Graham',
                     category: 'Business',
-                    downloads: 15
+                    downloads: 15,
+                    driveLink: 'https://drive.google.com/uc?export=download&id=1Example1'
                 },
                 {
                     id: 2,
-                    title: 'Clean Code',
+                    title: 'Clean Code: A Handbook of Agile Software Craftsmanship',
                     author: 'Robert C. Martin',
                     category: 'Programming',
-                    downloads: 8
+                    downloads: 8,
+                    driveLink: 'https://drive.google.com/uc?export=download&id=1Example2'
                 },
                 {
                     id: 3,
                     title: 'To Kill a Mockingbird',
                     author: 'Harper Lee',
                     category: 'Fiction',
-                    downloads: 12
+                    downloads: 12,
+                    driveLink: 'https://drive.google.com/uc?export=download&id=1Example3'
+                },
+                {
+                    id: 4,
+                    title: 'The Pragmatic Programmer',
+                    author: 'Andrew Hunt, David Thomas',
+                    category: 'Programming',
+                    downloads: 10,
+                    driveLink: 'https://drive.google.com/uc?export=download&id=1Example4'
                 }
             ];
             displayBooks();
@@ -621,8 +677,11 @@
                     <div class="book-cover">📚</div>
                     <div class="book-title">${book.title}</div>
                     <div class="book-author">${book.author}</div>
+                    <div style="color: #666; font-size: 0.8em; margin-bottom: 0.5rem;">
+                        ${book.category} • ${book.downloads} downloads
+                    </div>
                     <button class="download-btn" onclick="downloadBook(${book.id})">
-                        Download (${book.downloads})
+                        <i class="fas fa-download"></i> Download Now
                     </button>
                 </div>
             `).join('');
@@ -631,22 +690,31 @@
         function loadMyBooks() {
             const grid = document.getElementById('myBooksGrid');
             if (myBooks.length === 0) {
-                grid.innerHTML = '<div>No books uploaded yet.</div>';
+                grid.innerHTML = `
+                    <div style="grid-column: 1 / -1; text-align: center; padding: 2rem; color: #666;">
+                        <div style="font-size: 3em; margin-bottom: 1rem;">📚</div>
+                        <h3>No Books Uploaded Yet</h3>
+                        <p>Share your first book with the community!</p>
+                    </div>
+                `;
             } else {
                 grid.innerHTML = myBooks.map(book => `
                     <div class="book-card">
                         <div class="book-cover">📚</div>
                         <div class="book-title">${book.title}</div>
                         <div class="book-author">${book.author}</div>
+                        <div style="color: #666; font-size: 0.8em; margin-bottom: 0.5rem;">
+                            ${book.category} • ${book.downloads} downloads
+                        </div>
                         <button class="download-btn" onclick="downloadBook(${book.id})">
-                            Download (${book.downloads})
+                            <i class="fas fa-download"></i> Download (${book.downloads})
                         </button>
                     </div>
                 `).join('');
             }
         }
 
-        // UPLOAD FUNCTION - NOW WORKING!
+        // UPLOAD FUNCTION - WORKING!
         function uploadBook(event) {
             event.preventDefault();
             
@@ -656,7 +724,13 @@
             const link = document.getElementById('bookLink').value;
 
             if (!title || !author || !link) {
-                alert('Please fill all required fields');
+                showToast('❌ Please fill all required fields');
+                return;
+            }
+
+            // Validate Google Drive link format
+            if (!link.includes('drive.google.com')) {
+                showToast('❌ Please provide a valid Google Drive link');
                 return;
             }
 
@@ -666,12 +740,12 @@
                 author: author,
                 category: category,
                 downloads: 0,
-                link: link
+                driveLink: link
             };
 
             // Add to both collections
-            books.push(newBook);
-            myBooks.push(newBook);
+            books.unshift(newBook); // Add to beginning
+            myBooks.unshift(newBook);
 
             // Update displays
             displayBooks();
@@ -682,34 +756,58 @@
             event.target.reset();
 
             // Show success message
-            alert('Book uploaded successfully!');
+            showToast('✅ Book uploaded successfully!');
             
-            // Switch to my books tab
+            // Switch to my books tab to see the new upload
             showTab('mybooks');
         }
 
+        // DOWNLOAD FUNCTION - FIXED AND WORKING!
         function downloadBook(bookId) {
             const book = books.find(b => b.id === bookId);
             if (book) {
+                // Increment download count
                 book.downloads++;
-                displayBooks();
-                updateStats();
-                alert(`Downloading: ${book.title}`);
                 
-                // Open download link if available
-                if (book.link) {
-                    window.open(book.link, '_blank');
+                // Update displays
+                displayBooks();
+                loadMyBooks();
+                updateStats();
+
+                // Show download message
+                showToast(`📥 Downloading: ${book.title}`);
+                
+                // OPEN THE ACTUAL DOWNLOAD LINK IN NEW TAB
+                if (book.driveLink) {
+                    // Convert view link to download link if needed
+                    let downloadLink = book.driveLink;
+                    
+                    // If it's a Google Drive view link, convert to download link
+                    if (downloadLink.includes('/file/d/') && downloadLink.includes('/view')) {
+                        const fileId = downloadLink.split('/file/d/')[1].split('/')[0];
+                        downloadLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+                    }
+                    
+                    // Open download in new tab
+                    window.open(downloadLink, '_blank');
+                } else {
+                    showToast('❌ Download link not available');
                 }
             }
         }
 
         function updateStats() {
+            const totalDownloads = books.reduce((sum, book) => sum + book.downloads, 0);
+            const myDownloads = myBooks.reduce((sum, book) => sum + book.downloads, 0);
+            
             document.getElementById('totalBooks').textContent = books.length;
             document.getElementById('myBooksCount').textContent = myBooks.length;
             document.getElementById('profileUploads').textContent = myBooks.length;
-            document.getElementById('profileDownloads').textContent = myBooks.reduce((sum, book) => sum + book.downloads, 0);
+            document.getElementById('profileDownloads').textContent = myDownloads;
+            document.getElementById('profileMessages').textContent = messagesSent;
             document.getElementById('onlineUsers').textContent = Math.floor(Math.random() * 20) + 5;
-            document.getElementById('userLevel').textContent = Math.floor(myBooks.length / 2) + 1;
+            document.getElementById('userLevel').textContent = Math.floor((myBooks.length + messagesSent) / 3) + 1;
+            document.getElementById('profileLevel').textContent = Math.floor((myBooks.length + messagesSent) / 3) + 1;
         }
 
         // Chat functionality
@@ -719,8 +817,19 @@
             
             if (message) {
                 const chatMessages = document.getElementById('chatMessages');
-                chatMessages.innerHTML += `<div><strong>${currentUser}:</strong> ${message}</div>`;
+                const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                chatMessages.innerHTML += `
+                    <div style="margin-bottom: 0.8rem;">
+                        <div style="font-weight: bold; color: #667eea;">${currentUser}</div>
+                        <div>${message}</div>
+                        <div style="font-size: 0.8em; color: #666;">${time}</div>
+                    </div>
+                `;
+                
                 input.value = '';
+                messagesSent++;
+                updateStats();
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
         }
@@ -731,6 +840,23 @@
                 sendMessage();
             }
         });
+
+        // Add some sample chat messages
+        setTimeout(() => {
+            const chatMessages = document.getElementById('chatMessages');
+            chatMessages.innerHTML += `
+                <div style="margin-bottom: 0.8rem;">
+                    <div style="font-weight: bold; color: #28a745;">BookLover42</div>
+                    <div>Has anyone read "The Intelligent Investor"? Amazing book!</div>
+                    <div style="font-size: 0.8em; color: #666;">10:30 AM</div>
+                </div>
+                <div style="margin-bottom: 0.8rem;">
+                    <div style="font-weight: bold; color: #dc3545;">CodeMaster</div>
+                    <div>Just uploaded a new programming book. Check it out!</div>
+                    <div style="font-size: 0.8em; color: #666;">10:32 AM</div>
+                </div>
+            `;
+        }, 1000);
     </script>
 </body>
 </html>
