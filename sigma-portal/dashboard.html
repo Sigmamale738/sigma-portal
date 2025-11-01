@@ -739,7 +739,7 @@
         async function loadBooks() {
             try {
                 console.log("📚 Loading books from Firebase...");
-                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
+                const snapshot = await db.collection('books').get();
                 
                 if (snapshot.empty) {
                     document.getElementById('publicLibraryGrid').innerHTML = 
@@ -811,7 +811,7 @@
             try {
                 console.log("📂 Loading my books for user:", currentUser);
                 
-                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
+                const snapshot = await db.collection('books').get();
                 
                 if (snapshot.empty) {
                     document.getElementById('myBooksGrid').innerHTML = 
