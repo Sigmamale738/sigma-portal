@@ -1,40 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sigma Portal</title>
-
-  <!-- ✅ AdSense verification + script -->
-  <meta name="google-adsense-account" content="ca-pub-5569376681314000">
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5569376681314000"
-    crossorigin="anonymous"></script>
-
-  <!-- your existing CSS and JS links can stay below -->
     <title>Project Ebooks - Social eBook Platform</title>
+    <meta charset="UTF-8">
     <style>
-  nav {
-    background: #222;
-    padding: 10px 0;
-  }
-  nav ul {
-    list-style: none;
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-  }
-  nav ul li {
-    margin: 0 15px;
-  }
-  nav ul li a {
-    text-decoration: none;
-    color: #fff;
-    font-size: 16px;
-    transition: 0.3s;
-  }
-  nav ul li a:hover, nav ul li a.active {
-    color: #00bfff;
-  }
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
         body { background: #f8f9fa; }
         .navbar { background: white; padding: 1rem 2rem; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
@@ -123,6 +92,17 @@
             color: white;
         }
         
+        /* Firebase Status */
+        .firebase-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: #28a745;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            z-index: 1000;
         }
         .firebase-error {
             background: #dc3545;
@@ -297,15 +277,6 @@
 </head>
 <body>
     <div id="firebaseStatus" class="firebase-status">🔄 Connecting to Firebase...</div>
-    <nav>
-  <ul>
-    <li><a href="dashboard.html" class="active">Home</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="privacy.html">Privacy Policy</a></li>
-    <li><a href="terms.html">Terms & Conditions</a></li>
-    <li><a href="contact.html">Contact</a></li>
-  </ul>
-   </nav>
 
     <!-- Messaging Interface -->
     <button class="message-toggle-btn" onclick="toggleMessages()">
@@ -526,17 +497,13 @@
         // ==================== FIREBASE INITIALIZATION ====================
         
         const firebaseConfig = {
-    apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
-    authDomain: "sigma-ebooks.firebaseapp.com",
-    projectId: "sigma-ebooks",
-    storageBucket: "sigma-ebooks.appspot.com",  // ✅ corrected
-    messagingSenderId: "916594333041",
-    appId: "1:916594333041:web:8085ad7e4082530248d2d0"
-};
-
-        db.collection('books').limit(1).get().then(() => {
-  console.log("✅ Firestore connection verified");
-}).catch(err => console.error("❌ Firestore test failed:", err));
+            apiKey: "AIzaSyC1FPOa0TVWKwGnkM-f16jN7lWDLdayW98",
+            authDomain: "sigma-ebooks.firebaseapp.com",
+            projectId: "sigma-ebooks",
+            storageBucket: "sigma-ebooks.firebasestorage.app",
+            messagingSenderId: "916594333041",
+            appId: "1:916594333041:web:8085ad7e4082530248d2d0"
+        };
 
         // Initialize Firebase
         let db;
@@ -550,7 +517,6 @@
             document.getElementById('firebaseStatus').textContent = "❌ Firebase Error";
             document.getElementById('firebaseStatus').classList.add('firebase-error');
         }
-        
 
         // ==================== USER & ADMIN MANAGEMENT ====================
         
@@ -739,7 +705,7 @@
         async function loadBooks() {
             try {
                 console.log("📚 Loading books from Firebase...");
-                const snapshot = await db.collection('books').get();
+                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
                 
                 if (snapshot.empty) {
                     document.getElementById('publicLibraryGrid').innerHTML = 
@@ -811,7 +777,7 @@
             try {
                 console.log("📂 Loading my books for user:", currentUser);
                 
-                const snapshot = await db.collection('books').get();
+                const snapshot = await db.collection('books').orderBy('uploadDate', 'desc').get();
                 
                 if (snapshot.empty) {
                     document.getElementById('myBooksGrid').innerHTML = 
