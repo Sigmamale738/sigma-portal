@@ -533,6 +533,10 @@
     appId: "1:916594333041:web:8085ad7e4082530248d2d0"
 };
 
+        db.collection('books').limit(1).get().then(() => {
+  console.log("✅ Firestore connection verified");
+}).catch(err => console.error("❌ Firestore test failed:", err));
+
         // Initialize Firebase
         let db;
         try {
@@ -545,9 +549,7 @@
             document.getElementById('firebaseStatus').textContent = "❌ Firebase Error";
             document.getElementById('firebaseStatus').classList.add('firebase-error');
         }
-        db.collection('books').limit(1).get().then(() => {
-  console.log("✅ Firestore connection verified");
-}).catch(err => console.error("❌ Firestore test failed:", err));
+        
 
         // ==================== USER & ADMIN MANAGEMENT ====================
         
