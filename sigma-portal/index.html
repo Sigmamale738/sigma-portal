@@ -1,283 +1,66 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+
 <head>
-    <title>Project Ebooks - Open to Anyone</title>
     <meta charset="UTF-8">
-    <meta name="google-adsense-account" content="ca-pub-5569376681314000">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
-        body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { display: flex; width: 100%; max-width: 900px; background: white; border-radius: 15px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); overflow: hidden; }
-        .welcome-section { flex: 1; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 50px; display: flex; flex-direction: column; justify-content: center; }
-        .form-section { flex: 1; padding: 50px; }
-        .welcome-section h1 { font-size: 2.5em; margin-bottom: 20px; }
-        .welcome-section p { font-size: 1.1em; opacity: 0.9; line-height: 1.6; }
-        .form-container { width: 100%; }
-        .form-toggle { display: flex; margin-bottom: 30px; border-bottom: 2px solid #eee; }
-        .toggle-btn { flex: 1; padding: 15px; text-align: center; background: none; border: none; font-size: 1.1em; font-weight: 600; color: #666; cursor: pointer; transition: all 0.3s ease; }
-        .toggle-btn.active { color: #667eea; border-bottom: 3px solid #667eea; margin-bottom: -2px; }
-        .form { display: none; }
-        .form.active { display: block; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #333; }
-        .form-group input { width: 100%; padding: 15px; border: 2px solid #e1e1e1; border-radius: 8px; font-size: 1em; transition: border-color 0.3s ease; }
-        .form-group input:focus { outline: none; border-color: #667eea; }
-        .submit-btn { width: 100%; padding: 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: transform 0.2s ease; }
-        .submit-btn:hover { transform: translateY(-2px); }
-        .message { margin-top: 15px; padding: 10px; border-radius: 5px; text-align: center; display: none; }
-        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .otp-section { display: none; }
-        .otp-input { text-align: center; font-size: 1.2em; letter-spacing: 8px; font-weight: bold; }
-        .resend-btn { background: #28a745 !important; margin-top: 10px; }
-        .loading { opacity: 0.6; pointer-events: none; }
-        .admin-indicator { position: fixed; top: 10px; right: 10px; background: #ffc107; color: #856404; padding: 8px 12px; border-radius: 4px; font-size: 0.8em; display: none; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>Modern Login Page | AsmrProg</title>
 </head>
+
 <body>
-    <div class="admin-indicator" id="adminIndicator">🔒 Admin Mode Active</div>
-    
-    <div class="container">
-        <div class="welcome-section">
-            <h1>Project Ebooks</h1>
-            <p>True Cloud Database - Login from any device</p>
-        </div>
-        
-        <div class="form-section">
-            <div class="form-container">
-                <div class="form-toggle">
-                    <button class="toggle-btn" onclick="showForm('login')">Login</button>
-                    <button class="toggle-btn active" onclick="showForm('signup')">Sign Up</button>
+
+    <div class="container" id="container">
+        <div class="form-container sign-up">
+            <form>
+                <h1>Create Account</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
                 </div>
-                
-                <!-- Login Form -->
-                <form id="loginForm" class="form">
-                    <div class="form-group">
-                        <label for="loginUsername">Username</label>
-                        <input type="text" id="loginUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="loginPassword">Password</label>
-                        <input type="password" id="loginPassword" required>
-                    </div>
-                    <button type="button" class="submit-btn" onclick="loginUser()">Login to Project Ebooks</button>
-                    <div id="loginMessage" class="message"></div>
-                </form>
-                
-                <!-- Signup Form with OTP -->
-                <form id="signupForm" class="form active">
-                    <div class="form-group">
-                        <label for="signupUsername">Choose Username</label>
-                        <input type="text" id="signupUsername" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupEmail">Your Email</label>
-                        <input type="email" id="signupEmail" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signupPassword">Create Password</label>
-                        <input type="password" id="signupPassword" required minlength="6">
-                    </div>
-                    
-                    <!-- OTP Section -->
-                    <div id="otpSection" class="otp-section">
-                        <div class="form-group">
-                            <label for="otpCode">Enter OTP</label>
-                            <input type="text" id="otpCode" class="otp-input" maxlength="6" placeholder="000000" oninput="validateOTP(this)">
-                        </div>
-                        <button type="button" class="submit-btn" onclick="verifyOTP()">Verify OTP & Register</button>
-                        <button type="button" class="submit-btn resend-btn" onclick="resendOTP()">Resend OTP</button>
-                    </div>
-                    
-                    <button type="button" class="submit-btn" onclick="sendOTP()" id="sendOtpBtn">Send OTP to Email</button>
-                    <div id="signupMessage" class="message"></div>
-                </form>
+                <span>or use your email for registeration</span>
+                <input type="text" placeholder="Name">
+                <input type="email" placeholder="Email">
+                <input type="password" placeholder="Password">
+                <button>Sign Up</button>
+            </form>
+        </div>
+        <div class="form-container sign-in">
+            <form>
+                <h1>Sign In</h1>
+                <div class="social-icons">
+                    <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a>
+                </div>
+                <span>or use your email password</span>
+                <input type="email" placeholder="Email">
+                <input type="password" placeholder="Password">
+                <a href="#">Forget Your Password?</a>
+                <button>Sign In</button>
+            </form>
+        </div>
+        <div class="toggle-container">
+            <div class="toggle">
+                <div class="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your personal details to use all of site features</p>
+                    <button class="hidden" id="login">Sign In</button>
+                </div>
+                <div class="toggle-panel toggle-right">
+                    <h1>Hello, Friend!</h1>
+                    <p>Register with your personal details to use all of site features</p>
+                    <button class="hidden" id="register">Sign Up</button>
+                </div>
             </div>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <script>
-        // Initialize EmailJS with YOUR credentials
-        emailjs.init("6xeycUj5CInWKYKTr");
-        
-        let currentEmail = '';
-        let currentUsername = '';
-        let currentOTP = '';
-        
-        // Admin credentials
-        const ADMIN_USERNAME = "Sigma";
-        const ADMIN_PASSWORD = "RASHIM0789";
-
-        function showForm(formType) {
-            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            document.querySelectorAll('.form').forEach(form => form.classList.remove('active'));
-            document.getElementById(formType + 'Form').classList.add('active');
-        }
-
-        function showMessage(elementId, message, type) {
-            const messageEl = document.getElementById(elementId);
-            messageEl.textContent = message;
-            messageEl.className = 'message ' + type;
-            messageEl.style.display = 'block';
-        }
-
-        function validateOTP(input) {
-            input.value = input.value.replace(/[^0-9]/g, '');
-        }
-
-        function setLoading(button, isLoading) {
-            if (isLoading) {
-                button.disabled = true;
-                button.textContent = 'Sending OTP...';
-            } else {
-                button.disabled = false;
-                button.textContent = 'Send OTP to Email';
-            }
-        }
-
-        function generateOTP() {
-            return Math.floor(100000 + Math.random() * 900000).toString();
-        }
-
-        // Send OTP using EmailJS
-        async function sendOTP() {
-            const username = document.getElementById('signupUsername').value;
-            const email = document.getElementById('signupEmail').value;
-            const sendBtn = document.getElementById('sendOtpBtn');
-
-            if (!username || !email) {
-                showMessage('signupMessage', 'Please fill username and email', 'error');
-                return;
-            }
-
-            // Prevent using admin username
-            if (username.toLowerCase() === ADMIN_USERNAME.toLowerCase()) {
-                showMessage('signupMessage', 'This username is reserved. Please choose another.', 'error');
-                return;
-            }
-
-            currentEmail = email;
-            currentUsername = username;
-            currentOTP = generateOTP();
-
-            setLoading(sendBtn, true);
-
-            try {
-                const templateParams = {
-                    to_email: email,
-                    otp_code: currentOTP,
-                    user_name: username,
-                    website_name: "Project Ebooks"
-                };
-                
-                // Send email using EmailJS
-                const response = await emailjs.send(
-                    "service_039rifr",     // Your Service ID
-                    "template_c7tcljk",    // Your Template ID  
-                    templateParams
-                );
-
-                if (response.status === 200) {
-                    document.getElementById('otpSection').style.display = 'block';
-                    document.getElementById('sendOtpBtn').style.display = 'none';
-                    showMessage('signupMessage', '✅ OTP sent to your email! Check your inbox.', 'success');
-                    console.log('OTP for testing:', currentOTP);
-                }
-            } catch (error) {
-                document.getElementById('otpSection').style.display = 'block';
-                document.getElementById('sendOtpBtn').style.display = 'none';
-                showMessage('signupMessage', `✅ OTP: ${currentOTP} - Use this code (Email may have failed)`, 'success');
-                console.error('EmailJS Error:', error);
-            } finally {
-                setLoading(sendBtn, false);
-            }
-        }
-
-        // Verify OTP
-        function verifyOTP() {
-            const enteredOTP = document.getElementById('otpCode').value;
-            
-            if (enteredOTP.length !== 6) {
-                showMessage('signupMessage', 'Please enter 6-digit OTP', 'error');
-                return;
-            }
-
-            if (enteredOTP === currentOTP) {
-                // Store user in localStorage
-                const users = JSON.parse(localStorage.getItem('users') || '{}');
-                users[currentUsername] = { 
-                    email: currentEmail, 
-                    password: document.getElementById('signupPassword').value,
-                    verified: true,
-                    isAdmin: false
-                };
-                localStorage.setItem('users', JSON.stringify(users));
-                
-                showMessage('signupMessage', '✅ OTP verified! Welcome to Project Ebooks!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 2000);
-            } else {
-                showMessage('signupMessage', '❌ Invalid OTP! Please try again.', 'error');
-            }
-        }
-
-        // Login user
-        function loginUser() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
-            const messageEl = document.getElementById('loginMessage');
-            
-            // Check for admin login
-            if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                // Set admin session
-                localStorage.setItem('currentUser', username);
-                localStorage.setItem('isAdmin', 'true');
-                
-                showMessage('loginMessage', '🔓 Admin login successful! Full access granted.', 'success');
-                document.getElementById('adminIndicator').style.display = 'block';
-                
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-                return;
-            }
-            
-            // Regular user login
-            const users = JSON.parse(localStorage.getItem('users') || '{}');
-            
-            if (users[username] && users[username].password === password) {
-                localStorage.setItem('currentUser', username);
-                localStorage.setItem('isAdmin', 'false');
-                
-                showMessage('loginMessage', '✅ Login successful!', 'success');
-                setTimeout(() => {
-                    window.location.href = 'dashboard.html';
-                }, 1000);
-            } else {
-                showMessage('loginMessage', '❌ Invalid username or password!', 'error');
-            }
-        }
-
-        // Resend OTP
-        function resendOTP() {
-            currentOTP = generateOTP();
-            sendOTP();
-            showMessage('signupMessage', '📧 New OTP sent!', 'success');
-        }
-        
-        // Check if admin is already logged in
-        function checkAdminStatus() {
-            if (localStorage.getItem('isAdmin') === 'true') {
-                document.getElementById('adminIndicator').style.display = 'block';
-            }
-        }
-        
-        // Run on page load
-        window.onload = checkAdminStatus;
-    </script>
+    <script src="script.js"></script>
 </body>
+
 </html>
