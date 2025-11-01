@@ -1177,5 +1177,38 @@
         console.log("🔧 Admin:", isAdmin);
         console.log("💬 Messaging system ready");
     </script>
+    <!-- ====== LEGAL & INFO LINKS (added safely) ====== -->
+<footer style="margin-top: 3rem; text-align: center; padding: 1.5rem; background: #fff; border-top: 1px solid #eee;">
+  <div style="display: flex; justify-content: center; flex-wrap: wrap; gap: 1rem;">
+    <a href="#about" onclick="openPage('about')" style="color:#667eea; text-decoration:none;">About</a> |
+    <a href="#privacy" onclick="openPage('privacy')" style="color:#667eea; text-decoration:none;">Privacy Policy</a> |
+    <a href="#terms" onclick="openPage('terms')" style="color:#667eea; text-decoration:none;">Terms of Service</a> |
+    <a href="#contact" onclick="openPage('contact')" style="color:#667eea; text-decoration:none;">Contact</a>
+  </div>
+</footer>
+
+<!-- ====== POPUP PAGE CONTAINER ====== -->
+<div id="infoPopup" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999;">
+  <div style="position:absolute; top:50%; left:50%; transform:translate(-50%,-50%); background:white; color:#333; padding:2rem; border-radius:12px; width:90%; max-width:600px; height:80%; overflow-y:auto;">
+    <button onclick="closePage()" style="float:right; background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:5px; cursor:pointer;">× Close</button>
+    <div id="pageContent" style="margin-top:1rem;"></div>
+  </div>
+</div>
+
+<script>
+function openPage(page) {
+  const content = {
+    about: `<h2>About Sigma Portal</h2><p>Sigma Portal is an open community platform where users can upload and download eBooks freely. Built with passion for learners, it empowers sharing of knowledge globally. 📚</p>`,
+    privacy: `<h2>Privacy Policy</h2><p>We respect your privacy. Uploaded data (eBooks, messages, or user info) are stored securely using Firebase. We do not sell or share your personal information. You are responsible for the content you upload.</p>`,
+    terms: `<h2>Terms of Service</h2><p>By using Sigma Portal, you agree not to upload copyrighted material without permission. Any misuse, spam, or abuse will result in removal of content and possible account suspension.</p>`,
+    contact: `<h2>Contact Us</h2><p>Have a question or idea? Reach out via <b>sigmamale.site/contact</b> or email us at <b>support@sigmamale.site</b>.</p>`
+  };
+  document.getElementById("pageContent").innerHTML = content[page];
+  document.getElementById("infoPopup").style.display = "block";
+}
+function closePage() {
+  document.getElementById("infoPopup").style.display = "none";
+}
+</script>
 </body>
 </html>
