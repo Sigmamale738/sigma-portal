@@ -1,39 +1,99 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Redirecting...</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Loading — Sigma eBooks</title>
 <style>
-  body {
-    margin: 0; height: 100vh;
-    display: flex; align-items: center; justify-content: center;
-    background: linear-gradient(135deg, #667eea, #764ba2);
-    color: #fff; font-family: 'Poppins', sans-serif;
-    flex-direction: column; overflow: hidden;
+  /* Simple centered loader styled to match your site */
+  html,body{height:100%;margin:0}
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+    background: linear-gradient(135deg,#667eea,#764ba2);
+    color:#fff;
+    font-family: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
   }
   .loader {
-    border: 4px solid rgba(255,255,255,0.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    width: 40px; height: 40px;
-    animation: spin 1s linear infinite;
-    margin-bottom: 10px;
+    width:56px;height:56px;border-radius:50%;
+    border:5px solid rgba(255,255,255,0.18);
+    border-top-color:#fff; animation:spin 0.9s linear infinite;
+    margin-bottom:14px;
   }
-  @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
+  @keyframes spin{0%{transform:rotate(0)}100%{transform:rotate(360deg)}}
+  .msg{opacity:.95;font-size:15px}
+  .sub{font-size:13px;opacity:.9;margin-top:8px}
 </style>
 <script>
-  // Prevent flicker: redirect after short delay once DOM loads
-  window.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => window.location.replace("dashboard.html"), 300);
-  });
+  // Prevent any paint of plain white by keeping content in CSS/background above.
+  // Attempt to fetch dashboard and replace document without full navigation (no flicker).
+  (function(){
+    const DASH = 'dashboard.html';
+    const FETCH_TIMEOUT = 6000; // ms
+    const USE_CACHE_BUSTER = false; // set true to bypass aggressive caches if needed
+
+    // Helper: try fetching dashboard HTML
+    function fetchDashboard() {
+      let url = DASH;
+      if (USE_CACHE_BUSTER) url += '?_cb=' + Date.now();
+      return fetch(url, { credentials: 'same-origin', cache: 'no-store' })
+        .then(r => {
+          if (!r.ok) throw new Error('HTTP ' + r.status);
+          return r.text();
+        });
+    }
+
+    // Replace current document with the fetched HTML so scripts run as if navigated.
+    function replaceWithHTML(html) {
+      try {
+        // Replace full document synchronously
+        document.open();
+        document.write(html);
+        document.close();
+
+        // Optionally update URL (so address bar shows /dashboard.html)
+        if (history && history.replaceState) {
+          try { history.replaceState(null, '', '/dashboard.html'); } catch(e){ /* noop */ }
+        }
+      } catch (err) {
+        // If anything goes wrong, fall back to simple redirect
+        console.error('replaceWithHTML failed:', err);
+        window.location.replace(DASH);
+      }
+    }
+
+    // Try fetch with timeout and fallback
+    function fetchWithTimeout(ms) {
+      return new Promise((resolve, reject) => {
+        const timer = setTimeout(() => reject(new Error('timeout')), ms);
+        fetchDashboard()
+          .then(html => { clearTimeout(timer); resolve(html); })
+          .catch(err => { clearTimeout(timer); reject(err); });
+      });
+    }
+
+    // Flow: attempt to fetch; if success replace; if fail, fallback to location.replace
+    window.addEventListener('DOMContentLoaded', () => {
+      // start fetch
+      fetchWithTimeout(FETCH_TIMEOUT).then(html => {
+        // slight delay so loader shows at least briefly and the transition feels smooth
+        setTimeout(()=> replaceWithHTML(html), 150);
+      }).catch(err => {
+        console.warn('Preload failed, falling back:', err);
+        // fallback: try direct navigation
+        setTimeout(()=> window.location.replace(DASH), 200);
+      });
+    });
+
+    // Safety: if user clicks Back or something, keep default behavior
+  })();
 </script>
 </head>
 <body>
-  <div class="loader"></div>
-  <p>Loading your dashboard...</p>
+  <div class="loader" aria-hidden="true"></div>
+  <div class="msg">Taking you to the dashboard…</div>
+  <div class="sub">If this takes too long, please <a href="dashboard.html" style="color:#fff;text-decoration:underline">click here</a>.</div>
 </body>
 </html>
