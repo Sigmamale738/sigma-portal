@@ -542,9 +542,9 @@
         const currentUser = localStorage.getItem('currentUser');
         const isAdmin = localStorage.getItem('isAdmin') === 'true' || currentUser === 'Sigma';
         
-        if (!currentUser) {
-            window.location.href = 'index.html';
-        }
+        //if (!currentUser) {
+            //window.location.href = 'index.html';
+        //}
 
         // Initialize user display
         document.getElementById('userName').textContent = currentUser;
