@@ -1,9 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta http-equiv="refresh" content="0; url=dashboard.html">
-<script>window.location.replace("dashboard.html");</script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Redirecting...</title>
+<style>
+  body {
+    margin: 0; height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: #fff; font-family: 'Poppins', sans-serif;
+    flex-direction: column; overflow: hidden;
+  }
+  .loader {
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 40px; height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+</style>
+<script>
+  // Prevent flicker: redirect after short delay once DOM loads
+  window.addEventListener('DOMContentLoaded', () => {
+    setTimeout(() => window.location.replace("dashboard.html"), 300);
+  });
+</script>
 </head>
 <body>
+  <div class="loader"></div>
+  <p>Loading your dashboard...</p>
 </body>
 </html>
