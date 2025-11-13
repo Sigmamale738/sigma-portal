@@ -32,6 +32,18 @@
     <h2>🚀 Get Started</h2>
     <p>Click below to enter our eBook dashboard, upload your books, and start reading instantly.</p>
     <a href="dashboard.html" class="button">Enter the Library 🚀</a>
+    <a href="dashboard.html" class="button" onclick="checkLogin(event)">Enter the Library 🚀</a>
+
+<script>
+function checkLogin(event) {
+  const user = localStorage.getItem('currentUser');
+  if (!user) {
+    event.preventDefault();
+    alert("Please log in or sign up first!");
+    window.location.href = "login.html"; // or your index.html login page
+  }
+}
+</script>
 
     <!-- AdSense ad block -->
     <ins class="adsbygoogle"
