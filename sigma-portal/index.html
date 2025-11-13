@@ -1,59 +1,142 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="google-adsense-account" content="ca-pub-5569376681314000">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="google-adsense-account" content="ca-pub-5569376681314000" />
+  <title>Sigma eBooks – Discover and Share eBooks</title>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5569376681314000" crossorigin="anonymous"></script>
-  <title>Sigma eBooks – Free eBook Sharing Platform</title>
-  <meta name="description" content="Sigma eBooks is an open community to upload, share, and download eBooks from around the world. Free cloud storage and instant access.">
   <style>
-    body { font-family: 'Segoe UI', sans-serif; background:#f8f9fa; color:#333; line-height:1.6; }
-    .container { max-width:800px; margin:60px auto; background:white; padding:40px; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.1); }
-    h1 { color:#667eea; }
-    a.button { display:inline-block; margin-top:20px; background:#667eea; color:white; padding:10px 25px; border-radius:6px; text-decoration:none; }
-    a.button:hover { background:#5a6fd8; }
-    footer { margin-top:50px; text-align:center; font-size:0.9em; color:#777; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #f7f8fc;
+      color: #333;
+    }
+    header {
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      color: white;
+      padding: 15px 30px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    header h1 { font-size: 1.5em; }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin-left: 20px;
+      font-weight: 500;
+    }
+    nav a:hover { text-decoration: underline; }
+    .container {
+      max-width: 1000px;
+      margin: 40px auto;
+      padding: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+    }
+    h2 { color: #667eea; margin-bottom: 10px; }
+    p { margin-bottom: 15px; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .book-card {
+      border: 1px solid #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      background: #fafafa;
+      transition: transform 0.3s;
+    }
+    .book-card:hover { transform: translateY(-4px); }
+    .book-card img { width: 100%; height: 260px; object-fit: cover; }
+    .book-card h3 { padding: 10px; font-size: 1em; color: #333; }
+    .button {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: white;
+      padding: 12px 25px;
+      border-radius: 8px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    .button:hover { opacity: 0.85; }
+    footer {
+      text-align: center;
+      padding: 30px;
+      font-size: 0.9em;
+      color: #555;
+    }
   </style>
 </head>
 <body>
+  <header>
+    <h1>📚 Sigma eBooks</h1>
+    <nav>
+      <a href="index.html">Home</a>
+      <a href="#" onclick="goToDashboard()">Dashboard</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy</a>
+    </nav>
+  </header>
+
   <div class="container">
-    <h1>📚 Welcome to Sigma eBooks</h1>
-    <p>At <strong>Sigma eBooks</strong>, we believe knowledge should be free and shared by everyone. 
-    Our global cloud-based platform lets users upload, discover, and download eBooks instantly — from any device.</p>
-
-    <h2>🌍 Why Sigma eBooks?</h2>
-    <ul>
-      <li>Unlimited free uploads and downloads</li>
-      <li>Community-driven book sharing</li>
-      <li>Secure cloud-based data system</li>
-      <li>Real-time messaging between readers</li>
-    </ul>
-
-    <h2>🚀 Get Started</h2>
-    <p>Click below to enter our eBook dashboard, upload your books, and start reading instantly.</p>
-    <a href="dashboard.html" class="button">Enter the Library 🚀</a>
-    <a href="dashboard.html" class="button" onclick="checkLogin(event)">Enter the Library 🚀</a>
-
-<script>
-function checkLogin(event) {
-  const user = localStorage.getItem('currentUser');
-  if (!user) {
-    event.preventDefault();
-    alert("Please log in or sign up first!");
-    window.location.href = "login.html"; // or your index.html login page
-  }
-}
-</script>
+    <h2>Explore Free eBooks</h2>
+    <p>Welcome to <strong>Sigma eBooks</strong> — an open platform where readers share, explore, and download free eBooks. Start your reading journey below or log in to access the full library.</p>
+    
+    <!-- Example static books -->
+    <div class="grid">
+      <div class="book-card">
+        <img src="https://images.unsplash.com/photo-1512820790803-83ca734da794" alt="Book Cover">
+        <h3>The Future of Knowledge</h3>
+      </div>
+      <div class="book-card">
+        <img src="https://images.unsplash.com/photo-1524995997946-a1c2e315a42f" alt="Book Cover">
+        <h3>Digital Libraries Revolution</h3>
+      </div>
+      <div class="book-card">
+        <img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93" alt="Book Cover">
+        <h3>World Classics Collection</h3>
+      </div>
+      <div class="book-card">
+        <img src="https://images.unsplash.com/photo-1544717305-2782549b5136" alt="Book Cover">
+        <h3>Learning Never Ends</h3>
+      </div>
+    </div>
 
     <!-- AdSense ad block -->
     <ins class="adsbygoogle"
-         style="display:block; margin:30px 0;"
+         style="display:block; margin:40px 0;"
          data-ad-format="auto"
          data-ad-client="ca-pub-5569376681314000"
-         data-ad-slot="6740069711"></ins>
+         data-ad-slot="1234567890"></ins>
     <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
 
-    <footer>© 2025 Sigma eBooks – Free cloud-based eBook sharing platform.</footer>
+    <div style="text-align:center; margin-top:40px;">
+      <a href="login.html" class="button">Login / Sign Up</a>
+      <a href="dashboard.html" class="button" onclick="goToDashboard()">Enter Library 🚀</a>
+    </div>
   </div>
+
+  <footer>
+    © 2025 Sigma eBooks — Open-source cloud-based eBook platform for readers worldwide.
+  </footer>
+
+  <script>
+    function goToDashboard() {
+      const currentUser = localStorage.getItem('currentUser');
+      if (!currentUser) {
+        alert("Please log in or sign up first!");
+        window.location.href = "login.html";
+      } else {
+        window.location.href = "dashboard.html";
+      }
+    }
+  </script>
 </body>
 </html>
