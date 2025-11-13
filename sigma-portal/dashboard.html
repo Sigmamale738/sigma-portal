@@ -541,15 +541,7 @@
         
         const currentUser = localStorage.getItem('currentUser');
         const isAdmin = localStorage.getItem('isAdmin') === 'true' || currentUser === 'Sigma';
-const currentUser = localStorage.getItem('currentUser');
-const isAdmin = localStorage.getItem('isAdmin') === 'true' || currentUser === 'Sigma';
 
-// Allow Google crawler but not random users
-const isGoogleBot = /googlebot/i.test(navigator.userAgent);
-
-if (!currentUser && !isGoogleBot) {
-  window.location.href = 'index.html';
-}
 
 
         
