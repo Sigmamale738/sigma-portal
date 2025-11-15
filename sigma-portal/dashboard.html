@@ -583,6 +583,20 @@ if (!currentUser && !isGoogleBot) {
 
 
 
+auth.onAuthStateChanged(user => {
+    const isGoogleBot = /googlebot/i.test(navigator.userAgent);
+
+    if (!user && !isGoogleBot) {
+        window.location.replace("index.html");
+        return;
+    }
+
+    // Allow clicking buttons now
+    document.body.style.pointerEvents = "auto";
+});
+
+
+
 
 
 
