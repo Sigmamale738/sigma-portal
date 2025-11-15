@@ -541,13 +541,35 @@
         
         const currentUser = localStorage.getItem('currentUser');
         const isAdmin = localStorage.getItem('isAdmin') === 'true' || currentUser === 'Sigma';
-
-
-
-        
+     
         //if (!currentUser) {
             //window.location.href = 'index.html';
         //}
+
+
+
+
+
+
+
+// ============ USER ACCESS CONTROL ============
+
+// Real user from localStorage
+const currentUser = localStorage.getItem('currentUser');
+
+// Detect Googlebot (AdSense crawler)
+const isGoogleBot = /googlebot/i.test(navigator.userAgent);
+
+// If NOT logged in AND NOT Googlebot → send to homepage
+if (!currentUser && !isGoogleBot) {
+    window.location.replace('index.html');
+}
+
+
+
+
+
+
 
 
 
@@ -557,8 +579,6 @@ const isGoogleBot = /googlebot/i.test(navigator.userAgent);
 if (!currentUser && !isGoogleBot) {
     window.location.href = 'index.html';
 }
-
-
 
 
         // Initialize user display
