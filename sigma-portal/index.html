@@ -135,7 +135,7 @@
       const currentUser = localStorage.getItem('currentUser');
       if (!currentUser) {
         alert("Please log in or sign up first!");
-        window.location.href = "login.html";
+        window.location.replace('index.html');
       } else {
         window.location.href = "dashboard.html";
       }
